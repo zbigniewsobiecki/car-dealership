@@ -1,0 +1,20 @@
+layer: "api"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/routes"
+  type: "directory"
+  analyzed_at: "2026-01-09T18:59:20.006Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "Express route definitions for the API."
+  responsibility: "Defines the API endpoint structure, maps paths to controller actions, and applies
+    necessary middleware (authentication, validation, rate limiting) to specific route groups."
+contents:
+  - name: "auth.routes.ts"
+    summary: "Endpoints for login, registration, and token management"
+  - name: "customers.routes.ts"
+    summary: "RESTful endpoints for customer management"
+  - name: "sales.routes.ts"
+    summary: "Endpoints for transactions and sales analytics"
+  - name: "vehicles.routes.ts"
+    summary: "Endpoints for inventory browsing and management"

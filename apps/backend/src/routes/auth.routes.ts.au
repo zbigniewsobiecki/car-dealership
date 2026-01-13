@@ -1,0 +1,23 @@
+layer: "api"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/routes/auth.routes.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:51:51.609Z"
+  analyzed_hash: "95a970326bdeafd64aeebab117ebe538"
+understanding:
+  summary: "Route definitions for authentication."
+  purpose: "Exposes auth endpoints and applies RBAC/Authentication middleware where necessary."
+  exports:
+    - name: "default"
+      kind: "const"
+      description: "Express Router for auth paths"
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/controllers/auth.controller.ts"
+      symbols:
+        - "authController"
+    - ref: "au:apps/backend/src/middleware/auth.middleware.ts"
+      symbols:
+        - "authenticateToken"
+        - "requireRole"

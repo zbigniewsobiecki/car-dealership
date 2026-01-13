@@ -1,0 +1,14 @@
+layer: "shared"
+meta:
+  au: "1.0"
+  id: "au:packages/shared-types/src/enums/roles.enum.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:49:52.561Z"
+  analyzed_hash: "f4b418afd7110a08ddb3e989780095d0"
+understanding:
+  summary: "User role enumerations (Admin, Salesperson)."
+  purpose: "Ensures consistent role naming across frontend and backend for RBAC."
+  exports:
+    - name: "UserRole"
+      kind: "enum"
+      description: "Available user roles (ADMIN, SALESPERSON)"

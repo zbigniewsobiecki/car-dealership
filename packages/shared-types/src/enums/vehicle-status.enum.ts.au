@@ -1,0 +1,17 @@
+layer: "shared"
+meta:
+  au: "1.0"
+  id: "au:packages/shared-types/src/enums/vehicle-status.enum.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:49:54.735Z"
+  analyzed_hash: "6e26b15b30c089604685fc21cf926588"
+understanding:
+  summary: "Vehicle status and condition enumerations."
+  purpose: "Standardizes the condition and availability statuses of vehicles."
+  exports:
+    - name: "VehicleStatus"
+      kind: "enum"
+      description: "Availability status (AVAILABLE, SOLD, etc.)"
+    - name: "VehicleCondition"
+      kind: "enum"
+      description: "Condition categories (NEW, USED, etc.)"

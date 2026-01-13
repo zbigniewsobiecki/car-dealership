@@ -1,0 +1,19 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/components/customers/CustomerCard.tsx"
+  type: "file"
+  analyzed_at: "2026-01-09T18:00:09.986Z"
+  analyzed_hash: "35f2babaef9e54844638662696a426b1"
+understanding:
+  summary: "Display card for customer information."
+  purpose: "Present a summary of customer data with actions to edit or delete."
+  exports:
+    - name: "CustomerCard"
+      kind: "component"
+      description: "Customer display card"
+relationships:
+  depends_on:
+    - ref: "au:packages/shared-types/src/index.ts"
+      symbols:
+        - "Customer"

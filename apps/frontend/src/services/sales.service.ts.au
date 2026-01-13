@@ -1,0 +1,24 @@
+layer: "service"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/services/sales.service.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:54:37.933Z"
+  analyzed_hash: "52051489b7b396bd7dccd3af0c9ec060"
+understanding:
+  summary: "Service for sales and statistics API calls."
+  purpose: "Provides methods for managing sales transactions and fetching analytics data."
+  exports:
+    - name: "salesService"
+      kind: "const"
+      description: "Object containing sales CRUD and stats methods"
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/services/api.ts"
+      symbols:
+        - "default"
+    - ref: "au:packages/shared-types/src/index.ts"
+      symbols:
+        - "Sale"
+        - "CreateSaleDto"
+        - "UpdateSaleDto"

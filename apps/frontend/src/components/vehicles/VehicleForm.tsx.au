@@ -1,0 +1,14 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/components/vehicles/VehicleForm.tsx"
+  type: "file"
+  analyzed_at: "2026-01-09T18:00:19.409Z"
+  analyzed_hash: "7d17aed44ff0f2d6bb21247de9d82d02"
+understanding:
+  summary: "Modal form for vehicle inventory management."
+  purpose: "Comprehensive form for entering vehicle specifications and status updates."
+  exports:
+    - name: "VehicleForm"
+      kind: "component"
+      description: "Vehicle input form"

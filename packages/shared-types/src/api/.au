@@ -1,0 +1,15 @@
+layer: "shared"
+meta:
+  au: "1.0"
+  id: "au:packages/shared-types/src/api"
+  type: "directory"
+  analyzed_at: "2026-01-09T17:49:43.066Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "Types defining the interface between the frontend and backend."
+  responsibility: "Encapsulating request and response structures for standardized API communication."
+contents:
+  - name: "requests.types.ts"
+    summary: "Interfaces for data sent to the backend"
+  - name: "responses.types.ts"
+    summary: "Interfaces for data received from the backend"

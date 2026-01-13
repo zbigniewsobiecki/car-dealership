@@ -1,0 +1,18 @@
+layer: "infrastructure"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/services/api.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:54:31.041Z"
+  analyzed_hash: "51dfd166e5507e35384f044576ae1953"
+understanding:
+  summary: "Axios instance configuration with interceptors for authentication."
+  purpose: "Centralizes API communication logic, automatically handling JWT attachment and transparent
+    token refreshing."
+  exports:
+    - name: "default"
+      kind: "const"
+      description: "Configured Axios instance"
+  key_logic: "Request interceptor: Attaches Bearer token from localStorage. Response interceptor: On
+    401 error, attempts to POST to /auth/refresh with refreshToken. If successful, retries the
+    original request; if fails, redirects to /login."

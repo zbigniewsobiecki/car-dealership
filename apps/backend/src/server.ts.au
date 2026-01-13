@@ -1,0 +1,23 @@
+layer: "infrastructure"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/server.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:50:01.828Z"
+  analyzed_hash: "eab1c9b777464a9043e3163bdf92df0c"
+understanding:
+  summary: "Entry point for the backend API server."
+  purpose: "Initializes the database connection, starts the Express server, and handles process
+    lifecycle events (graceful shutdown)."
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/app.ts"
+      symbols:
+        - "app"
+    - ref: "au:apps/backend/src/config/env.ts"
+      symbols:
+        - "env"
+    - ref: "au:apps/backend/src/models/db.ts"
+      symbols:
+        - "dbUtils"
+      nature: "Database connection testing"

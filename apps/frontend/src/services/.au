@@ -1,0 +1,15 @@
+layer: "service"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/services"
+  type: "directory"
+  analyzed_at: "2026-01-09T17:54:41.845Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "API communication services for the frontend."
+  responsibility: "Abstracting API endpoints and providing typed methods for data fetching and mutation."
+contents:
+  - name: "api.ts"
+    summary: "Axios configuration and interceptors"
+  - name: "auth.service.ts"
+    summary: "Auth API wrapper"

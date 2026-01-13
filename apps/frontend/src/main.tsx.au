@@ -1,0 +1,18 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/main.tsx"
+  type: "file"
+  analyzed_at: "2026-01-09T17:56:26.737Z"
+  analyzed_hash: "3d969effef57185247e7b9699569d226"
+understanding:
+  summary: "Frontend application entry point."
+  purpose: "Renders the root React component into the DOM and provides global providers (QueryClient)."
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/App.tsx"
+      symbols:
+        - "default"
+    - ref: "au:apps/frontend/src/index.css"
+      symbols: []
+      nature: "Global styles"

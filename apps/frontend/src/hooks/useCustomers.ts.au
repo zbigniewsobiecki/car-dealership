@@ -1,0 +1,22 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/hooks/useCustomers.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:55:18.216Z"
+  analyzed_hash: "6452ec7d962a731b351742e89300950b"
+understanding:
+  summary: "React Query hooks for customer data management."
+  purpose: "Provides declarative data fetching, caching, and mutation logic for customers."
+  exports:
+    - name: "useCustomers"
+      kind: "function"
+      description: "Hook to fetch all customers"
+    - name: "useCreateCustomer"
+      kind: "function"
+      description: "Mutation hook to create a customer and invalidate list query"
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/services/customers.service.ts"
+      symbols:
+        - "customersService"

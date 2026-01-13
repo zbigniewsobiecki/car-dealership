@@ -1,0 +1,23 @@
+layer: "service"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/services/auth.service.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:54:33.316Z"
+  analyzed_hash: "7f448b9ba684f59ebd2f4a982461ce11"
+understanding:
+  summary: "Service for authentication-related API calls."
+  purpose: "Wraps login and session retrieval API calls."
+  exports:
+    - name: "authService"
+      kind: "const"
+      description: "Object containing login, getMe, and logout methods"
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/services/api.ts"
+      symbols:
+        - "default"
+    - ref: "au:packages/shared-types/src/index.ts"
+      symbols:
+        - "AuthResponse"
+        - "LoginRequest"

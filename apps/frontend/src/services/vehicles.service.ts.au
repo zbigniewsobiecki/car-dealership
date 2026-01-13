@@ -1,0 +1,25 @@
+layer: "service"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/services/vehicles.service.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:54:40.191Z"
+  analyzed_hash: "2bb2af20eee81962c7b5c37c226d9725"
+understanding:
+  summary: "Service for vehicle inventory API calls."
+  purpose: "Provides methods for browsing, filtering, and managing vehicle inventory."
+  exports:
+    - name: "vehiclesService"
+      kind: "const"
+      description: "Object containing vehicle management and statistics methods"
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/services/api.ts"
+      symbols:
+        - "default"
+    - ref: "au:packages/shared-types/src/index.ts"
+      symbols:
+        - "Vehicle"
+        - "CreateVehicleDto"
+        - "UpdateVehicleDto"
+        - "VehicleFilters"

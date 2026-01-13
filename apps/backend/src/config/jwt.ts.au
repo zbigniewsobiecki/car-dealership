@@ -1,0 +1,19 @@
+layer: "config"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/config/jwt.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:50:09.410Z"
+  analyzed_hash: "f5295831b8d4109404255dfe65be1f38"
+understanding:
+  summary: "JWT-specific configuration constants."
+  purpose: "Provides a scoped configuration object specifically for JWT authentication logic."
+  exports:
+    - name: "jwtConfig"
+      kind: "const"
+      description: "JWT secrets and expiration settings"
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/config/env.ts"
+      symbols:
+        - "env"

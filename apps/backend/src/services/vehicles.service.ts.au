@@ -1,0 +1,29 @@
+layer: "service"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/services/vehicles.service.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T19:00:34.601Z"
+  analyzed_hash: "8a57aab22d9f662dedfa9dd7cf6a531c"
+understanding:
+  summary: "Business logic for vehicle inventory management."
+  purpose: "Manages vehicle lifecycle, ensures VIN uniqueness, and provides inventory statistics."
+  exports:
+    - name: "vehiclesService"
+      kind: "const"
+      description: "Methods for vehicle management and stats"
+  key_logic:
+    Validation: "Ensures VIN is unique when creating or updating vehicles."
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/models/Vehicle.model.ts"
+      symbols:
+        - "VehicleModel"
+    - ref: "au:apps/backend/src/middleware/errorHandler.middleware.ts"
+      symbols:
+        - "AppError"
+    - ref: "au:packages/shared-types"
+      symbols:
+        - "CreateVehicleDto"
+        - "UpdateVehicleDto"
+        - "VehicleFilters"

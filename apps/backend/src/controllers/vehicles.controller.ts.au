@@ -1,0 +1,20 @@
+layer: "api"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/controllers/vehicles.controller.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:51:48.318Z"
+  analyzed_hash: "1621c61779219a62e568fc4849569e3d"
+understanding:
+  summary: "HTTP controller for vehicle inventory endpoints."
+  purpose: "Parses query parameters for filtering and delegates vehicle inventory operations to the
+    service layer."
+  exports:
+    - name: "vehiclesController"
+      kind: "const"
+      description: "Request handlers for vehicle routes"
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/services/vehicles.service.ts"
+      symbols:
+        - "vehiclesService"

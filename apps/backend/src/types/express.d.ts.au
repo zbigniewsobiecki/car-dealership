@@ -1,0 +1,16 @@
+layer: "infrastructure"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/types/express.d.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:54:07.943Z"
+  analyzed_hash: "141b83faf06956aa850f210d0a8496a3"
+understanding:
+  summary: "Type augmentation for Express Request object."
+  purpose: "Adds the 'user' property to the Express Request interface to provide type safety for the
+    authenticated user data attached by the auth middleware."
+relationships:
+  depends_on:
+    - ref: "au:packages/shared-types/src/enums/roles.enum.ts"
+      symbols:
+        - "UserRole"

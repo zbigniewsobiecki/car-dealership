@@ -1,0 +1,28 @@
+layer: "repository"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/models/db.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T19:00:32.471Z"
+  analyzed_hash: "663c8f275e234e88943a9bfab051f5b5"
+understanding:
+  summary: "Re-exports database pool and provides utility functions for connection testing and schema
+    checks."
+  purpose: "Centralizes database access and provides lifecycle/diagnostic utilities for the server
+    entry point and other models."
+  exports:
+    - name: "pool"
+      kind: "const"
+      description: "pg.Pool instance re-exported from config"
+    - name: "query"
+      kind: "const"
+      description: "Query helper function re-exported from config"
+    - name: "dbUtils"
+      kind: "const"
+      description: "Diagnostic utilities for database connection and schema verification"
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/config/database.ts"
+      symbols:
+        - "pool"
+        - "query"

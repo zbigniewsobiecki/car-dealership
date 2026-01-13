@@ -1,0 +1,40 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/App.tsx"
+  type: "file"
+  analyzed_at: "2026-01-09T17:56:29.911Z"
+  analyzed_hash: "1a3d7cd4088e713a2c0aa77c3a60b578"
+understanding:
+  summary: "Root application component with routing and authentication logic."
+  purpose: "Defines the application's route structure and handles the initial authentication check."
+  exports:
+    - name: "default"
+      kind: "component"
+      description: "The main application component containing the router"
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/store/authStore.ts"
+      symbols:
+        - "useAuthStore"
+    - ref: "au:apps/frontend/src/pages/Login.tsx"
+      symbols:
+        - "Login"
+    - ref: "au:apps/frontend/src/pages/Dashboard.tsx"
+      symbols:
+        - "Dashboard"
+    - ref: "au:apps/frontend/src/pages/Vehicles.tsx"
+      symbols:
+        - "Vehicles"
+    - ref: "au:apps/frontend/src/pages/Customers.tsx"
+      symbols:
+        - "Customers"
+    - ref: "au:apps/frontend/src/pages/Sales.tsx"
+      symbols:
+        - "Sales"
+    - ref: "au:apps/frontend/src/components/auth/ProtectedRoute.tsx"
+      symbols:
+        - "ProtectedRoute"
+    - ref: "au:apps/frontend/src/components/layout/Layout.tsx"
+      symbols:
+        - "Layout"

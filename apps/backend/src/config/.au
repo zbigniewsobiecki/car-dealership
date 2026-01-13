@@ -1,0 +1,18 @@
+layer: "config"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/config"
+  type: "directory"
+  analyzed_at: "2026-01-09T18:58:13.307Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "Configuration files for the backend application."
+  responsibility: "Centralizes application settings, environment variables, and connection pools for
+    external services like the database."
+contents:
+  - name: "database.ts"
+    summary: "PostgreSQL connection pool setup"
+  - name: "env.ts"
+    summary: "Environment variable parsing and defaults"
+  - name: "jwt.ts"
+    summary: "JWT-specific settings"

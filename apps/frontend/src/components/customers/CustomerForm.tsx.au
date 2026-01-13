@@ -1,0 +1,16 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/components/customers/CustomerForm.tsx"
+  type: "file"
+  analyzed_at: "2026-01-09T18:00:11.952Z"
+  analyzed_hash: "24d2e7712cfd786790c6684d87daab9c"
+understanding:
+  summary: "Modal form for creating and editing customers."
+  purpose: "Provides a unified interface for inputting customer data with validation."
+  exports:
+    - name: "CustomerForm"
+      kind: "component"
+      description: "Customer input form"
+  key_logic: "Uses react-hook-form for state management and validation. Prefills with existing
+    customer data when in edit mode."

@@ -1,0 +1,28 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/pages/Sales.tsx"
+  type: "file"
+  analyzed_at: "2026-01-09T17:57:50.751Z"
+  analyzed_hash: "d06db81de786ee84f7d55ca74dfb799c"
+understanding:
+  summary: "Sales transaction management page."
+  purpose: "Displays sales history and provides UI for creating and managing car sales transactions."
+  exports:
+    - name: "Sales"
+      kind: "component"
+      description: "Sales management view"
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/hooks/useSales.ts"
+      symbols:
+        - "useSales"
+        - "useCreateSale"
+        - "useUpdateSale"
+        - "useDeleteSale"
+    - ref: "au:apps/frontend/src/components/sales/SaleCard.tsx"
+      symbols:
+        - "SaleCard"
+    - ref: "au:apps/frontend/src/components/sales/SaleForm.tsx"
+      symbols:
+        - "SaleForm"

@@ -1,0 +1,10 @@
+layer: "shared"
+meta:
+  au: "1.0"
+  id: "au:packages/shared-types/src/enums"
+  type: "directory"
+  analyzed_at: "2026-01-09T17:49:44.857Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "Shared constants and enumerations."
+  responsibility: "Providing type-safe constants for statuses, roles, and other fixed categories."

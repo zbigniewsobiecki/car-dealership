@@ -1,0 +1,19 @@
+layer: "api"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/controllers"
+  type: "directory"
+  analyzed_at: "2026-01-09T18:58:13.972Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "API controllers for the backend."
+  responsibility: "Handling HTTP request/response lifecycle, input parsing, and delegating to services."
+contents:
+  - name: "auth.controller.ts"
+    summary: "Authentication and session management handlers"
+  - name: "customers.controller.ts"
+    summary: "Customer CRUD and relationship handlers"
+  - name: "sales.controller.ts"
+    summary: "Transaction and analytics handlers"
+  - name: "vehicles.controller.ts"
+    summary: "Inventory management and search handlers"

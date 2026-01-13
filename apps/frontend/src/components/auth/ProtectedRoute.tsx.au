@@ -1,0 +1,24 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/components/auth/ProtectedRoute.tsx"
+  type: "file"
+  analyzed_at: "2026-01-09T17:56:55.636Z"
+  analyzed_hash: "ed4ba4f48be3db05285de3d77c2cb695"
+understanding:
+  summary: "Route guard component for protecting authenticated routes."
+  purpose: "Redirects unauthenticated users to the login page while allowing authenticated users to
+    access nested routes via Outlet."
+  exports:
+    - name: "ProtectedRoute"
+      kind: "component"
+      description: "Auth guard component"
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/store/authStore.ts"
+      symbols:
+        - "useAuthStore"
+    - ref: "au:apps/frontend/src/components/layout/Layout.tsx"
+      symbols:
+        - "Layout"
+      nature: "Nested routing context"

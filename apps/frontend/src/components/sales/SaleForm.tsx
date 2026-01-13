@@ -1,0 +1,198 @@
+import { useForm } from 'react-hook-form';
+import { Sale, CreateSaleDto, SaleStatus, VehicleStatus } from '@car-dealership/shared-types';
+import { useVehicles } from '../../hooks/useVehicles';
+import { useCustomers } from '../../hooks/useCustomers';
+import { useAuthStore } from '../../store/authStore';
+import { X } from 'lucide-react';
+
+interface SaleFormProps {
+  sale?: Sale;
+  onSubmit: (data: CreateSaleDto) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
+
+export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps) => {
+  const user = useAuthStore((state) => state.user);
+  const { data: vehicles } = useVehicles();
+  const { data: customers } = useCustomers();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateSaleDto>({
+    defaultValues: sale || {
+      salespersonId: user?.id,
+      saleDate: new Date().toISOString().split('T')[0],
+      status: SaleStatus.PENDING,
+    },
+  });
+
+  // Filter available vehicles for new sales
+  const availableVehicles = vehicles?.filter(
+    (v) =>
+      v.status === VehicleStatus.AVAILABLE ||
+      (sale && v.id === sale.vehicleId)
+  );
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900">
+            {sale ? 'Edit Sale' : 'New Sale'}
+          </h2>
+          <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label">Vehicle *</label>
+              <select
+                {...register('vehicleId', { required: 'Vehicle is required' })}
+                className="input"
+              >
+                <option value="">Select vehicle</option>
+                {availableVehicles?.map((vehicle) => (
+                  <option key={vehicle.id} value={vehicle.id}>
+                    {vehicle.year} {vehicle.make} {vehicle.model} - ${vehicle.price}
+                  </option>
+                ))}
+              </select>
+              {errors.vehicleId && (
+                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="label">Customer *</label>
+              <select
+                {...register('customerId', { required: 'Customer is required' })}
+                className="input"
+              >
+                <option value="">Select customer</option>
+                {customers?.map((customer) => (
+                  <option key={customer.id} value={customer.id}>
+                    {customer.firstName} {customer.lastName}
+                  </option>
+                ))}
+              </select>
+              {errors.customerId && (
+                <p className="text-red-600 text-sm mt-1">{errors.customerId.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="label">Sale Price *</label>
+              <input
+                type="number"
+                step="0.01"
+                {...register('salePrice', {
+                  required: 'Sale price is required',
+                  valueAsNumber: true,
+                })}
+                className="input"
+                placeholder="28000.00"
+              />
+              {errors.salePrice && (
+                <p className="text-red-600 text-sm mt-1">{errors.salePrice.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="label">Sale Date *</label>
+              <input
+                type="date"
+                {...register('saleDate', { required: 'Sale date is required' })}
+                className="input"
+              />
+              {errors.saleDate && (
+                <p className="text-red-600 text-sm mt-1">{errors.saleDate.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="label">Payment Method</label>
+              <select {...register('paymentMethod')} className="input">
+                <option value="">Select payment method</option>
+                <option value="Cash">Cash</option>
+                <option value="Financing">Financing</option>
+                <option value="Lease">Lease</option>
+                <option value="Check">Check</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="label">Status *</label>
+              <select {...register('status')} className="input">
+                <option value={SaleStatus.PENDING}>Pending</option>
+                <option value={SaleStatus.COMPLETED}>Completed</option>
+                <option value={SaleStatus.CANCELLED}>Cancelled</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="label">Down Payment</label>
+              <input
+                type="number"
+                step="0.01"
+                {...register('downPayment', { valueAsNumber: true })}
+                className="input"
+                placeholder="5000.00"
+              />
+            </div>
+
+            <div>
+              <label className="label">Trade-In Value</label>
+              <input
+                type="number"
+                step="0.01"
+                {...register('tradeInValue', { valueAsNumber: true })}
+                className="input"
+                placeholder="3000.00"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="label">Trade-In Vehicle</label>
+            <input
+              {...register('tradeInVehicle')}
+              className="input"
+              placeholder="2015 Honda Civic"
+            />
+          </div>
+
+          <div>
+            <label className="label">Notes</label>
+            <textarea
+              {...register('notes')}
+              className="input"
+              rows={3}
+              placeholder="Additional notes about the sale..."
+            />
+          </div>
+
+          <input type="hidden" {...register('salespersonId')} />
+
+          <div className="flex space-x-3 pt-4">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="flex-1 btn btn-primary disabled:opacity-50"
+            >
+              {isLoading ? 'Saving...' : sale ? 'Update Sale' : 'Create Sale'}
+            </button>
+            <button type="button" onClick={onCancel} className="flex-1 btn btn-secondary">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};

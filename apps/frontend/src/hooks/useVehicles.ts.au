@@ -1,0 +1,37 @@
+layer: "frontend"
+meta:
+  au: "1.0"
+  id: "au:apps/frontend/src/hooks/useVehicles.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T18:57:48.996Z"
+  analyzed_hash: "c08bfc9d43844be3b50dcc30d5109794"
+understanding:
+  summary: "React Query hooks for vehicle inventory management."
+  purpose: "Handles vehicle listing (with filters), detail retrieval, and inventory mutations."
+  exports:
+    - name: "useVehicles"
+      kind: "function"
+      description: "Fetches vehicle inventory list with optional filters"
+    - name: "useVehicle"
+      kind: "function"
+      description: "Fetches details for a specific vehicle by ID"
+    - name: "useCreateVehicle"
+      kind: "function"
+      description: "Mutation to add a new vehicle to inventory"
+    - name: "useUpdateVehicle"
+      kind: "function"
+      description: "Mutation to update an existing vehicle"
+    - name: "useDeleteVehicle"
+      kind: "function"
+      description: "Mutation to remove a vehicle from inventory"
+    - name: "useVehicleStats"
+      kind: "function"
+      description: "Fetches inventory valuation and status statistics"
+  key_logic: "Uses React Query to provide cached access to vehicle data. Mutations include cache
+    invalidation for the 'vehicles' query key to trigger automatic UI updates when the inventory
+    changes."
+relationships:
+  depends_on:
+    - ref: "au:apps/frontend/src/services/vehicles.service.ts"
+      symbols:
+        - "vehiclesService"

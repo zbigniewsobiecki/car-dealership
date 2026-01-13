@@ -1,0 +1,21 @@
+layer: "repository"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/models"
+  type: "directory"
+  analyzed_at: "2026-01-09T18:59:00.264Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "Data access layer for the backend."
+  responsibility: "Direct communication with the PostgreSQL database, mapping rows to TypeScript entities."
+contents:
+  - name: "Customer.model.ts"
+    summary: "Persistence for customer entities"
+  - name: "db.ts"
+    summary: "Database query utilities and diagnostics"
+  - name: "Sale.model.ts"
+    summary: "Persistence and reporting for sales transactions"
+  - name: "User.model.ts"
+    summary: "Persistence for user management"
+  - name: "Vehicle.model.ts"
+    summary: "Persistence and filtering for inventory"

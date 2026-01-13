@@ -1,0 +1,25 @@
+layer: "repository"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/models/Sale.model.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T18:55:44.279Z"
+  analyzed_hash: "03cf1477eaf208862eb76ce3364f44df"
+understanding:
+  summary: "Data access object for sales transactions and reporting."
+  purpose: "Manages sales records and provides aggregation queries for sales statistics and monthly
+    reporting."
+  exports:
+    - name: "SaleModel"
+      kind: "const"
+      description: "Database operations and statistics for Sales"
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/models/db.ts"
+      symbols:
+        - "query"
+    - ref: "au:packages/shared-types"
+      symbols:
+        - "Sale"
+        - "CreateSaleDto"
+        - "UpdateSaleDto"

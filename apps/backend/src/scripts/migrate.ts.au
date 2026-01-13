@@ -1,0 +1,18 @@
+layer: "database"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/scripts/migrate.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:53:21.635Z"
+  analyzed_hash: "5f277c5fc1cf80f4067a2bfc8ceb43a0"
+understanding:
+  summary: "Database migration script to create tables, indexes, and triggers."
+  purpose: "Sets up the initial PostgreSQL database schema and required triggers for automated timestamps."
+  key_logic: "Executes a series of SQL CREATE TABLE, CREATE INDEX, and CREATE TRIGGER statements. Uses
+    'IF NOT EXISTS' to be idempotent."
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/models/db.ts"
+      symbols:
+        - "pool"
+        - "query"

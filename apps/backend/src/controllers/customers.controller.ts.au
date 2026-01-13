@@ -1,0 +1,20 @@
+layer: "api"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/controllers/customers.controller.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:51:44.699Z"
+  analyzed_hash: "34bfeb15c5f1b3dac7d2a6755a2f5fde"
+understanding:
+  summary: "HTTP controller for customer management endpoints."
+  purpose: "Handles customer-related API requests, including retrieving related sales for a specific
+    customer."
+  exports:
+    - name: "customersController"
+      kind: "const"
+      description: "Request handlers for customer routes"
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/services/customers.service.ts"
+      symbols:
+        - "customersService"

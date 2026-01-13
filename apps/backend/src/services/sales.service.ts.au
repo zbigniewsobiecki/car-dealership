@@ -1,0 +1,38 @@
+layer: "service"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/services/sales.service.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T19:00:33.790Z"
+  analyzed_hash: "b779bbbb1b403f0a25222495dd8dbcac"
+understanding:
+  summary: "Business logic for processing car sales and transactions."
+  purpose: "Handles sale creation, updates, and deletion while maintaining referential integrity and
+    updating vehicle inventory status."
+  exports:
+    - name: "salesService"
+      kind: "const"
+      description: "Methods for sales management and statistics"
+  key_logic:
+    Transitions: "When a sale status changes to COMPLETED, the associated vehicle is marked as SOLD. If
+      a completed sale is cancelled or deleted, the vehicle status is reverted to AVAILABLE."
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/models/Sale.model.ts"
+      symbols:
+        - "SaleModel"
+    - ref: "au:apps/backend/src/models/Vehicle.model.ts"
+      symbols:
+        - "VehicleModel"
+    - ref: "au:apps/backend/src/models/Customer.model.ts"
+      symbols:
+        - "CustomerModel"
+    - ref: "au:apps/backend/src/middleware/errorHandler.middleware.ts"
+      symbols:
+        - "AppError"
+    - ref: "au:packages/shared-types"
+      symbols:
+        - "CreateSaleDto"
+        - "UpdateSaleDto"
+        - "VehicleStatus"
+        - "SaleStatus"

@@ -1,0 +1,15 @@
+layer: "infrastructure"
+meta:
+  au: "1.0"
+  id: "au:apps"
+  type: "directory"
+  analyzed_at: "2026-01-09T17:49:14.639Z"
+  analyzed_hash: "d41d8cd98f00b204e9800998ecf8427e"
+understanding:
+  summary: "Contains the main applications of the system."
+  responsibility: "Hosting the deployable units: the backend API and the frontend user interface."
+contents:
+  - name: "backend"
+    summary: "Express.js API server for the dealership system"
+  - name: "frontend"
+    summary: "Vite-powered React application for the dealership dashboard"

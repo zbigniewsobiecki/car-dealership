@@ -1,0 +1,18 @@
+layer: "database"
+meta:
+  au: "1.0"
+  id: "au:apps/backend/src/scripts/seed.ts"
+  type: "file"
+  analyzed_at: "2026-01-09T17:53:23.386Z"
+  analyzed_hash: "183a391081f718bfb967b54f78d91ac3"
+understanding:
+  summary: "Database seeding script to populate the database with sample data."
+  purpose: "Provides a set of initial users, customers, vehicles, and sales for development and testing."
+  key_logic: "Hashes passwords using bcrypt, inserts related records across multiple tables (users,
+    customers, vehicles, sales), and updates vehicle statuses to match sales."
+relationships:
+  depends_on:
+    - ref: "au:apps/backend/src/models/db.ts"
+      symbols:
+        - "pool"
+        - "query"
