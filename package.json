@@ -11,7 +11,12 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "type-check": "turbo run type-check"
+    "type-check": "turbo run type-check",
+    "test": "turbo run test:unit test:integration",
+    "test:unit": "turbo run test:unit",
+    "test:integration": "turbo run test:integration",
+    "test:coverage": "turbo run test:coverage",
+    "test:e2e": "pnpm --filter @car-dealership/frontend test:e2e"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

@@ -55,3 +55,7 @@ Thumbs.db
 # Secrets
 *.pem
 *.key
+
+# Debug directories
+.sysml.debug
+.au.debug

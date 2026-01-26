@@ -1,0 +1,210 @@
+{
+  "version": 2,
+  "discoveredAt": "2026-01-26T14:20:00.000Z",
+  "project": {
+    "name": "car-dealership-app",
+    "primaryLanguage": "typescript",
+    "framework": "express+react",
+    "architectureStyle": "monorepo"
+  },
+  "directories": [
+    {
+      "path": "apps/backend/src/controllers",
+      "purpose": "API request handlers and routing logic",
+      "cycles": {
+        "cycle4": {
+          "patterns": [
+            "*.controller.ts"
+          ],
+          "reason": "Business logic and operation definitions"
+        }
+      }
+    },
+    {
+      "path": "apps/backend/src/models",
+      "purpose": "Database models and data access logic",
+      "cycles": {
+        "cycle3": {
+          "patterns": [
+            "*.model.ts",
+            "db.ts"
+          ],
+          "reason": "Data entity definitions and database connection"
+        }
+      }
+    },
+    {
+      "path": "apps/backend/src/services",
+      "purpose": "Core business logic services",
+      "cycles": {
+        "cycle4": {
+          "patterns": [
+            "*.service.ts"
+          ],
+          "reason": "Behavioral logic and service operations"
+        }
+      }
+    },
+    {
+      "path": "apps/frontend/src/pages",
+      "purpose": "Frontend view components and page structure",
+      "cycles": {
+        "cycle2": {
+          "patterns": [
+            "*.tsx"
+          ],
+          "reason": "System structure and UI decomposition"
+        }
+      }
+    },
+    {
+      "path": "apps/frontend/src/services",
+      "purpose": "Frontend API clients and data services",
+      "cycles": {
+        "cycle4": {
+          "patterns": [
+            "*.ts"
+          ],
+          "reason": "Client-side behavioral logic"
+        }
+      }
+    },
+    {
+      "path": "packages/shared-types/src/entities",
+      "purpose": "Shared domain entity type definitions",
+      "cycles": {
+        "cycle3": {
+          "patterns": [
+            "*.types.ts"
+          ],
+          "reason": "Canonical domain model definitions"
+        }
+      }
+    },
+    {
+      "path": "apps/frontend/src/components",
+      "purpose": "Reusable UI components",
+      "cycles": {
+        "cycle2": {
+          "patterns": [
+            "**/*.tsx"
+          ],
+          "reason": "UI component hierarchy"
+        }
+      }
+    }
+  ],
+  "cycles": {
+    "cycle1": {
+      "name": "Discovery & Context",
+      "sourceFiles": [
+        "README.md",
+        "package.json",
+        "apps/*/package.json",
+        "packages/*/package.json",
+        "pnpm-workspace.yaml",
+        "turbo.json"
+      ],
+      "expectedOutputs": [
+        "context/boundaries.sysml",
+        "context/requirements.sysml"
+      ]
+    },
+    "cycle2": {
+      "name": "Structure & Modules",
+      "sourceFiles": [
+        "apps/backend/src/app.ts",
+        "apps/backend/src/server.ts",
+        "apps/backend/src/routes/*.ts",
+        "apps/frontend/src/main.tsx",
+        "apps/frontend/src/App.tsx",
+        "apps/frontend/src/pages/*.tsx",
+        "apps/frontend/src/components/**/*.tsx"
+      ],
+      "expectedOutputs": [
+        "structure/connections.sysml",
+        "structure/interfaces.sysml",
+        "structure/modules.sysml"
+      ]
+    },
+    "cycle3": {
+      "name": "Data & Types",
+      "sourceFiles": [
+        "apps/backend/src/models/*.ts",
+        "packages/shared-types/src/entities/*.types.ts",
+        "packages/shared-types/src/enums/*.enum.ts",
+        "packages/shared-types/src/api/*.types.ts",
+        "packages/shared-types/src/index.ts"
+      ],
+      "expectedOutputs": [
+        "data/dtos.sysml",
+        "data/entities.sysml",
+        "data/enums.sysml"
+      ]
+    },
+    "cycle4": {
+      "name": "Behavior & Logic",
+      "sourceFiles": [
+        "apps/backend/src/services/*.service.ts",
+        "apps/backend/src/controllers/*.controller.ts",
+        "apps/frontend/src/services/*.ts",
+        "apps/frontend/src/hooks/*.ts",
+        "apps/frontend/src/store/*.ts",
+        "apps/backend/src/utils/*.ts"
+      ],
+      "expectedOutputs": [
+        "behavior/operations.sysml",
+        "behavior/states.sysml"
+      ]
+    },
+    "cycle5": {
+      "name": "Verification",
+      "sourceFiles": [
+        "apps/backend/test/**/*.ts",
+        "apps/frontend/test/**/*.ts",
+        "apps/frontend/e2e/*.spec.ts",
+        "apps/frontend/cypress/**/*.ts",
+        "apps/frontend/test/components/*.tsx",
+        "apps/frontend/test/unit/hooks/*.tsx"
+      ],
+      "expectedOutputs": [
+        "verification/test-mapping.sysml"
+      ]
+    },
+    "cycle6": {
+      "name": "Analysis",
+      "sourceFiles": [
+        "apps/backend/src/config/*.ts",
+        "apps/backend/src/middleware/*.ts",
+        "apps/backend/tsconfig.json",
+        "apps/backend/vitest.config.ts",
+        "apps/frontend/*.config.*",
+        "apps/frontend/tsconfig*.json",
+        "apps/frontend/vite.config.ts",
+        "apps/frontend/vitest.config.ts",
+        "packages/typescript-config/*.json",
+        "packages/eslint-config/index.js",
+        "packages/shared-types/tsconfig.json"
+      ],
+      "expectedOutputs": [
+        "analysis/profiles.sysml"
+      ]
+    }
+  },
+  "statistics": {
+    "totalFiles": 122,
+    "relevantFiles": 122
+  },
+  "discoveredEntities": [
+    "User",
+    "Customer",
+    "Vehicle",
+    "Sale"
+  ],
+  "discoveredDomains": [
+    "Auth",
+    "Customer",
+    "Vehicle",
+    "Sale"
+  ]
+}
