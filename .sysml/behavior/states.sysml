@@ -1,40 +1,46 @@
 package EntityStateMachines {
-    import SysMLPrimitives::*;
     import DomainEnums::*;
-    doc /* Entity lifecycle state machines. */
-    @SourceFile {
-        :>> path = "packages/shared-types/src/enums/sale-status.enum.ts";
-    }
-    state def SaleLifecycle {
-        transition toCompleted first pending then completed;
-        transition toCancelled first pending then cancelled;
-        state pending;
-        state completed;
-        state cancelled;
-    }
-
 
     @SourceFile {
         :>> path = "packages/shared-types/src/enums/vehicle-status.enum.ts";
     }
     state def VehicleLifecycle {
-        transition reserve first available then reserved;
-        transition sell first available then sold;
-        transition sellReserved first reserved then sold;
-        transition maintain first available then maintenance;
-        transition ready first maintenance then available;
-        state available;
-        state reserved;
-        state sold;
-        state maintenance;
+        transition first Available then Reserved;
+        transition first Reserved then Sold;
+        transition first Reserved then Available;
+        transition first Available then Sold;
+        transition first Available then Maintenance;
+        transition first Maintenance then Available;
+        state Available;
+        state Reserved;
+        state Sold;
+        state Maintenance;
+    }
+
+
+    @SourceFile {
+        :>> path = "packages/shared-types/src/enums/sale-status.enum.ts";
+    }
+    state def SaleLifecycle {
+        transition first Pending then Completed;
+        transition first Pending then Cancelled;
+        transition first Completed then Cancelled;
+        state Pending;
+        state Completed;
+        state Cancelled;
     }
     @SourceFile {
-        :>> path = "apps/backend/src/models/User.model.ts";
+        :>> path = "apps/frontend/src/store/authStore.ts";
     }
-    state def UserAccountState {
-        transition deactivate first Active then Inactive;
-        transition activate first Inactive then Active;
-        state Active;
-        state Inactive;
+    state def AuthSessionState {
+        transition first Unauthenticated then Authenticating;
+        transition first Authenticating then Authenticated;
+        transition first Authenticating then Error;
+        transition first Authenticated then Unauthenticated;
+        transition first Error then Authenticating;
+        state Unauthenticated;
+        state Authenticating;
+        state Authenticated;
+        state Error;
     }
 }

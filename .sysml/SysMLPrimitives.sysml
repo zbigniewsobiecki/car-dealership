@@ -1,4 +1,4 @@
-standard library package SysMLPrimitives {
+library package SysMLPrimitives {
     doc /*
      * AU SysML v2 Primitives for software project modeling.
      * Self-contained - no external dependencies required.
@@ -41,6 +41,12 @@ standard library package SysMLPrimitives {
         attribute eventId : Identifier;
         attribute eventType : String;
         attribute timestamp : DateTime;
+    }
+
+    item def AnyItem :> Item {
+        doc /*Concrete marker for polymorphic item fields.
+             Use when a field can hold any item type (e.g., API response data).
+             Example: item data : AnyItem [0..1]; */
     }
 
     // ========== BASE REQUIREMENT TYPE ==========
@@ -101,13 +107,12 @@ standard library package SysMLPrimitives {
         end behavior;
         end module;
     }
-
     // ========== METADATA ==========
-    // Usage: @SourceFile { :>> path = "src/file.ts"; :>> line = 42; }
-    // Or prefix: #SourceFile { :>> path = "src/file.ts"; }
+    // Usage: @SourceFile { :>> path = "package.json"; :>> line = 1; }
+    // Or prefix: #SourceFile { :>> path = "package.json"; }
     metadata def SourceFile {
         attribute path : FilePath;
-        attribute line : Integer;
+        attribute line : Integer [0..1];
     }
 
     // Stereotype markers - use with semicolon: @external; or prefix: #external
@@ -351,19 +356,19 @@ standard library package SysMLPrimitives {
     // ========== CONNECTION DEFINITIONS ==========
     connection def APIConnection :> ServiceBinding {
         doc /*Frontend to Backend API connection */
-        end client : ~HTTPPort;
-        end server : HTTPPort;
+        end client:~HTTPPort;
+        end server:HTTPPort;
     }
 
     connection def DatabaseConnection {
         doc /*Application to Database connection */
-        end app : ~DatabasePort;
-        end db : DatabasePort;
+        end app:~DatabasePort;
+        end db:DatabasePort;
     }
 
     connection def CacheConnection {
         doc /*Application to Cache connection */
-        end app : ~CachePort;
-        end cache : CachePort;
+        end app:~CachePort;
+        end cache:CachePort;
     }
 }

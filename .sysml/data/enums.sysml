@@ -1,39 +1,33 @@
 package DomainEnums {
     import SysMLPrimitives::*;
-
-    @SourceFile {
-        :>> path = "packages/shared-types/src/enums/roles.enum.ts";
-    }
+    
+    doc /* Domain enumerations for roles, vehicle status, and sale status. */
+    
+    @SourceFile { :>> path = "packages/shared-types/src/enums/roles.enum.ts"; }
     enum def UserRole {
-        admin;
-        salesperson;
-        manager;
+        ADMIN;
+        SALESPERSON;
     }
-
-    @SourceFile {
-        :>> path = "packages/shared-types/src/enums/sale-status.enum.ts";
-    }
-    enum def SaleStatus {
-        pending;
-        completed;
-        cancelled;
-    }
-
-    @SourceFile {
-        :>> path = "packages/shared-types/src/enums/vehicle-status.enum.ts";
-    }
+    
+    @SourceFile { :>> path = "packages/shared-types/src/enums/vehicle-status.enum.ts"; }
     enum def VehicleStatus {
-        available;
-        sold;
-        reserved;
-        maintenance;
+        AVAILABLE;
+        SOLD;
+        RESERVED;
+        MAINTENANCE;
     }
-    @SourceFile {
-        :>> path = "packages/shared-types/src/enums/vehicle-status.enum.ts";
-    }
+    
+    @SourceFile { :>> path = "packages/shared-types/src/enums/vehicle-status.enum.ts"; }
     enum def VehicleCondition {
-        new;
-        used;
-        certified_pre_owned;
+        NEW;
+        USED;
+        CERTIFIED_PRE_OWNED;
+    }
+    
+    @SourceFile { :>> path = "packages/shared-types/src/enums/sale-status.enum.ts"; }
+    enum def SaleStatus {
+        PENDING;
+        COMPLETED;
+        CANCELLED;
     }
 }

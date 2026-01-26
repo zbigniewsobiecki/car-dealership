@@ -2,8 +2,6 @@ package SystemContext {
     import SysMLPrimitives::*;
     import ProjectMetadata::*;
     doc /*System Context. Defines the system boundary and external dependencies. Discovered from package.json. System context for car-dealership-app */
-
-
     @external;
     part def ExternalDependency {
         attribute name : String;
@@ -39,41 +37,57 @@ package SystemContext {
         // System ports (discovered interfaces)
         port httpApi;
     }
-
     part system : CarDealershipSystem;
 
-    @SourceFile {
-        :>> path = "apps/backend/package.json";
-    }
-    part postgres : PostgreSQL {
+    part database : PostgreSQL {
         :>> name = "PostgreSQL";
-        :>> purpose = "Primary relational database for car and user data";
+        :>> purpose = "Primary data persistence for vehicle, sales, and user data.";
     }
 
-    @SourceFile {
-        :>> path = "package.json";
-    }
     part def CarDealershipSystem :> WebApplication {
-        doc /* The main system boundary encompassing frontend and backend services. */
-        @SourceFile {
-            :>> path = "apps/frontend/package.json";
-        }
+        port httpApi : HTTPPort;
         part :>> frontend : Frontend {
             :>> framework = "react";
-            :>> port = 5173;
-            // Default Vite port
-        }
-
-        @SourceFile {
-            :>> path = "apps/backend/package.json";
         }
         part :>> backend : APIServer {
             :>> framework = "express";
-            :>> port = 3000;
         }
     }
 
-    connection apiLink : APIConnection;
+    @SourceFile {
+        :>> path = "apps/backend/.env.example";
+    }
+    part postgres_db : PostgreSQL {
+        :>> name = "car_dealership";
+        :>> host = "localhost";
+        :>> port = 5432;
+        :>> purpose = "Relational database for car dealership data.";
+    }
 
-    connection dbLink : DatabaseConnection;
+    @SourceFile {
+        :>> path = "apps/frontend/.env.example";
+    }
+    part backend_api : APIServer {
+        :>> name = "Backend API";
+        :>> port = 3000;
+        :>> basePath = "/api";
+    }
+
+    @SourceFile {
+        :>> path = "packages/eslint-config/package.json";
+    }
+    part linter : Module {
+        :>> name = "ESLint Config";
+        :>> path = "packages/eslint-config";
+        :>> layer = "Tooling";
+    }
+
+    @SourceFile {
+        :>> path = "packages/shared-types/package.json";
+    }
+    part shared_types : Module {
+        :>> name = "Shared Types";
+        :>> path = "packages/shared-types";
+        :>> layer = "Domain";
+    }
 }

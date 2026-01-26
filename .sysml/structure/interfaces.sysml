@@ -1,29 +1,44 @@
 package SystemInterfaces {
     import SysMLPrimitives::*;
-    doc /* Module interface definitions with typed ports. */
-    port def NavigationPort {
-        out item route : String;
+    doc /* Module interface definitions with typed ports for the Car Dealership API. */
+    @SourceFile {
+        :>> path = "apps/backend/src/routes/auth.routes.ts";
     }
-    port def AuthStatePort {
-        in item isAuthenticated : Boolean;
-        in item user : JSON;
+    port def AuthPort :> HTTPPort {
+        doc /* POST /login, POST /refresh, POST /register, GET /me */
     }
-    port def AuthApiPort :> HTTPPort {
-        doc /* Port for authentication endpoints */
+    @SourceFile {
+        :>> path = "apps/backend/src/routes/customers.routes.ts";
     }
-
-    port def CustomerApiPort :> HTTPPort {
-        doc /* Port for customer management endpoints */
+    port def CustomerPort :> ServicePort {
+        doc /* Port for customer management operations */
     }
-
-    port def VehicleApiPort :> HTTPPort {
-        doc /* Port for vehicle inventory endpoints */
+    @SourceFile {
+        :>> path = "apps/backend/src/routes/vehicles.routes.ts";
     }
-
-    port def SaleApiPort :> HTTPPort {
-        doc /* Port for sales transaction endpoints */
+    port def VehiclePort :> ServicePort {
+        doc /* Port for vehicle inventory operations */
     }
-    port def DataPort :> ServicePort {
-        doc /* Generic data access port for fetching entities. */
+    @SourceFile {
+        :>> path = "apps/backend/src/routes/sales.routes.ts";
+    }
+    port def SalesPort :> ServicePort {
+        doc /* Port for sales transaction operations */
+    }
+    interface def AuthInterface {
+        end provider:AuthPort;
+        end consumer:~AuthPort;
+    }
+    interface def CustomerInterface {
+        end provider:CustomerPort;
+        end consumer:~CustomerPort;
+    }
+    interface def VehicleInterface {
+        end provider:VehiclePort;
+        end consumer:~VehiclePort;
+    }
+    interface def SalesInterface {
+        end provider:SalesPort;
+        end consumer:~SalesPort;
     }
 }
