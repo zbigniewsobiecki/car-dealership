@@ -1,110 +1,84 @@
 package SystemOperations {
+    import DomainEntities::*;
+    import SysMLPrimitives::*;
     import DataModel::Entities::*;
     import DataTransferObjects::*;
-    import DataModel::DTOs::*;
-    import DomainEnums::*;
-    import DomainEntities::*;
-
     @SourceFile {
         :>> path = "apps/backend/src/services/auth.service.ts";
     }
     action def RegisterUser {
         flow from request.email to checkExisting.email;
-        flow from request.password to hashPassword.raw;
+        flow from request.password to hashPassword.password;
+        flow from hashPassword.hash to createUser.hash;
         flow from request to createUser.data;
-        flow from hashPassword.hashed to createUser.pwdHash;
-        flow from createUser.user to signTokens.user;
-        flow from signTokens.res to response;
+        flow from createUser.user to generateTokens.user;
+        flow from generateTokens.response to response;
         first checkExisting then hashPassword;
         first hashPassword then createUser;
-        first createUser then signTokens;
+        first createUser then generateTokens;
         in request : CreateUserDto;
         out response : AuthResponse;
-        out error : ApiError [0..1];
-
         action checkExisting {
             in email : String;
-            out exists : Boolean;
         }
         action hashPassword {
-            in raw : String;
-            out hashed : String;
+            in password : String;
+            out hash : String;
         }
         action createUser {
             in data : CreateUserDto;
-            in pwdHash : String;
+            in hash : String;
             out user : User;
         }
-        action signTokens {
+        action generateTokens {
             in user : User;
-            out res : AuthResponse;
-            action signTokens {
-                in user : User;
-                out res : AuthResponse;
-                out refreshToken : String;
-            }
+            out response : AuthResponse;
         }
     }
-
-
     @SourceFile {
         :>> path = "apps/backend/src/services/auth.service.ts";
     }
     action def Login {
-        flow from email to findUser.email;
-        flow from password to verifyPassword.raw;
-        flow from findUser.user.passwordHash to verifyPassword.hashed;
-        flow from findUser.user to signTokens.user;
-        flow from signTokens.res to response;
+        flow from credentials.email to findUser.email;
+        flow from credentials.password to verifyPassword.password;
+        flow from findUser.user to issueTokens.user;
+        flow from issueTokens.response to response;
         first findUser then verifyPassword;
-        first verifyPassword then signTokens;
-        in email : String;
-        in password : String;
+        first verifyPassword then issueTokens;
+        in credentials : LoginRequest;
         out response : AuthResponse;
-        out error : ApiError [0..1];
-
         action findUser {
             in email : String;
-            out user : UserWithPassword;
+            out user : User;
         }
         action verifyPassword {
-            in raw : String;
-            in hashed : String;
-            out valid : Boolean;
+            in password : String;
+            in hash : String;
         }
-        action signTokens {
+        action issueTokens {
             in user : User;
-            out res : AuthResponse;
-            action signTokens {
-                in user : User;
-                out res : AuthResponse;
-                out refreshToken : String;
-            }
+            out response : AuthResponse;
         }
     }
     @SourceFile {
         :>> path = "apps/backend/src/services/sales.service.ts";
     }
     action def CreateSale {
-        flow from request.vehicleId to verifyVehicle.id;
-        flow from request.customerId to verifyCustomer.id;
-        flow from request to persistSale.data;
+        flow from data.vehicleId to verifyVehicle.id;
+        flow from data.customerId to verifyCustomer.id;
+        flow from data to persistSale.data;
+        flow from data.vehicleId to updateVehicleStatus.id;
         flow from persistSale.sale to sale;
-        flow from request.vehicleId to updateVehicleStatus.id;
         first verifyVehicle then verifyCustomer;
         first verifyCustomer then persistSale;
         first persistSale then updateVehicleStatus;
-        in request : CreateSaleDto;
+        in data : CreateSaleDto;
         out sale : Sale;
-        out error : ApiError [0..1];
-
         action verifyVehicle {
             in id : Identifier;
-            out vehicle : Vehicle;
         }
         action verifyCustomer {
             in id : Identifier;
-            out customer : Customer;
         }
         action persistSale {
             in data : CreateSaleDto;
@@ -112,7 +86,117 @@ package SystemOperations {
         }
         action updateVehicleStatus {
             in id : Identifier;
-            in status : VehicleStatus;
+            in status : DomainEnums::VehicleStatus;
         }
+    }
+    @SourceFile {
+        :>> path = "apps/backend/src/utils/jwt.util.ts";
+    }
+    action def SignToken {
+        in payload : JSON;
+        out token : String;
+    }
+    @SourceFile {
+        :>> path = "apps/backend/src/utils/jwt.util.ts";
+    }
+    action def VerifyToken {
+        in token : String;
+        out payload : JSON;
+    }
+    @SourceFile {
+        :>> path = "apps/backend/src/utils/password.util.ts";
+    }
+    action def HashPassword {
+        in password : String;
+        out hash : String;
+    }
+    @SourceFile {
+        :>> path = "apps/backend/src/utils/password.util.ts";
+    }
+    action def ComparePassword {
+        in password : String;
+        in hash : String;
+        out isValid : Boolean;
+    }
+    @SourceFile {
+        :>> path = "apps/frontend/src/hooks/useVehicles.ts";
+    }
+    action def UseVehiclesHook {
+        flow from filters to fetchVehicles.params;
+        flow from fetchVehicles.data.data to vehicles;
+        in filters : VehicleFilters [0..1];
+        out vehicles : Vehicle [0..*];
+        out isLoading : Boolean;
+        out error : AnyItem [0..1];
+        action fetchVehicles {
+            in params : VehicleFilters;
+            out data : PaginatedResponseWrapper;
+        }
+    }
+    @SourceFile {
+        :>> path = "apps/frontend/src/services/api.ts";
+    }
+    action def AxiosRequest {
+        in method : String;
+        in url : String;
+        in data : JSON [0..1];
+        out response : ApiResponse;
+    }
+    @SourceFile {
+        :>> path = "apps/frontend/src/services/auth.service.ts";
+    }
+    action def FrontendLogin {
+        in credentials : LoginRequest;
+        out response : AuthResponse;
+    }
+
+    @SourceFile {
+        :>> path = "apps/frontend/src/services/customers.service.ts";
+    }
+    action def FrontendGetCustomers {
+        out customers : Customer [0..*];
+    }
+
+    @SourceFile {
+        :>> path = "apps/frontend/src/services/sales.service.ts";
+    }
+    action def FrontendCreateSale {
+        in data : CreateSaleDto;
+        out sale : Sale;
+    }
+
+    @SourceFile {
+        :>> path = "apps/frontend/src/services/vehicles.service.ts";
+    }
+    action def FrontendGetVehicles {
+        in filters : VehicleFilters [0..1];
+        out data : PaginatedResponseWrapper;
+    }
+    @SourceFile {
+        :>> path = "apps/frontend/src/hooks/useCustomers.ts";
+    }
+    action def UseCustomersHook {
+        out customers : Customer [0..*];
+        out isLoading : Boolean;
+    }
+
+    @SourceFile {
+        :>> path = "apps/frontend/src/hooks/useSales.ts";
+    }
+    action def UseSalesHook {
+        out sales : Sale [0..*];
+        out isLoading : Boolean;
+    }
+
+    @SourceFile {
+        :>> path = "apps/frontend/src/store/authStore.ts";
+    }
+    action def AuthStoreActions {
+        action setAuth {
+            in user : User;
+            in token : String;
+        }
+        action logout;
+        action checkAuth;
     }
 }

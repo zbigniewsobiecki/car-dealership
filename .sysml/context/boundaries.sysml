@@ -37,57 +37,40 @@ package SystemContext {
         // System ports (discovered interfaces)
         port httpApi;
     }
-    part system : CarDealershipSystem;
-
-    part database : PostgreSQL {
-        :>> name = "PostgreSQL";
-        :>> purpose = "Primary data persistence for vehicle, sales, and user data.";
-    }
-
-    part def CarDealershipSystem :> WebApplication {
-        port httpApi : HTTPPort;
+    part system : CarDealershipSystem {
+        :>> name = "car-dealership-app";
         part :>> frontend : Frontend {
             :>> framework = "react";
+            :>> port = 5173;
+            // Default Vite port
         }
         part :>> backend : APIServer {
             :>> framework = "express";
+            :>> port = 3000;
+        }
+    }
+    @SourceFile {
+        :>> path = "apps/backend/.env.example";
+    }
+    part postgres : PostgreSQL {
+        :>> name = "PostgreSQL";
+        :>> purpose = "Primary relational database for data persistence";
+        :>> port = 5432;
+    }
+    @SourceFile {
+        :>> path = "apps/backend/package.json";
+    }
+    part def CarDealershipSystem :> WebApplication {
+        port httpApi : HTTPPort {
+            :>> port = 3000;
         }
     }
 
     @SourceFile {
         :>> path = "apps/backend/.env.example";
     }
-    part postgres_db : PostgreSQL {
-        :>> name = "car_dealership";
+    part redis : Redis {
         :>> host = "localhost";
-        :>> port = 5432;
-        :>> purpose = "Relational database for car dealership data.";
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/.env.example";
-    }
-    part backend_api : APIServer {
-        :>> name = "Backend API";
-        :>> port = 3000;
-        :>> basePath = "/api";
-    }
-
-    @SourceFile {
-        :>> path = "packages/eslint-config/package.json";
-    }
-    part linter : Module {
-        :>> name = "ESLint Config";
-        :>> path = "packages/eslint-config";
-        :>> layer = "Tooling";
-    }
-
-    @SourceFile {
-        :>> path = "packages/shared-types/package.json";
-    }
-    part shared_types : Module {
-        :>> name = "Shared Types";
-        :>> path = "packages/shared-types";
-        :>> layer = "Domain";
+        :>> port = 6379;
     }
 }

@@ -1,11 +1,5 @@
 package SystemBehavior {
-    import BackendUtilities::*;
-    import BackendServices::*;
-    import SystemOperations::*;
-    import FrontendHooks::*;
-    import EntityStateMachines::*;
     import SysMLPrimitives::*;
-    import EventHandlers::*;
     import DataModel::*;
     import SystemArchitecture::*;
     doc /*System Behavior. Operations, state machines, and event handlers. Behavioral aspects of the system. */
@@ -74,6 +68,7 @@ package SystemBehavior {
             in result;
         }
     }
+
 
 
     // Operations (to be populated by analysis)

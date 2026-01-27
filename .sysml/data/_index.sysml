@@ -1,7 +1,7 @@
 package DataModel {
     import SysMLPrimitives::*;
-    doc /*Data Model. Domain entities, data transfer objects, and enumerations. Data structures discovered from type definitions and schemas. */
 
+    doc /*Data Model. Domain entities, data transfer objects, and enumerations. Data structures discovered from type definitions and schemas. */
 
     // Base entity with common attributes - extends Item for standard library compatibility
     item def BaseEntity :> Item {
@@ -27,14 +27,26 @@ package DataModel {
     // Relationship template for entity connections
     connection def EntityRelation {
         doc /*Template for entity relationships */
-        end [1] source;
-        end [0..*] target;
+        end source [1];
+        end target [0..*];
     }
 
     // Entity definitions (to be populated by analysis)
     package Entities {
-        import DataModel::DTOs::*;
         import DataModel::*;
+
+        // Stub - attributes populated in Cycle 3
+        item def User :> BaseEntity {
+            doc /* User domain entity */
+        }
+
+        item def CreateUserDto :> BaseDTO {
+            doc /* Request DTO for creating a User */
+        }
+
+        item def UpdateUserDto :> BaseDTO {
+            doc /* Request DTO for updating a User */
+        }
 
         // Stub - attributes populated in Cycle 3
         item def Customer :> BaseEntity {
@@ -50,30 +62,6 @@ package DataModel {
         }
 
         // Stub - attributes populated in Cycle 3
-        item def Sale :> BaseEntity {
-            doc /* Sale domain entity */
-        }
-
-        item def CreateSaleDto :> BaseDTO {
-            doc /* Request DTO for creating a Sale */
-        }
-
-        item def UpdateSaleDto :> BaseDTO {
-            doc /* Request DTO for updating a Sale */
-        }
-
-        // Stub - attributes populated in Cycle 3
-        item def User :> BaseEntity {
-            doc /* User domain entity */
-        }
-        item def CreateUserDto :> BaseDTO {
-            doc /* Request DTO for creating a User */
-        }
-        item def UpdateUserDto :> BaseDTO {
-            doc /* Request DTO for updating a User */
-        }
-
-        // Stub - attributes populated in Cycle 3
         item def Vehicle :> BaseEntity {
             doc /* Vehicle domain entity */
         }
@@ -84,6 +72,19 @@ package DataModel {
 
         item def UpdateVehicleDto :> BaseDTO {
             doc /* Request DTO for updating a Vehicle */
+        }
+
+        // Stub - attributes populated in Cycle 3
+        item def Sale :> BaseEntity {
+            doc /* Sale domain entity */
+        }
+
+        item def CreateSaleDto :> BaseDTO {
+            doc /* Request DTO for creating a Sale */
+        }
+
+        item def UpdateSaleDto :> BaseDTO {
+            doc /* Request DTO for updating a Sale */
         }
     }
 

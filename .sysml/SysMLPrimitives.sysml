@@ -107,12 +107,13 @@ library package SysMLPrimitives {
         end behavior;
         end module;
     }
+
     // ========== METADATA ==========
-    // Usage: @SourceFile { :>> path = "package.json"; :>> line = 1; }
-    // Or prefix: #SourceFile { :>> path = "package.json"; }
+    // Usage: @SourceFile { :>> path = "src/file.ts"; :>> line = 42; }
+    // Or prefix: #SourceFile { :>> path = "src/file.ts"; }
     metadata def SourceFile {
         attribute path : FilePath;
-        attribute line : Integer [0..1];
+        attribute line : Integer;
     }
 
     // Stereotype markers - use with semicolon: @external; or prefix: #external
@@ -122,6 +123,32 @@ library package SysMLPrimitives {
     metadata def SecurityCritical;
     metadata def PerformanceCritical;
     metadata def Async;
+
+    // ========== ACCESS CONTROL TYPES ==========
+    abstract item def Role :> Item {
+        doc /*Base for role definitions */
+        attribute name : String;
+        attribute description : String [0..1];
+    }
+
+    item def Permission :> Item {
+        doc /*Permission definition */
+        attribute action : String;
+        attribute resource : String;
+    }
+
+    part def AccessPolicy :> Part {
+        doc /*Access control policy mapping roles to permissions */
+        attribute isPublic : Boolean;
+        attribute requiresAuth : Boolean;
+        attribute allowedRoles : String [0..*];
+    }
+
+    allocation def RolePermission {
+        doc /*Maps roles to permissions */
+        end role;
+        end permission;
+    }
 
     // ========== COMMON ENUMS ==========
     enum def LifecycleStatus {
@@ -161,6 +188,30 @@ library package SysMLPrimitives {
         in minVal : Real;
         in maxVal : Real;
         value >= minVal and value <= maxVal
+    }
+
+    // ========== BUSINESS CONSTRAINT TYPES ==========
+    constraint def UniqueConstraint {
+        doc /*Field value must be unique across all records */
+    }
+
+    constraint def PatternConstraint {
+        doc /*Value must match a regex pattern */
+        in pattern : String;
+    }
+
+    constraint def LengthConstraint {
+        doc /*String length must be within bounds */
+        in minLength : Integer;
+        in maxLength : Integer;
+    }
+
+    constraint def EmailFormat :> PatternConstraint {
+        doc /*Must be valid email format */
+    }
+
+    constraint def RequiredConstraint :> NotNull {
+        doc /*Field is required (alias for NotNull) */
     }
 
     // ========== APPLICATION COMPONENTS ==========
@@ -314,6 +365,28 @@ library package SysMLPrimitives {
         attribute body : JSON [0..1];
     }
 
+    // ========== API ENDPOINT TYPES ==========
+    enum def HTTPMethod {
+        doc /*Standard HTTP methods */
+        GET;
+        POST;
+        PUT;
+        DELETE;
+        PATCH;
+        OPTIONS;
+        HEAD;
+    }
+
+    item def APIEndpoint :> BaseDTO {
+        doc /*API endpoint definition with HTTP semantics */
+        attribute method : HTTPMethod;
+        attribute path : String;
+        attribute pathParams : String [0..*];
+        attribute queryParams : String [0..*];
+        attribute requiresAuth : Boolean;
+        attribute requiredRoles : String [0..*];
+    }
+
     item def Message :> Item {
         doc /*Generic message */
         attribute payload : JSON;
@@ -330,6 +403,67 @@ library package SysMLPrimitives {
         doc /*Database query result */
         attribute rows : JSON;
         attribute rowCount : Integer;
+    }
+
+    // ========== QUERY & FILTER TYPES ==========
+    enum def SortOrder {
+        doc /*Sort direction for queries */
+        Asc;
+        Desc;
+    }
+
+    enum def FilterOperator {
+        doc /*Filter comparison operators */
+        Eq;
+        // equals
+        Ne;
+        // not equals
+        Gt;
+        // greater than
+        Gte;
+        // greater than or equal
+        Lt;
+        // less than
+        Lte;
+        // less than or equal
+        Contains;
+        // string contains
+        StartsWith;
+        // string starts with
+        EndsWith;
+        // string ends with
+        In;
+        // value in list
+        NotIn;
+        // value not in list
+        IsNull;
+        // is null
+        IsNotNull;
+    }
+    // is not null
+
+    item def PaginationParams :> BaseDTO {
+        doc /*Standard pagination parameters */
+        attribute page : Integer;
+        attribute pageSize : Integer;
+        attribute sortBy : String [0..1];
+        attribute sortOrder : SortOrder [0..1];
+    }
+
+    item def FilterParam :> BaseDTO {
+        doc /*Single filter parameter */
+        attribute field : String;
+        attribute operator : FilterOperator;
+        attribute value : String;
+    }
+
+    item def PaginatedResponse :> BaseDTO {
+        doc /*Paginated response wrapper */
+        item data : AnyItem [0..*];
+        attribute total : Integer;
+        attribute page : Integer;
+        attribute pageSize : Integer;
+        attribute totalPages : Integer;
     }
 
     item def Credentials :> BaseDTO {

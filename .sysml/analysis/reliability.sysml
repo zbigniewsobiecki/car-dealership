@@ -1,51 +1,45 @@
 package ReliabilityAnalysis {
     import SysMLPrimitives::*;
-
-
-    @SourceFile {
-        :>> path = "apps/backend/src/app.ts";
-    }
-    @SourceFile {
-        :>> path = "apps/backend/src/config/database.ts";
-    }
+    
+    doc /*Reliability patterns and error handling discovered in the backend. */
+    
     analysis def ReliabilityProfile {
         // Retry patterns
         attribute hasRetries : Boolean = false;
-        attribute retryStrategy : String = "none";
-        attribute maxRetries : Integer [0..1];
-
+    
         // Circuit breaker
         attribute hasCircuitBreaker : Boolean = false;
-        attribute circuitBreakerThreshold : Integer [0..1];
-
+    
         // Graceful degradation
-        attribute hasGracefulDegradation : Boolean = false;
-        attribute fallbackStrategies : String [0..*];
-
+        attribute hasGracefulDegradation : Boolean = true;
+        attribute fallbackStrategies : String = "Global Error Handler (AppError)";
+    
         // Health checks
         attribute hasHealthChecks : Boolean = true;
-        attribute healthEndpoints : String [1] = "/health";
-
+        attribute healthEndpoints : String = "/health";
+    
         // Timeouts
         attribute hasTimeouts : Boolean = true;
-        attribute defaultTimeoutMs : Integer = 30000;
-        // idleTimeoutMillis
-
+        attribute defaultTimeoutMs : Integer = 30000; // Database idle timeout
+    
         results {
-            attribute failureHandling : String;
-            attribute recoveryStrategy : String;
-            attribute estimatedAvailability : String;
+            attribute failureHandling : String = "Centralized middleware with status codes";
+            attribute recoveryStrategy : String = "Process exit on critical DB error; SIGTERM/SIGINT handling";
         }
     }
-
+    
+    @SourceFile { :>> path = "apps/backend/src/middleware/errorHandler.middleware.ts"; }
     analysis def ErrorHandlingAnalysis {
-        attribute errorBoundaries : String [0..*];
+        doc /* Analysis of the centralized error handling mechanism. */
         attribute globalErrorHandler : Boolean = true;
         attribute errorLogging : Boolean = true;
-        attribute errorReporting : String [0..1];
-
-        results {
-            attribute errorRecoveryNotes : String;
-        }
+        attribute customErrorClass : String = "AppError";
+    }
+    
+    @SourceFile { :>> path = "apps/backend/src/server.ts"; }
+    analysis def ShutdownAnalysis {
+        doc /* Analysis of graceful shutdown procedures. */
+        attribute handlesSigterm : Boolean = true;
+        attribute handlesSigint : Boolean = true;
     }
 }

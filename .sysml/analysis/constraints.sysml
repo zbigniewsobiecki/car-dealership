@@ -1,26 +1,27 @@
 package PerformanceConstraints {
     import SysMLPrimitives::*;
     import SystemArchitecture::*;
-
-
+    
+    doc /*Performance constraints with expressions based on configuration. */
+    
     constraint def ResponseTimeLimit {
-        doc /*API response must be within limit */
+        doc /*API response must be within limit. */
         in actual : Real;
-        in limit : Real = 200;
+        in limit : Real = 500.0;
         actual <= limit
     }
-
-    constraint def ThroughputMinimum {
-        doc /*System must handle minimum requests per second */
-        in actual : Real;
-        in minimum : Real = 100;
-        actual >= minimum
+    
+    constraint def DatabaseConnectionLimit {
+        doc /*Database pool must not exceed max connections. */
+        in current : Integer;
+        in max : Integer = 20;
+        current <= max
     }
-
-    constraint def AvailabilityTarget {
-        doc /*System uptime must meet SLA */
-        in uptime : Real;
-        in target : Real = 99.9;
-        uptime >= target
+    
+    constraint def RateLimitConstraint {
+        doc /*Requests per window must be within limit. */
+        in requests : Integer;
+        in limit : Integer = 100;
+        requests <= limit
     }
 }

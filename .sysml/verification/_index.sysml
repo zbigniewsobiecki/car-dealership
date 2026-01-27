@@ -27,13 +27,11 @@ package Verification {
         attribute description : String [0..1];
     }
 
-    // Test coverage analysis template
+    // Test coverage analysis template - attributes at top level so they can be redefined
     analysis def TestCoverage {
-        doc /*Template for test coverage analysis */
-        results {
-            attribute testedOperations : Integer;
-            attribute totalOperations : Integer;
-            attribute coveragePercent : Real;
-        }
+        doc /*Template for test coverage analysis. Specialize with :> and redefine with :>> */
+        attribute testedOperations : Integer;
+        attribute totalOperations : Integer;
+        attribute coveragePercent : Real;
     }
 }

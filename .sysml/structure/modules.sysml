@@ -1,298 +1,221 @@
 package SystemModules {
+    import SystemContext::*;
     import SysMLPrimitives::*;
     import SystemArchitecture::*;
     import SystemInterfaces::*;
-    doc /* Backend module decomposition following the Express routing structure. */
-    @SourceFile {
-        :>> path = "apps/backend/src/app.ts";
+    doc /* System module decomposition for the backend services. */
+    part def BackendModule :> APIServer {
+        attribute layer : String = "backend";
     }
     @SourceFile {
-        :>> path = "apps/backend/src/server.ts";
+        :>> path = "apps/backend/src/routes/auth.routes.ts";
     }
-    part def BackendApp :> APIServer {
-        :>> framework = "express";
-        :>> path = "apps/backend/src/app.ts";
-        port authApi : AuthPort;
-        port customerApi : CustomerPort;
-        port vehicleApi : VehiclePort;
-        port salesApi : SalesPort;
-    }
-    @SourceFile {
-        :>> path = "apps/backend/src/controllers/auth.controller.ts";
-    }
-    part def AuthModule :> Module {
+    part def AuthModule :> BackendModule {
         :>> path = "apps/backend/src/auth";
-        :>> responsibility = "Handles user registration, login, and session refreshing.";
-        :>> layer = "service";
+        :>> responsibility = "Handles user registration, login, and token refresh.";
         port api : AuthPort;
     }
     @SourceFile {
-        :>> path = "apps/backend/src/controllers/customers.controller.ts";
+        :>> path = "apps/backend/src/routes/customers.routes.ts";
     }
-    part def CustomerModule :> Module {
-        :>> path = "apps/backend/src/users";
-        :>> responsibility = "Manages customer profiles and their associated sales history.";
-        :>> layer = "service";
+    part def CustomerModule :> BackendModule {
+        :>> path = "apps/backend/src/customers";
+        :>> responsibility = "Manages customer profiles and their associated sales.";
         port api : CustomerPort;
-        part def CustomerModule :> Module {
-            :>> path = "apps/backend/src/controllers/customers.controller.ts";
-            :>> responsibility = "Manages customer profiles and their associated sales history.";
-            :>> layer = "service";
-            port api : CustomerPort;
-        }
     }
     @SourceFile {
-        :>> path = "apps/backend/src/controllers/vehicles.controller.ts";
+        :>> path = "apps/backend/src/routes/vehicles.routes.ts";
     }
-    part def VehicleModule :> Module {
-        :>> path = "apps/backend/src/services/vehicles.service.ts";
-        :>> responsibility = "Manages vehicle inventory, filtering, and statistics.";
-        :>> layer = "service";
+    part def VehicleModule :> BackendModule {
+        :>> path = "apps/backend/src/vehicles";
+        :>> responsibility = "Manages vehicle inventory and statistics.";
         port api : VehiclePort;
     }
     @SourceFile {
-        :>> path = "apps/backend/src/controllers/sales.controller.ts";
+        :>> path = "apps/backend/src/routes/sales.routes.ts";
     }
-    part def SalesModule :> Module {
-        :>> path = "apps/backend/src/services/sales.service.ts";
-        :>> responsibility = "Processes sales transactions and generates financial stats.";
-        :>> layer = "service";
-        port api : SalesPort;
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/main.tsx";
+    part def SaleModule :> BackendModule {
+        :>> path = "apps/backend/src/sales";
+        :>> responsibility = "Processes sales transactions and generates reports.";
+        port api : SalePort;
     }
     @SourceFile {
         :>> path = "apps/frontend/src/App.tsx";
     }
-    part def FrontendApp :> Frontend {
-        :>> framework = "react";
-        :>> path = "apps/frontend/src/main.tsx";
-        port authClient : ~AuthPort;
-        port customerClient : ~CustomerPort;
-        port vehicleClient : ~VehiclePort;
-        port salesClient : ~SalesPort;
+    part def MainApp :> FrontendModule {
+        :>> path = "apps/frontend/src/App.tsx";
+        :>> responsibility = "Root component handling routing and layout.";
     }
+
     @SourceFile {
         :>> path = "apps/frontend/src/pages/Dashboard.tsx";
     }
-    part def DashboardPage :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Displays high-level metrics for vehicles and sales.";
-        port salesData : ~SalesPort;
-        port vehicleStats : ~VehiclePort;
+    part def DashboardPage :> FrontendModule {
+        :>> path = "apps/frontend/src/pages/Dashboard.tsx";
+        :>> responsibility = "Displays overview statistics for sales and inventory.";
     }
+
     @SourceFile {
         :>> path = "apps/frontend/src/pages/Vehicles.tsx";
     }
-    part def VehiclesPage :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Inventory management view with search and filtering.";
-        port api : ~VehiclePort;
+    part def VehiclesPage :> FrontendModule {
+        :>> path = "apps/frontend/src/pages/Vehicles.tsx";
+        :>> responsibility = "Inventory management view for vehicles.";
     }
-    @SourceFile {
-        :>> path = "apps/frontend/src/pages/Login.tsx";
-    }
-    part def LoginPage :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "User authentication entry point.";
-        port auth : ~AuthPort;
-    }
+
     @SourceFile {
         :>> path = "apps/frontend/src/pages/Customers.tsx";
     }
-    part def CustomersPage :> Module {
-        :>> layer = "presentation";
+    part def CustomersPage :> FrontendModule {
+        :>> path = "apps/frontend/src/pages/Customers.tsx";
         :>> responsibility = "Customer relationship management view.";
-        port api : ~CustomerPort;
     }
+
     @SourceFile {
         :>> path = "apps/frontend/src/pages/Sales.tsx";
     }
-    part def SalesPage :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Sales transaction history and creation view.";
-        port api : ~SalesPort;
+    part def SalesPage :> FrontendModule {
+        :>> path = "apps/frontend/src/pages/Sales.tsx";
+        :>> responsibility = "Sales transaction and reporting view.";
+    }
+    @SourceFile {
+        :>> path = "apps/backend/src/app.ts";
+    }
+    part def BackendApp :> APIServer {
+        :>> path = "apps/backend/src/app.ts";
+        :>> responsibility = "Express application setup and middleware configuration.";
+        part auth : AuthModule;
+        part customers : CustomerModule;
+        part vehicles : VehicleModule;
+        part sales : SaleModule;
+    }
+
+    part carDealershipSystem : CarDealershipSystem {
+        part backendApp : BackendApp;
+        part frontendApp : MainApp;
+    }
+    @SourceFile {
+        :>> path = "apps/backend/src/services/auth.service.ts";
+    }
+    part def AuthService :> Module {
+        :>> path = "apps/backend/src/services/auth.service.ts";
+        :>> responsibility = "Business logic for authentication and JWT management.";
     }
 
     @SourceFile {
-        :>> path = "apps/frontend/src/services/auth.service.ts";
+        :>> path = "apps/backend/src/services/customers.service.ts";
     }
-    part def AuthServiceClient :> Module {
-        :>> layer = "infrastructure";
-        port api : ~AuthPort;
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/services/customers.service.ts";
-    }
-    part def CustomerServiceClient :> Module {
-        :>> layer = "infrastructure";
-        port api : ~CustomerPort;
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/services/vehicles.service.ts";
-    }
-    part def VehicleServiceClient :> Module {
-        :>> layer = "infrastructure";
-        port api : ~VehiclePort;
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/services/sales.service.ts";
-    }
-    part def SalesServiceClient :> Module {
-        :>> layer = "infrastructure";
-        port api : ~SalesPort;
+    part def CustomerService :> Module {
+        :>> path = "apps/backend/src/services/customers.service.ts";
+        :>> responsibility = "Business logic for customer data and sales history.";
     }
 
     @SourceFile {
         :>> path = "apps/frontend/src/components/layout/Layout.tsx";
     }
-    part def LayoutComponent :> Module {
-        :>> layer = "presentation";
-        attribute hasSidebar : Boolean = true;
+    part def LayoutComponent :> FrontendModule {
+        :>> path = "apps/frontend/src/components/layout/Layout.tsx";
+        :>> responsibility = "Main layout wrapper with Sidebar and Navbar.";
     }
 
     @SourceFile {
         :>> path = "apps/frontend/src/components/auth/ProtectedRoute.tsx";
     }
-    part def ProtectedRoute :> Module {
-        :>> layer = "presentation";
-        port authCheck : ~AuthPort;
+    part def ProtectedRoute :> FrontendModule {
+        :>> path = "apps/frontend/src/components/auth/ProtectedRoute.tsx";
+        :>> responsibility = "Route guard for authenticated access.";
     }
     @SourceFile {
-        :>> path = "apps/backend/src/middleware/auth.middleware.ts";
+        :>> path = "apps/backend/src/server.ts";
     }
-    part def AuthMiddleware :> Module {
-        :>> responsibility = "JWT validation and role-based access control.";
-        :>> layer = "infrastructure";
+    part def ServerEntry :> Module {
+        :>> path = "apps/backend/src/server.ts";
+        :>> responsibility = "Server entry point, database connection initialization, and listener start.";
     }
 
     @SourceFile {
-        :>> path = "apps/backend/src/middleware/errorHandler.middleware.ts";
+        :>> path = "apps/backend/src/services/vehicles.service.ts";
     }
-    part def ErrorHandler :> Module {
-        :>> responsibility = "Global exception handling and standardized error responses.";
-        :>> layer = "infrastructure";
-    }
-
-    @SourceFile {
-        :>> path = "apps/backend/src/config/env.ts";
-    }
-    part def ConfigModule :> Module {
-        :>> responsibility = "Environment variable validation and configuration management.";
-        :>> layer = "infrastructure";
+    part def VehicleService :> Module {
+        :>> path = "apps/backend/src/services/vehicles.service.ts";
+        :>> responsibility = "Business logic for vehicle inventory, filtering, and stats.";
     }
 
     @SourceFile {
-        :>> path = "apps/backend/src/models/db.ts";
+        :>> path = "apps/backend/src/services/sales.service.ts";
     }
-    part def DatabaseModule :> Module {
-        :>> responsibility = "Database connection pooling and utility functions.";
-        :>> layer = "data";
-        port dbPort : DatabasePort;
+    part def SaleService :> Module {
+        :>> path = "apps/backend/src/services/sales.service.ts";
+        :>> responsibility = "Business logic for sales transactions and monthly reporting.";
     }
+    @SourceFile {
+        :>> path = "apps/frontend/src/main.tsx";
+    }
+    part def FrontendEntry :> Module {
+        :>> path = "apps/frontend/src/main.tsx";
+        :>> responsibility = "React application mounting and provider setup.";
+    }
+
     @SourceFile {
         :>> path = "apps/frontend/src/components/layout/Navbar.tsx";
     }
-    part def NavbarComponent :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Top navigation bar with user profile and links.";
+    part def NavbarComponent :> FrontendModule {
+        :>> path = "apps/frontend/src/components/layout/Navbar.tsx";
+        :>> responsibility = "Top navigation bar with user profile and branding.";
     }
 
     @SourceFile {
         :>> path = "apps/frontend/src/components/layout/Sidebar.tsx";
     }
-    part def SidebarComponent :> Module {
-        :>> layer = "presentation";
+    part def SidebarComponent :> FrontendModule {
+        :>> path = "apps/frontend/src/components/layout/Sidebar.tsx";
         :>> responsibility = "Side navigation menu for main application sections.";
     }
 
     @SourceFile {
         :>> path = "apps/frontend/src/components/vehicles/VehicleCard.tsx";
     }
-    part def VehicleCardComponent :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Display card for vehicle summary information.";
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/components/vehicles/VehicleForm.tsx";
-    }
-    part def VehicleFormComponent :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Form for creating and editing vehicle records.";
-        port api : ~VehiclePort;
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/components/sales/SaleCard.tsx";
-    }
-    part def SaleCardComponent :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Display card for sale transaction details.";
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/components/sales/SaleForm.tsx";
-    }
-    part def SaleFormComponent :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Form for recording new sales transactions.";
-        port api : ~SalesPort;
+    part def VehicleCard :> FrontendModule {
+        :>> path = "apps/frontend/src/components/vehicles/VehicleCard.tsx";
+        :>> responsibility = "UI component for displaying individual vehicle details.";
     }
 
     @SourceFile {
         :>> path = "apps/frontend/src/components/customers/CustomerCard.tsx";
     }
-    part def CustomerCardComponent :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Display card for customer contact and summary info.";
+    part def CustomerCard :> FrontendModule {
+        :>> path = "apps/frontend/src/components/customers/CustomerCard.tsx";
+        :>> responsibility = "UI component for displaying customer summary information.";
+    }
+
+    @SourceFile {
+        :>> path = "apps/frontend/src/components/sales/SaleCard.tsx";
+    }
+    part def SaleCard :> FrontendModule {
+        :>> path = "apps/frontend/src/components/sales/SaleCard.tsx";
+        :>> responsibility = "UI component for displaying sale transaction details.";
+    }
+    @SourceFile {
+        :>> path = "apps/frontend/src/components/vehicles/VehicleForm.tsx";
+    }
+    part def VehicleForm :> FrontendModule {
+        :>> path = "apps/frontend/src/components/vehicles/VehicleForm.tsx";
+        :>> responsibility = "Form for creating and editing vehicle records.";
     }
 
     @SourceFile {
         :>> path = "apps/frontend/src/components/customers/CustomerForm.tsx";
     }
-    part def CustomerFormComponent :> Module {
-        :>> layer = "presentation";
-        :>> responsibility = "Form for managing customer profile data.";
-        port api : ~CustomerPort;
-    }
-    // System instances
-    part backendApp : BackendApp;
-    part frontendApp : FrontendApp;
-    @SourceFile {
-        :>> path = "apps/frontend/src/store/authStore.ts";
-    }
-    part def AuthStore :> Module {
-        :>> layer = "infrastructure";
-        :>> responsibility = "Client-side authentication state management using Zustand.";
+    part def CustomerForm :> FrontendModule {
+        :>> path = "apps/frontend/src/components/customers/CustomerForm.tsx";
+        :>> responsibility = "Form for creating and editing customer profiles.";
     }
 
     @SourceFile {
-        :>> path = "apps/frontend/src/hooks/useVehicles.ts";
+        :>> path = "apps/frontend/src/components/sales/SaleForm.tsx";
     }
-    part def VehicleHooks :> Module {
-        :>> layer = "infrastructure";
-        :>> responsibility = "React Query hooks for vehicle data fetching and mutations.";
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/hooks/useCustomers.ts";
-    }
-    part def CustomerHooks :> Module {
-        :>> layer = "infrastructure";
-        :>> responsibility = "React Query hooks for customer data management.";
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/src/hooks/useSales.ts";
-    }
-    part def SalesHooks :> Module {
-        :>> layer = "infrastructure";
-        :>> responsibility = "React Query hooks for sales transactions and stats.";
+    part def SaleForm :> FrontendModule {
+        :>> path = "apps/frontend/src/components/sales/SaleForm.tsx";
+        :>> responsibility = "Form for processing new sales transactions.";
     }
 }

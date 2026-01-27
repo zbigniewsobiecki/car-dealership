@@ -1,29 +1,23 @@
 {
   "version": 2,
-  "discoveredAt": "2026-01-26T20:05:00.000Z",
+  "discoveredAt": "2026-01-27T11:50:00.000Z",
   "project": {
     "name": "car-dealership-app",
     "primaryLanguage": "typescript",
-    "framework": "react + express",
+    "framework": "express + react",
     "architectureStyle": "monorepo"
   },
   "directories": [
     {
-      "path": "apps/backend/src/auth",
-      "purpose": "Authentication logic (guards, strategies)",
+      "path": "apps/backend/src/controllers",
+      "purpose": "API request handlers",
       "cycles": {
         "cycle2": {
           "patterns": [
-            "**/*.ts"
+            "*.controller.ts"
           ]
-        }
-      }
-    },
-    {
-      "path": "apps/backend/src/controllers",
-      "purpose": "API Request handlers",
-      "cycles": {
-        "cycle2": {
+        },
+        "cycle4": {
           "patterns": [
             "*.controller.ts"
           ]
@@ -31,20 +25,8 @@
       }
     },
     {
-      "path": "apps/backend/src/models",
-      "purpose": "Database models and data access",
-      "cycles": {
-        "cycle3": {
-          "patterns": [
-            "*.model.ts",
-            "db.ts"
-          ]
-        }
-      }
-    },
-    {
       "path": "apps/backend/src/services",
-      "purpose": "Business logic services",
+      "purpose": "Business logic layer",
       "cycles": {
         "cycle4": {
           "patterns": [
@@ -54,8 +36,19 @@
       }
     },
     {
+      "path": "apps/backend/src/models",
+      "purpose": "Data access layer",
+      "cycles": {
+        "cycle3": {
+          "patterns": [
+            "*.model.ts"
+          ]
+        }
+      }
+    },
+    {
       "path": "apps/backend/src/routes",
-      "purpose": "API Route definitions",
+      "purpose": "API route definitions",
       "cycles": {
         "cycle2": {
           "patterns": [
@@ -66,9 +59,9 @@
     },
     {
       "path": "apps/backend/src/middleware",
-      "purpose": "Request processing middleware",
+      "purpose": "Request processing pipeline",
       "cycles": {
-        "cycle4": {
+        "cycle6": {
           "patterns": [
             "*.middleware.ts"
           ]
@@ -76,41 +69,8 @@
       }
     },
     {
-      "path": "apps/backend/src/config",
-      "purpose": "Backend configuration",
-      "cycles": {
-        "cycle6": {
-          "patterns": [
-            "*.ts"
-          ]
-        }
-      }
-    },
-    {
-      "path": "apps/backend/src/utils",
-      "purpose": "Backend utility functions",
-      "cycles": {
-        "cycle4": {
-          "patterns": [
-            "*.ts"
-          ]
-        }
-      }
-    },
-    {
-      "path": "apps/backend/test",
-      "purpose": "Backend tests, factories, and helpers",
-      "cycles": {
-        "cycle5": {
-          "patterns": [
-            "**/*.ts"
-          ]
-        }
-      }
-    },
-    {
       "path": "apps/frontend/src/pages",
-      "purpose": "Frontend view components",
+      "purpose": "UI views and routing",
       "cycles": {
         "cycle2": {
           "patterns": [
@@ -132,101 +92,33 @@
     },
     {
       "path": "apps/frontend/src/services",
-      "purpose": "Frontend API clients",
+      "purpose": "API client services",
       "cycles": {
         "cycle4": {
           "patterns": [
             "*.ts"
-          ]
-        }
-      }
-    },
-    {
-      "path": "apps/frontend/src/hooks",
-      "purpose": "React custom hooks",
-      "cycles": {
-        "cycle4": {
-          "patterns": [
-            "*.ts",
-            "*.tsx"
-          ]
-        }
-      }
-    },
-    {
-      "path": "apps/frontend/src/store",
-      "purpose": "Global state management",
-      "cycles": {
-        "cycle4": {
-          "patterns": [
-            "*.ts"
-          ]
-        }
-      }
-    },
-    {
-      "path": "apps/frontend/test",
-      "purpose": "Frontend unit/component tests and mocks",
-      "cycles": {
-        "cycle5": {
-          "patterns": [
-            "**/*.ts",
-            "**/*.tsx"
-          ]
-        }
-      }
-    },
-    {
-      "path": "apps/frontend/e2e",
-      "purpose": "End-to-end tests",
-      "cycles": {
-        "cycle5": {
-          "patterns": [
-            "*.spec.ts"
           ]
         }
       }
     },
     {
       "path": "packages/shared-types/src/entities",
-      "purpose": "Shared domain entity types",
+      "purpose": "Domain entity definitions",
       "cycles": {
         "cycle3": {
           "patterns": [
-            "*.types.ts"
+            "*.ts"
           ]
         }
       }
     },
     {
-      "path": "packages/shared-types/src/api",
-      "purpose": "Shared DTO types",
+      "path": "apps/backend/src/utils",
+      "purpose": "Helper functions",
       "cycles": {
-        "cycle3": {
+        "cycle4": {
           "patterns": [
-            "*.types.ts"
-          ]
-        }
-      }
-    },
-    {
-      "path": "packages/shared-types/src/enums",
-      "purpose": "Shared enumerations",
-      "cycles": {
-        "cycle3": {
-          "patterns": [
-            "*.enum.ts"
-          ]
-        }
-      }
-    },
-    {
-      "path": "packages/typescript-config",
-      "purpose": "Shared TS configurations",
-      "cycles": {
-        "cycle1": {
-          "patterns": [
-            "*.json"
+            "*.ts"
           ]
         }
       }
@@ -236,20 +128,17 @@
     "cycle1": {
       "name": "Discovery & Context",
       "sourceFiles": [
+        "README.md",
         "package.json",
-        "apps/*/package.json",
-        "packages/*/package.json",
-        "pnpm-workspace.yaml",
-        "turbo.json",
-        "apps/backend/.env.example",
-        "apps/frontend/.env.example",
-        "packages/typescript-config/*.json",
-        "packages/eslint-config/index.js"
+        "apps/backend/package.json",
+        "apps/frontend/package.json",
+        "packages/shared-types/package.json",
+        "packages/shared-types/src/index.ts"
       ],
       "expectedOutputs": [
         "context/boundaries.sysml",
-        "context/monorepo_config.sysml",
-        "context/requirements.sysml"
+        "context/requirements.sysml",
+        "context/shared_types_config.sysml"
       ]
     },
     "cycle2": {
@@ -258,7 +147,6 @@
         "apps/backend/src/app.ts",
         "apps/backend/src/server.ts",
         "apps/backend/src/routes/*.ts",
-        "apps/backend/src/controllers/*.ts",
         "apps/frontend/src/main.tsx",
         "apps/frontend/src/App.tsx",
         "apps/frontend/src/pages/*.tsx",
@@ -273,61 +161,63 @@
     "cycle3": {
       "name": "Data & Types",
       "sourceFiles": [
-        "packages/shared-types/src/**/*.ts",
+        "packages/shared-types/src/entities/*.ts",
+        "packages/shared-types/src/enums/*.ts",
+        "packages/shared-types/src/api/*.ts",
         "apps/backend/src/models/*.ts"
       ],
       "expectedOutputs": [
+        "data/constraints.sysml",
+        "data/database_models.sysml",
         "data/dtos.sysml",
         "data/entities.sysml",
-        "data/enums.sysml",
-        "data/operations.sysml",
-        "data/shared_barrel.sysml"
+        "data/enums.sysml"
       ]
     },
     "cycle4": {
       "name": "Behavior & Logic",
       "sourceFiles": [
         "apps/backend/src/services/*.ts",
-        "apps/backend/src/middleware/*.ts",
+        "apps/backend/src/controllers/*.ts",
         "apps/backend/src/utils/*.ts",
         "apps/frontend/src/services/*.ts",
         "apps/frontend/src/hooks/*.ts",
         "apps/frontend/src/store/*.ts"
       ],
       "expectedOutputs": [
-        "behavior/backend_utils.sysml",
-        "behavior/frontend_services.sysml",
-        "behavior/handlers.sysml",
-        "behavior/hooks.sysml",
+        "behavior/customer_ops.sysml",
+        "behavior/endpoints.sysml",
         "behavior/operations.sysml",
-        "behavior/services.sysml",
-        "behavior/states.sysml"
+        "behavior/states.sysml",
+        "behavior/vehicle_ops.sysml"
       ]
     },
     "cycle5": {
-      "name": "Verification",
+      "name": "Verification & Quality",
       "sourceFiles": [
         "apps/backend/test/**/*.ts",
-        "apps/frontend/test/**/*.ts",
         "apps/frontend/test/**/*.tsx",
+        "apps/frontend/test/**/*.ts",
         "apps/frontend/e2e/*.spec.ts"
       ],
       "expectedOutputs": [
+        "verification/component_tests.sysml",
         "verification/coverage.sysml",
-        "verification/test-mapping.sysml",
-        "verification/test_coverage.sysml"
+        "verification/test-mapping.sysml"
       ]
     },
     "cycle6": {
-      "name": "Analysis",
+      "name": "Analysis & Properties",
       "sourceFiles": [
+        "apps/backend/src/middleware/*.ts",
         "apps/backend/src/config/*.ts",
-        "apps/backend/src/middleware/auth.middleware.ts",
-        "apps/backend/src/middleware/errorHandler.middleware.ts"
+        "packages/typescript-config/*.json",
+        "packages/eslint-config/index.js"
       ],
       "expectedOutputs": [
+        "analysis/access-control.sysml",
         "analysis/allocations.sysml",
-        "analysis/backend_configs.sysml",
+        "analysis/config_coverage.sysml",
         "analysis/constraints.sysml",
         "analysis/observability.sysml",
         "analysis/performance.sysml",
@@ -337,20 +227,19 @@
     }
   },
   "statistics": {
-    "totalFiles": 120,
+    "totalFiles": 105,
     "relevantFiles": 105
   },
   "discoveredEntities": [
-    "Customer",
-    "Sale",
     "User",
-    "Vehicle"
+    "Customer",
+    "Vehicle",
+    "Sale"
   ],
   "discoveredDomains": [
     "Auth",
     "Customer",
     "Sale",
-    "Vehicle",
-    "User"
+    "Vehicle"
   ]
 }

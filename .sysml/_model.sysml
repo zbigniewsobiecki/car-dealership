@@ -1,30 +1,29 @@
 package car_dealership_appModel {
-    doc /*car-dealership-app - SysML v2 Model. Master index file importing all model packages. Generated: 2026-01-26T20:03:49.804Z. */
+    doc /*car-dealership-app - SysML v2 Model. Master index file importing all model packages. Generated: 2026-01-27T11:34:29.575Z. */
 
     // Import all model packages by their package names
+    import APIEndpoints::*;
+    import AccessControlAnalysis::*;
     import Analysis::*;
-    import BackendConfigsAnalysis::*;
-    import BackendServices::*;
-    import BackendUtilities::*;
     import BehaviorAllocations::*;
+    import ComponentTests::*;
+    import ConfigCoverage::*;
     import CoverageAnalysis::*;
+    import CustomerOperations::*;
+    import DataConstraints::*;
     import DataModel::*;
     import DataTransferObjects::*;
-    import DatabaseOperations::*;
+    import DatabaseModels::*;
     import DomainEntities::*;
     import DomainEnums::*;
     import EntityStateMachines::*;
-    import EventHandlers::*;
-    import FrontendHooks::*;
-    import FrontendServices::*;
-    import MonorepoConfiguration::*;
     import ObservabilityAnalysis::*;
     import PerformanceAnalysis::*;
     import PerformanceConstraints::*;
     import ProjectMetadata::*;
     import ReliabilityAnalysis::*;
     import SecurityAnalysis::*;
-    import SharedTypesBarrel::*;
+    import SharedTypesConfig::*;
     import SystemArchitecture::*;
     import SystemBehavior::*;
     import SystemConnections::*;
@@ -33,8 +32,8 @@ package car_dealership_appModel {
     import SystemModules::*;
     import SystemOperations::*;
     import SystemRequirements::*;
-    import TestCoverage::*;
     import TestMappings::*;
+    import VehicleOperations::*;
     import Verification::*;
 
     // Re-export key packages for convenience

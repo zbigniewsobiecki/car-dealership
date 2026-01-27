@@ -1,8 +1,6 @@
 package DomainEntities {
-    import DataTransferObjects::*;
     import SysMLPrimitives::*;
-    import DomainEnums::*;
-    doc /* Core domain entities for the Car Dealership system. */
+
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/user.types.ts";
     }
@@ -10,17 +8,8 @@ package DomainEntities {
         attribute email : String;
         attribute firstName : String;
         attribute lastName : String;
-        attribute role : UserRole;
+        attribute role : DomainEnums::UserRole;
         attribute isActive : Boolean;
-        item def User :> BaseEntity {
-            attribute email : String;
-            attribute firstName : String;
-            attribute lastName : String;
-            attribute role : UserRole;
-            attribute isActive : Boolean;
-            attribute :>> createdAt : DateTime [1..1];
-            attribute :>> updatedAt : DateTime [1..1];
-        }
     }
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/customer.types.ts";
@@ -32,35 +21,13 @@ package DomainEntities {
         attribute phone : String [0..1];
         attribute address : String [0..1];
         attribute city : String [0..1];
-        attribute stateValue : String [0..1];
-        // Renamed from 'state' (reserved)
+        attribute stateProvince : String [0..1];
         attribute zipCode : String [0..1];
         attribute notes : String [0..1];
         attribute createdBy : Identifier [0..1];
-        item def Customer :> BaseEntity {
-            attribute firstName : String;
-            attribute lastName : String;
-            attribute email : String [0..1];
-            attribute phone : String [0..1];
-            attribute address : String [0..1];
-            attribute city : String [0..1];
-            attribute state : String [0..1];
-            attribute zipCode : String [0..1];
-            attribute notes : String [0..1];
-            attribute createdBy : Identifier [0..1];
-            attribute :>> createdAt : DateTime [1..1];
-            attribute :>> updatedAt : DateTime [1..1];
-        }
+        attribute state : String [0..1];
     }
-    @SourceFile {
-        :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
-    }
-    item def VehicleImage {
-        attribute id : Identifier;
-        attribute url : URL;
-        attribute isPrimary : Boolean;
-        attribute order : Integer;
-    }
+
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
     }
@@ -73,8 +40,8 @@ package DomainEntities {
         attribute mileage : Integer [0..1];
         attribute price : Real;
         attribute cost : Real [0..1];
-        attribute status : VehicleStatus;
-        attribute condition : VehicleCondition [0..1];
+        attribute status : DomainEnums::VehicleStatus;
+        attribute condition : DomainEnums::VehicleCondition [0..1];
         attribute bodyType : String [0..1];
         attribute transmission : String [0..1];
         attribute fuelType : String [0..1];
@@ -84,10 +51,10 @@ package DomainEntities {
         attribute interiorColor : String [0..1];
         attribute features : JSON [0..1];
         attribute description : String [0..1];
-        item images : VehicleImage [0..*];
         attribute dateAcquired : DateTime [0..1];
         attribute createdBy : Identifier [0..1];
     }
+
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/sale.types.ts";
     }
@@ -102,51 +69,37 @@ package DomainEntities {
         attribute tradeInVehicle : String [0..1];
         attribute tradeInValue : Real [0..1];
         attribute downPayment : Real [0..1];
-        attribute status : SaleStatus;
+        attribute status : DomainEnums::SaleStatus;
         attribute notes : String [0..1];
     }
+
+    connection def CustomerSales {
+        end [1] customer:Customer;
+        end [0..*] sales:Sale;
+    }
+
+    connection def VehicleSale {
+        end [1] vehicle:Vehicle;
+        end [0..1] sale:Sale;
+    }
     @SourceFile {
-        :>> path = "apps/backend/src/models/User.model.ts";
+        :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
     }
-    item def UserWithPassword :> User {
-        doc /* Internal user representation including password hash for authentication. */
-        attribute passwordHash : String;
+    item def VehicleImage :> BaseEntity {
+        attribute url : String;
+        attribute isPrimary : Boolean;
+        attribute order : Integer;
     }
 
     @SourceFile {
-        :>> path = "apps/backend/src/models/User.model.ts";
+        :>> path = "apps/backend/src/models/Vehicle.model.ts";
     }
-    part def UserModel :> DataModule {
-        doc /* Data access object for User entities. */
-        action findById {
-            in id : Identifier;
-            out user : User [0..1];
-        }
-
-        action findByEmail {
-            in email : String;
-            out user : UserWithPassword [0..1];
-        }
-
-        action findAll {
-            out users : User [0..*];
-        }
-
-        action create {
-            in data : CreateUserDto;
-            in passwordHash : String;
-            out user : User;
-        }
-
-        action update {
-            in id : Identifier;
-            in data : UpdateUserDto;
-            out user : User [0..1];
-        }
-
-        action delete {
-            in id : Identifier;
-            out success : Boolean;
-        }
+    item def VehicleStats :> BaseDTO {
+        attribute total : Integer;
+        attribute available : Integer;
+        attribute sold : Integer;
+        attribute reserved : Integer;
+        attribute maintenance : Integer;
+        attribute totalInventoryValue : Real;
     }
 }
