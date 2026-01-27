@@ -4,36 +4,32 @@ package DomainEnums {
         :>> path = "packages/shared-types/src/enums/roles.enum.ts";
     }
     enum def UserRole {
-        admin;
-        salesperson;
-        manager;
+        ADMIN;
+        SALESPERSON;
     }
-
     @SourceFile {
         :>> path = "packages/shared-types/src/enums/sale-status.enum.ts";
     }
     enum def SaleStatus {
-        pending;
-        completed;
-        cancelled;
+        PENDING;
+        COMPLETED;
+        CANCELLED;
     }
-
     @SourceFile {
         :>> path = "packages/shared-types/src/enums/vehicle-status.enum.ts";
     }
     enum def VehicleStatus {
-        available;
-        sold;
-        reserved;
-        maintenance;
+        AVAILABLE;
+        SOLD;
+        RESERVED;
+        MAINTENANCE;
     }
-
     @SourceFile {
         :>> path = "packages/shared-types/src/enums/vehicle-status.enum.ts";
     }
     enum def VehicleCondition {
-        new;
-        used;
-        certified_pre_owned;
+        NEW;
+        USED;
+        CERTIFIED_PRE_OWNED;
     }
 }

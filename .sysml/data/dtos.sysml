@@ -27,7 +27,6 @@ package DataTransferObjects {
         attribute notes : String [0..1];
         attribute state : String [0..1];
     }
-
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
     }
@@ -44,6 +43,14 @@ package DataTransferObjects {
         attribute condition : VehicleCondition [0..1];
         attribute features : JSON [0..1];
         attribute dateAcquired : DateTime [0..1];
+        attribute bodyType : String [0..1];
+        attribute transmission : String [0..1];
+        attribute fuelType : String [0..1];
+        attribute engine : String [0..1];
+        attribute drivetrain : String [0..1];
+        attribute exteriorColor : String [0..1];
+        attribute interiorColor : String [0..1];
+        attribute description : String [0..1];
     }
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/sale.types.ts";
@@ -166,5 +173,65 @@ package DataTransferObjects {
         attribute status : String [0..1];
         attribute condition : String [0..1];
         attribute search : String [0..1];
+    }
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/user.types.ts";
+    }
+    item def UpdateUserDto :> BaseDTO {
+        attribute email : String [0..1];
+        attribute firstName : String [0..1];
+        attribute lastName : String [0..1];
+        attribute role : UserRole [0..1];
+        attribute isActive : Boolean [0..1];
+    }
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/customer.types.ts";
+    }
+    item def UpdateCustomerDto :> BaseDTO {
+        attribute firstName : String [0..1];
+        attribute lastName : String [0..1];
+        attribute email : String [0..1];
+        attribute phone : String [0..1];
+        attribute address : String [0..1];
+        attribute city : String [0..1];
+        attribute stateProvince : String [0..1];
+        attribute zipCode : String [0..1];
+        attribute notes : String [0..1];
+        attribute state : String [0..1];
+    }
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
+    }
+    item def UpdateVehicleDto :> BaseDTO {
+        attribute vin : String [0..1];
+        attribute make : String [0..1];
+        attribute model : String [0..1];
+        attribute year : Integer [0..1];
+        attribute color : String [0..1];
+        attribute mileage : Integer [0..1];
+        attribute price : Real [0..1];
+        attribute cost : Real [0..1];
+        attribute status : VehicleStatus [0..1];
+        attribute condition : VehicleCondition [0..1];
+        attribute bodyType : String [0..1];
+        attribute transmission : String [0..1];
+        attribute fuelType : String [0..1];
+        attribute engine : String [0..1];
+        attribute drivetrain : String [0..1];
+        attribute exteriorColor : String [0..1];
+        attribute interiorColor : String [0..1];
+        attribute features : JSON [0..1];
+        attribute description : String [0..1];
+        attribute dateAcquired : DateTime [0..1];
+    }
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/sale.types.ts";
+    }
+    item def UpdateSaleDto :> BaseDTO {
+        attribute salePrice : Real [0..1];
+        attribute saleDate : DateTime [0..1];
+        attribute status : SaleStatus [0..1];
+        attribute paymentMethod : String [0..1];
+        attribute notes : String [0..1];
     }
 }

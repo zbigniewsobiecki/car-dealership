@@ -1,6 +1,5 @@
 package DomainEntities {
     import SysMLPrimitives::*;
-
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/user.types.ts";
     }
@@ -10,6 +9,7 @@ package DomainEntities {
         attribute lastName : String;
         attribute role : DomainEnums::UserRole;
         attribute isActive : Boolean;
+        attribute password : String;
     }
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/customer.types.ts";
@@ -27,7 +27,14 @@ package DomainEntities {
         attribute createdBy : Identifier [0..1];
         attribute state : String [0..1];
     }
-
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
+    }
+    item def VehicleImage :> BaseEntity {
+        attribute url : String;
+        attribute isPrimary : Boolean;
+        attribute order : Integer;
+    }
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
     }
@@ -53,8 +60,8 @@ package DomainEntities {
         attribute description : String [0..1];
         attribute dateAcquired : DateTime [0..1];
         attribute createdBy : Identifier [0..1];
+        item images : VehicleImage [0..*];
     }
-
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/sale.types.ts";
     }
@@ -72,27 +79,16 @@ package DomainEntities {
         attribute status : DomainEnums::SaleStatus;
         attribute notes : String [0..1];
     }
-
     connection def CustomerSales {
         end [1] customer:Customer;
         end [0..*] sales:Sale;
     }
-
     connection def VehicleSale {
         end [1] vehicle:Vehicle;
         end [0..1] sale:Sale;
     }
     @SourceFile {
-        :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
-    }
-    item def VehicleImage :> BaseEntity {
-        attribute url : String;
-        attribute isPrimary : Boolean;
-        attribute order : Integer;
-    }
-
-    @SourceFile {
-        :>> path = "apps/backend/src/models/Vehicle.model.ts";
+        :>> path = "apps/backend/src/controllers/vehicles.controller.ts";
     }
     item def VehicleStats :> BaseDTO {
         attribute total : Integer;

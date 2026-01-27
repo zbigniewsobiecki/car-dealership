@@ -108,14 +108,6 @@ library package SysMLPrimitives {
         end module;
     }
 
-    // ========== METADATA ==========
-    // Usage: @SourceFile { :>> path = "src/file.ts"; :>> line = 42; }
-    // Or prefix: #SourceFile { :>> path = "src/file.ts"; }
-    metadata def SourceFile {
-        attribute path : FilePath;
-        attribute line : Integer;
-    }
-
     // Stereotype markers - use with semicolon: @external; or prefix: #external
     metadata def external;
     metadata def internal;
@@ -504,5 +496,9 @@ library package SysMLPrimitives {
         doc /*Application to Cache connection */
         end app:~CachePort;
         end cache:CachePort;
+    }
+    metadata def SourceFile {
+        attribute path : FilePath;
+        attribute line : Integer [0..1];
     }
 }
