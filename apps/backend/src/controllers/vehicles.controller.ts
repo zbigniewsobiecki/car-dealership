@@ -102,4 +102,17 @@ export const vehiclesController = {
       next(error);
     }
   },
+
+  async getRecent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+      const vehicles = await vehiclesService.getRecent(limit);
+      res.json({
+        success: true,
+        data: vehicles,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

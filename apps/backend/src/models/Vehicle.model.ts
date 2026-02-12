@@ -222,6 +222,14 @@ export const VehicleModel = {
     return (result.rowCount ?? 0) > 0;
   },
 
+  async findRecent(limit: number): Promise<Vehicle[]> {
+    const result = await query(
+      'SELECT * FROM vehicles ORDER BY created_at DESC LIMIT $1',
+      [limit]
+    );
+    return result.rows.map(VehicleModel.mapRow);
+  },
+
   async getStats(): Promise<VehicleStats> {
     const result = await query(`
       SELECT

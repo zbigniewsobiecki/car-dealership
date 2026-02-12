@@ -62,3 +62,10 @@ export const useVehicleStats = () => {
     queryFn: () => vehiclesService.getStats(),
   });
 };
+
+export const useRecentVehicles = (limit?: number) => {
+  return useQuery({
+    queryKey: ['vehicles', 'recent', limit],
+    queryFn: () => vehiclesService.getRecent(limit),
+  });
+};

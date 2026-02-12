@@ -50,4 +50,9 @@ export const vehiclesService = {
     const response = await api.get('/vehicles/stats');
     return response.data.data as VehicleStats;
   },
+
+  async getRecent(limit: number = 5): Promise<Vehicle[]> {
+    const response = await api.get(`/vehicles/recent?limit=${limit}`);
+    return response.data.data as Vehicle[];
+  },
 };
