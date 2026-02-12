@@ -13,7 +13,7 @@ import customersRoutes from './routes/customers.routes.js';
 import salesRoutes from './routes/sales.routes.js';
 import healthRoutes from './routes/health.routes.js';
 
-const app = express();
+const app: express.Application = express();
 
 // Security middleware
 app.use(helmet());
@@ -53,7 +53,7 @@ app.use('/api/customers', customersRoutes);
 app.use('/api/sales', salesRoutes);
 
 // 404 handler
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({
     success: false,
     error: {
