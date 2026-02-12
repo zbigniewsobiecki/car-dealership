@@ -11,6 +11,7 @@ export interface Customer {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
   createdBy?: string;
 }
 

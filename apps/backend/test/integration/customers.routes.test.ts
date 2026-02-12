@@ -59,6 +59,7 @@ const createMockCustomerRow = (overrides = {}) => ({
   notes: null,
   created_at: new Date(),
   updated_at: new Date(),
+  deleted_at: null,
   created_by: 'user-1',
   ...overrides,
 });
@@ -118,6 +119,17 @@ describe('Customers Routes Integration', () => {
 
       expect(response.status).toBe(404);
       expect(response.body.error.message).toBe('Customer not found');
+    });
+
+    it('should return 404 for soft-deleted customer', async () => {
+      // Model will return null because of WHERE deleted_at IS NULL
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const response = await request(app)
+        .get('/api/customers/deleted-id')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
     });
   });
 

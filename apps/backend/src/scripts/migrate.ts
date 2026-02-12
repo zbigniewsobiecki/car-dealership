@@ -40,14 +40,26 @@ const createTables = async () => {
         notes TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP WITH TIME ZONE,
         created_by UUID REFERENCES users(id)
       );
     `);
     console.log('✓ Created customers table');
 
+    // Add deleted_at column if it doesn't exist (for existing databases)
+    await query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='customers' AND column_name='deleted_at') THEN
+          ALTER TABLE customers ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
+        END IF;
+      END $$;
+    `);
+
     // Create indexes for customers
     await query('CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);');
     await query('CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(last_name, first_name);');
+    await query('CREATE INDEX IF NOT EXISTS idx_customers_deleted_at ON customers(deleted_at);');
     console.log('✓ Created customers indexes');
 
     // Create vehicles table
