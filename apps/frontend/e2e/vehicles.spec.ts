@@ -65,4 +65,30 @@ test.describe('Vehicles', () => {
       await page.waitForTimeout(500);
     }
   });
+
+  test('should filter vehicles by price range', async ({ page }) => {
+    await page.goto('/vehicles');
+
+    const minPriceInput = page.getByPlaceholder('Min Price');
+    const maxPriceInput = page.getByPlaceholder('Max Price');
+    const searchButton = page.getByRole('button', { name: 'Search' });
+    const clearButton = page.getByRole('button', { name: 'Clear' });
+
+    // Verify inputs are visible
+    await expect(minPriceInput).toBeVisible();
+    await expect(maxPriceInput).toBeVisible();
+
+    // Fill price range
+    await minPriceInput.fill('10000');
+    await maxPriceInput.fill('50000');
+    await searchButton.click();
+
+    // Verify clear button appears and works
+    await expect(clearButton).toBeVisible();
+    await clearButton.click();
+
+    // Verify inputs are cleared
+    await expect(minPriceInput).toHaveValue('');
+    await expect(maxPriceInput).toHaveValue('');
+  });
 });
