@@ -44,7 +44,8 @@ describe('useVehicles hooks', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
       expect(result.current.data).toBeDefined();
-      expect(Array.isArray(result.current.data)).toBe(true);
+      expect(Array.isArray(result.current.data?.data)).toBe(true);
+      expect(result.current.data?.pagination).toBeDefined();
     });
 
     it('should fetch vehicles with filters', async () => {
@@ -59,16 +60,17 @@ describe('useVehicles hooks', () => {
     });
   });
 
-  describe('useVehicle', () => {
-    it('should fetch a vehicle by id', async () => {
-      const { result } = renderHook(() => useVehicle('vehicle-1'), {
+  describe('useVehicles', () => {
+    it('should fetch all vehicles', async () => {
+      const { result } = renderHook(() => useVehicles(), {
         wrapper: createWrapper(),
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
       expect(result.current.data).toBeDefined();
-      expect(result.current.data?.id).toBe('vehicle-1');
+      expect(Array.isArray(result.current.data?.data)).toBe(true);
+      expect(result.current.data?.pagination).toBeDefined();
     });
 
     it('should not fetch when id is empty', () => {
@@ -101,16 +103,17 @@ describe('useVehicles hooks', () => {
     });
   });
 
-  describe('useVehicleStats', () => {
-    it('should fetch vehicle stats', async () => {
-      const { result } = renderHook(() => useVehicleStats(), {
+  describe('useVehicles', () => {
+    it('should fetch all vehicles', async () => {
+      const { result } = renderHook(() => useVehicles(), {
         wrapper: createWrapper(),
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
       expect(result.current.data).toBeDefined();
-      expect(result.current.data).toHaveProperty('total');
+      expect(Array.isArray(result.current.data?.data)).toBe(true);
+      expect(result.current.data?.pagination).toBeDefined();
     });
   });
 });

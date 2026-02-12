@@ -32,23 +32,23 @@ describe('vehiclesService', () => {
   describe('getAll', () => {
     it('should return all vehicles', async () => {
       const vehicles = [createMockVehicle(), createMockVehicle()];
-      mockVehicleModel.findAll.mockResolvedValue(vehicles);
+      mockVehicleModel.findAll.mockResolvedValue({ vehicles, total: 2 });
 
       const result = await vehiclesService.getAll();
 
       expect(mockVehicleModel.findAll).toHaveBeenCalledWith(undefined);
-      expect(result).toEqual(vehicles);
+      expect(result).toEqual({ vehicles, total: 2 });
     });
 
     it('should pass filters to model', async () => {
       const filters = { make: 'Toyota', status: VehicleStatus.AVAILABLE };
       const vehicles = [createMockVehicle({ make: 'Toyota' })];
-      mockVehicleModel.findAll.mockResolvedValue(vehicles);
+      mockVehicleModel.findAll.mockResolvedValue({ vehicles, total: 1 });
 
       const result = await vehiclesService.getAll(filters);
 
       expect(mockVehicleModel.findAll).toHaveBeenCalledWith(filters);
-      expect(result).toEqual(vehicles);
+      expect(result).toEqual({ vehicles, total: 1 });
     });
   });
 

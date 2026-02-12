@@ -11,8 +11,10 @@ describe('vehiclesService', () => {
     it('should return all vehicles', async () => {
       const result = await vehiclesService.getAll();
 
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.success).toBe(true);
+      expect(Array.isArray(result.data)).toBe(true);
+      expect(result.data.length).toBeGreaterThan(0);
+      expect(result.pagination).toBeDefined();
     });
 
     it('should build query params from filters', async () => {
@@ -23,7 +25,7 @@ describe('vehiclesService', () => {
 
       const result = await vehiclesService.getAll(filters);
 
-      expect(Array.isArray(result)).toBe(true);
+      expect(Array.isArray(result.data)).toBe(true);
     });
   });
 
