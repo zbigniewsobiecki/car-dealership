@@ -4,7 +4,7 @@ import { customersService } from '../services/customers.service.js';
 export const customersController = {
   async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
-      const customers = await customersService.getAll();
+      const { data: customers } = await customersService.getAll();
       res.json({
         success: true,
         data: customers,
