@@ -262,9 +262,74 @@ describe('Vehicles Routes Integration', () => {
       expect(response.status).toBe(400);
       expect(response.body.error.message).toBe('Vehicle with this VIN already exists');
     });
+
+    it('should fail when creating vehicle with invalid image URL', async () => {
+      const response = await request(app)
+        .post('/api/vehicles')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          vin: '1234567890ABCDEF1',
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2022,
+          color: 'Blue',
+          price: 25000,
+          status: VehicleStatus.AVAILABLE,
+          images: [{ url: 'not-a-url' }]
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toContain('Each image must have a valid URL');
+    });
+
+    it('should succeed with valid image URLs', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] }); // VIN check
+      const mockCreatedVehicle = createMockVehicleRow({ 
+        id: 'new-vehicle',
+        images: [{ url: 'https://example.com/image.jpg', isPrimary: true, order: 1 }]
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [mockCreatedVehicle] });
+
+      const response = await request(app)
+        .post('/api/vehicles')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          vin: '1234567890ABCDEF2',
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2022,
+          color: 'Blue',
+          price: 25000,
+          status: VehicleStatus.AVAILABLE,
+          images: [{ url: 'https://example.com/image.jpg', isPrimary: true, order: 1 }]
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.success).toBe(true);
+      
+      // Verify that images were passed to the database query
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO vehicles'),
+        expect.arrayContaining([
+          expect.stringContaining('https://example.com/image.jpg')
+        ])
+      );
+    });
   });
 
   describe('PUT /api/vehicles/:id', () => {
+    it('should fail when updating vehicle with invalid image URL', async () => {
+      // Validator runs BEFORE the controller/service, so no mocks are consumed if validation fails
+      const response = await request(app)
+        .put('/api/vehicles/vehicle-1')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          images: [{ url: 'invalid-url' }]
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toContain('Each image must have a valid URL');
+    });
     it('should update a vehicle', async () => {
       // First query: find existing vehicle
       mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
@@ -280,6 +345,35 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
+    });
+
+    it('should update vehicle images', async () => {
+      // First query: find existing vehicle
+      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
+
+      // Second query: update vehicle
+      const mockUpdatedVehicle = createMockVehicleRow({ 
+        images: [{ url: 'https://example.com/new-image.jpg', isPrimary: true, order: 1 }]
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [mockUpdatedVehicle] });
+
+      const response = await request(app)
+        .put('/api/vehicles/vehicle-1')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          images: [{ url: 'https://example.com/new-image.jpg', isPrimary: true, order: 1 }]
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      
+      // Verify that images were passed to the database query
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('UPDATE vehicles SET'),
+        expect.arrayContaining([
+          expect.stringContaining('https://example.com/new-image.jpg')
+        ])
+      );
     });
 
     it('should return 404 for non-existent vehicle', async () => {

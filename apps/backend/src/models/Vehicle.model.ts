@@ -88,8 +88,8 @@ export const VehicleModel = {
       `INSERT INTO vehicles (
         vin, make, model, year, color, mileage, price, cost, status, condition,
         body_type, transmission, fuel_type, engine, drivetrain, exterior_color,
-        interior_color, features, description, date_acquired, created_by
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+        interior_color, features, description, images, date_acquired, created_by
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
       RETURNING *`,
       [
         data.vin,
@@ -111,6 +111,7 @@ export const VehicleModel = {
         data.interiorColor || null,
         data.features ? JSON.stringify(data.features) : null,
         data.description || null,
+        data.images ? JSON.stringify(data.images) : null,
         data.dateAcquired || null,
         createdBy,
       ]
@@ -194,11 +195,15 @@ export const VehicleModel = {
     }
     if (data.features !== undefined) {
       fields.push(`features = $${paramCount++}`);
-      values.push(JSON.stringify(data.features));
+      values.push(data.features ? JSON.stringify(data.features) : null);
     }
     if (data.description !== undefined) {
       fields.push(`description = $${paramCount++}`);
       values.push(data.description);
+    }
+    if (data.images !== undefined) {
+      fields.push(`images = $${paramCount++}`);
+      values.push(data.images ? JSON.stringify(data.images) : null);
     }
     if (data.dateAcquired !== undefined) {
       fields.push(`date_acquired = $${paramCount++}`);
