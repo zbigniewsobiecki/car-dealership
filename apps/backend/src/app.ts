@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.routes.js';
 import vehiclesRoutes from './routes/vehicles.routes.js';
 import customersRoutes from './routes/customers.routes.js';
 import salesRoutes from './routes/sales.routes.js';
+import healthRoutes from './routes/health.routes.js';
 
 const app = express();
 
@@ -43,9 +44,7 @@ if (env.nodeEnv === 'development') {
 }
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+app.use('/health', healthRoutes);
 
 // API routes
 app.use('/api/auth', authRoutes);
