@@ -7,7 +7,7 @@ echo "Agent profile: ${AGENT_PROFILE_NAME:-not set}"
 # =============================================================================
 # 0. Install Dependencies (only for implementation and respond-to-review agents)
 # =============================================================================
-if [ "$AGENT_PROFILE_NAME" = "implementation" ] || [ "$AGENT_PROFILE_NAME" = "respond-to-review" ]; then
+if [ "$AGENT_PROFILE_NAME" = "implementation" ] || [ "$AGENT_PROFILE_NAME" = "respond-to-review" ] || [ "$AGENT_PROFILE_NAME" = "review" ] || [ "$AGENT_PROFILE_NAME" = "respond-to-ci" ]; thenthen
   echo ""
   echo "--- Installing Dependencies ---"
   CI=true PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install
