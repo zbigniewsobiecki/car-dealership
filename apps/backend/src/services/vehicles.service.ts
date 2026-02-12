@@ -64,4 +64,8 @@ export const vehiclesService = {
   async getStats(): Promise<VehicleStats> {
     return VehicleModel.getStats();
   },
+
+  async getRecent(limit: number) {
+    return VehicleModel.findRecent(limit);
+  },
 };

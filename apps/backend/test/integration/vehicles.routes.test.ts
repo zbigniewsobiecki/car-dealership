@@ -153,6 +153,42 @@ describe('Vehicles Routes Integration', () => {
     });
   });
 
+  describe('GET /api/vehicles/recent', () => {
+    it('should return recently added vehicles', async () => {
+      const mockVehicles = [
+        createMockVehicleRow({ id: 'v-1', created_at: new Date('2024-01-02') }),
+        createMockVehicleRow({ id: 'v-2', created_at: new Date('2024-01-01') }),
+      ];
+      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
+
+      const response = await request(app)
+        .get('/api/vehicles/recent?limit=2')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toHaveLength(2);
+      expect(response.body.data[0].id).toBe('v-1');
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('ORDER BY created_at DESC LIMIT $1'),
+        [2]
+      );
+    });
+
+    it('should use default limit of 5 if not provided', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await request(app)
+        .get('/api/vehicles/recent')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('LIMIT $1'),
+        [5]
+      );
+    });
+  });
+
   describe('GET /api/vehicles/:id', () => {
     it('should return a vehicle by id', async () => {
       const mockVehicle = createMockVehicleRow();

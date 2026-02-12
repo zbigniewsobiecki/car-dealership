@@ -11,6 +11,7 @@ router.use(authenticateToken);
 
 router.get('/', vehiclesController.getAll);
 router.get('/stats', vehiclesController.getStats);
+router.get('/recent', vehiclesController.getRecent);
 router.get('/:id', vehiclesController.getById);
 router.post('/', createVehicleValidator, validate, vehiclesController.create);
 router.put('/:id', vehiclesController.update);
