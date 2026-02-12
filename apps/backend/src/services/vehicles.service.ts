@@ -4,6 +4,7 @@ import {
   CreateVehicleDto,
   UpdateVehicleDto,
   VehicleFilters,
+  VehicleStats,
 } from '@car-dealership/shared-types';
 
 export const vehiclesService = {
@@ -60,7 +61,7 @@ export const vehiclesService = {
     return { success: true };
   },
 
-  async getStats() {
+  async getStats(): Promise<VehicleStats> {
     return VehicleModel.getStats();
   },
 };
