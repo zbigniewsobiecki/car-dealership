@@ -10,14 +10,14 @@ export interface JwtPayload {
 
 export const jwtUtils = {
   sign(payload: JwtPayload): string {
-    return jwt.sign(payload, jwtConfig.secret, {
-      expiresIn: jwtConfig.expiresIn,
+    return jwt.sign(payload, jwtConfig.secret as jwt.Secret, {
+      expiresIn: jwtConfig.expiresIn as jwt.SignOptions['expiresIn'],
     });
   },
 
   signRefreshToken(payload: JwtPayload): string {
-    return jwt.sign(payload, jwtConfig.refreshSecret, {
-      expiresIn: jwtConfig.refreshExpiresIn,
+    return jwt.sign(payload, jwtConfig.refreshSecret as jwt.Secret, {
+      expiresIn: jwtConfig.refreshExpiresIn as jwt.SignOptions['expiresIn'],
     });
   },
 

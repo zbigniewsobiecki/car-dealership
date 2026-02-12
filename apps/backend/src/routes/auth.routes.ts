@@ -3,7 +3,7 @@ import { authController } from '../controllers/auth.controller.js';
 import { authenticateToken, requireRole } from '../middleware/auth.middleware.js';
 import { UserRole } from '@car-dealership/shared-types';
 
-const router = Router();
+const router: Router = Router();
 
 // Public routes
 router.post('/login', authController.login);

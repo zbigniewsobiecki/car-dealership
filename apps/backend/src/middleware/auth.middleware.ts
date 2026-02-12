@@ -5,7 +5,7 @@ import { UserRole } from '@car-dealership/shared-types';
 
 export const authenticateToken = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   const authHeader = req.headers['authorization'];
@@ -29,7 +29,7 @@ export const authenticateToken = (
 };
 
 export const requireRole = (...roles: UserRole[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request,  _res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new AppError(401, 'Authentication required'));
     }

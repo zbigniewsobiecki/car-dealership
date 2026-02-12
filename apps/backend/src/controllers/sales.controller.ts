@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { salesService } from '../services/sales.service.js';
 
 export const salesController = {
-  async getAll(req: Request, res: Response, next: NextFunction) {
+  async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
       const sales = await salesService.getAll();
       res.json({
@@ -62,7 +62,7 @@ export const salesController = {
     }
   },
 
-  async getStats(req: Request, res: Response, next: NextFunction) {
+  async getStats(_req: Request, res: Response, next: NextFunction) {
     try {
       const stats = await salesService.getStats();
       res.json({
@@ -74,7 +74,7 @@ export const salesController = {
     }
   },
 
-  async getMonthlyStats(req: Request, res: Response, next: NextFunction) {
+  async getMonthlyStats(_req: Request, res: Response, next: NextFunction) {
     try {
       const stats = await salesService.getMonthlyStats();
       res.json({

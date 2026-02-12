@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { vehiclesController } from '../controllers/vehicles.controller.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 
-const router = Router();
+const router: Router = Router();
 
 // All vehicle routes require authentication
 router.use(authenticateToken);

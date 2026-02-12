@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { customersService } from '../services/customers.service.js';
 
 export const customersController = {
-  async getAll(req: Request, res: Response, next: NextFunction) {
+  async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
       const customers = await customersService.getAll();
       res.json({

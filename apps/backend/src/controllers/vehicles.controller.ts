@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { vehiclesService } from '../services/vehicles.service.js';
+import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
 
 export const vehiclesController = {
   async getAll(req: Request, res: Response, next: NextFunction) {
@@ -11,8 +12,8 @@ export const vehiclesController = {
         yearMax: req.query.yearMax ? parseInt(req.query.yearMax as string) : undefined,
         priceMin: req.query.priceMin ? parseFloat(req.query.priceMin as string) : undefined,
         priceMax: req.query.priceMax ? parseFloat(req.query.priceMax as string) : undefined,
-        status: req.query.status as string | undefined,
-        condition: req.query.condition as string | undefined,
+        status: req.query.status as VehicleStatus | undefined,
+        condition: req.query.condition as VehicleCondition | undefined,
         search: req.query.search as string | undefined,
       };
 
@@ -74,7 +75,7 @@ export const vehiclesController = {
     }
   },
 
-  async getStats(req: Request, res: Response, next: NextFunction) {
+  async getStats(_req: Request, res: Response, next: NextFunction) {
     try {
       const stats = await vehiclesService.getStats();
       res.json({

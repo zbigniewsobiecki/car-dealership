@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { salesController } from '../controllers/sales.controller.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 
-const router = Router();
+const router: Router = Router();
 
 // All sales routes require authentication
 router.use(authenticateToken);
