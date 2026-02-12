@@ -245,6 +245,14 @@ export const VehicleModel = {
     };
   },
 
+  async findRecent(days: number): Promise<Vehicle[]> {
+    const result = await query(
+      'SELECT * FROM vehicles WHERE date_acquired >= NOW() - make_interval(days => $1) ORDER BY date_acquired DESC',
+      [days]
+    );
+    return result.rows.map(VehicleModel.mapRow);
+  },
+
   mapRow(row: Record<string, unknown>): Vehicle {
     return {
       id: row.id as string,

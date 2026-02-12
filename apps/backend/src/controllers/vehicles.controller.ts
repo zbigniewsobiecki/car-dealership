@@ -102,4 +102,17 @@ export const vehiclesController = {
       next(error);
     }
   },
+
+  async getRecent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const vehicles = await vehiclesService.getRecent(isNaN(days) ? 7 : days);
+      res.json({
+        success: true,
+        data: vehicles,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

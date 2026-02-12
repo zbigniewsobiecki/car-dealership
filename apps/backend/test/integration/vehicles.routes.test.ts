@@ -153,6 +153,58 @@ describe('Vehicles Routes Integration', () => {
     });
   });
 
+  describe('GET /api/vehicles/recent', () => {
+    it('should return recently added vehicles with default days (7)', async () => {
+      const mockVehicles = [
+        createMockVehicleRow({ id: 'v1', date_acquired: new Date() }),
+        createMockVehicleRow({ id: 'v2', date_acquired: new Date() }),
+      ];
+      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
+
+      const response = await request(app)
+        .get('/api/vehicles/recent')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toHaveLength(2);
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('date_acquired >= NOW() - make_interval(days => $1)'),
+        [7]
+      );
+    });
+
+    it('should return recently added vehicles with custom days', async () => {
+      const mockVehicles = [createMockVehicleRow({ id: 'v1' })];
+      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
+
+      const response = await request(app)
+        .get('/api/vehicles/recent?days=30')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('date_acquired >= NOW() - make_interval(days => $1)'),
+        [30]
+      );
+    });
+
+    it('should use default days if days parameter is invalid', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const response = await request(app)
+        .get('/api/vehicles/recent?days=invalid')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('date_acquired >= NOW() - make_interval(days => $1)'),
+        [7]
+      );
+    });
+  });
+
   describe('GET /api/vehicles/:id', () => {
     it('should return a vehicle by id', async () => {
       const mockVehicle = createMockVehicleRow();
