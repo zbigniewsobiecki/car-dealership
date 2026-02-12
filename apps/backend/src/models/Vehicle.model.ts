@@ -195,7 +195,7 @@ export const VehicleModel = {
     }
     if (data.features !== undefined) {
       fields.push(`features = $${paramCount++}`);
-      values.push(JSON.stringify(data.features));
+      values.push(data.features ? JSON.stringify(data.features) : null);
     }
     if (data.description !== undefined) {
       fields.push(`description = $${paramCount++}`);
@@ -203,7 +203,7 @@ export const VehicleModel = {
     }
     if (data.images !== undefined) {
       fields.push(`images = $${paramCount++}`);
-      values.push(JSON.stringify(data.images));
+      values.push(data.images ? JSON.stringify(data.images) : null);
     }
     if (data.dateAcquired !== undefined) {
       fields.push(`date_acquired = $${paramCount++}`);
