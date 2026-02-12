@@ -3,12 +3,12 @@ import { Customer, CreateCustomerDto, UpdateCustomerDto } from '@car-dealership/
 
 export const CustomerModel = {
   async findAll(): Promise<Customer[]> {
-    const result = await query('SELECT * FROM customers ORDER BY created_at DESC');
+    const result = await query('SELECT * FROM customers WHERE deleted_at IS NULL ORDER BY created_at DESC');
     return result.rows.map(CustomerModel.mapRow);
   },
 
   async findById(id: string): Promise<Customer | null> {
-    const result = await query('SELECT * FROM customers WHERE id = $1', [id]);
+    const result = await query('SELECT * FROM customers WHERE id = $1 AND deleted_at IS NULL', [id]);
     if (result.rows.length === 0) return null;
     return CustomerModel.mapRow(result.rows[0]);
   },
@@ -91,7 +91,7 @@ export const CustomerModel = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const result = await query('DELETE FROM customers WHERE id = $1', [id]);
+    const result = await query('UPDATE customers SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL', [id]);
     return (result.rowCount ?? 0) > 0;
   },
 
@@ -110,6 +110,7 @@ export const CustomerModel = {
       createdAt: row.created_at as Date,
       updatedAt: row.updated_at as Date,
       createdBy: row.created_by as string | undefined,
+      deletedAt: row.deleted_at as Date | undefined,
     };
   },
 };

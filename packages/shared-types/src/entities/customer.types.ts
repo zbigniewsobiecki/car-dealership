@@ -12,6 +12,7 @@ export interface Customer {
   createdAt: Date;
   updatedAt: Date;
   createdBy?: string;
+  deletedAt?: Date;
 }
 
 export interface CreateCustomerDto {

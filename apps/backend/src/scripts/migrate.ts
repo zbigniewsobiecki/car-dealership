@@ -48,6 +48,8 @@ const createTables = async () => {
     // Create indexes for customers
     await query('CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);');
     await query('CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(last_name, first_name);');
+    await query('ALTER TABLE customers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;');
+    await query('CREATE INDEX IF NOT EXISTS idx_customers_deleted_at ON customers(deleted_at);');
     console.log('✓ Created customers indexes');
 
     // Create vehicles table
