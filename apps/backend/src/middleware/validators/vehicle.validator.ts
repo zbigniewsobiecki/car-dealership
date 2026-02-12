@@ -1,7 +1,5 @@
 import { body } from 'express-validator';
-import { VehicleStatus } from '@car-dealership/shared-types';
-
-const currentYear = new Date().getFullYear();
+import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
 
 export const createVehicleValidator = [
   body('vin')
@@ -26,8 +24,15 @@ export const createVehicleValidator = [
   body('year')
     .notEmpty()
     .withMessage('Year is required')
-    .isInt({ min: 1900, max: currentYear + 1 })
-    .withMessage(`Year must be between 1900 and ${currentYear + 1}`),
+    .isInt({ min: 1900 })
+    .withMessage('Year must be at least 1900')
+    .custom((value: number) => {
+      const currentYear = new Date().getFullYear();
+      if (value > currentYear + 1) {
+        throw new Error(`Year must not exceed ${currentYear + 1}`);
+      }
+      return true;
+    }),
 
   body('color')
     .trim()
@@ -45,4 +50,38 @@ export const createVehicleValidator = [
     .withMessage('Status is required')
     .isIn(Object.values(VehicleStatus))
     .withMessage(`Status must be one of: ${Object.values(VehicleStatus).join(', ')}`),
+
+  // Optional field validations
+  body('mileage')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Mileage must be a non-negative integer'),
+
+  body('cost')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Cost must be a non-negative number'),
+
+  body('condition')
+    .optional()
+    .isIn(Object.values(VehicleCondition))
+    .withMessage(`Condition must be one of: ${Object.values(VehicleCondition).join(', ')}`),
+
+  body('bodyType')
+    .optional()
+    .trim()
+    .isString()
+    .withMessage('Body type must be a string'),
+
+  body('transmission')
+    .optional()
+    .trim()
+    .isString()
+    .withMessage('Transmission must be a string'),
+
+  body('fuelType')
+    .optional()
+    .trim()
+    .isString()
+    .withMessage('Fuel type must be a string'),
 ];

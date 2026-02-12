@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
-import { VehicleStatus } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
 import { createVehicleValidator } from '../../../../src/middleware/validators/vehicle.validator.js';
 import { validate } from '../../../../src/middleware/validation.middleware.js';
 import { validationResult } from 'express-validator';
@@ -92,7 +92,7 @@ describe('Vehicle Validator', () => {
       mockReq.body = { ...validVehicle, year: 1899 };
       await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
       const errors = validationResult(mockReq as Request);
-      expect(errors.array().some(e => e.msg.includes('Year must be between 1900'))).toBe(true);
+      expect(errors.array().some(e => e.msg.includes('Year must be at least 1900'))).toBe(true);
     });
 
     it('should fail if year is too far in the future', async () => {
@@ -100,7 +100,15 @@ describe('Vehicle Validator', () => {
       mockReq.body = { ...validVehicle, year: futureYear };
       await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
       const errors = validationResult(mockReq as Request);
-      expect(errors.array().some(e => e.msg.includes('Year must be between 1900'))).toBe(true);
+      expect(errors.array().some(e => e.msg.includes('Year must not exceed'))).toBe(true);
+    });
+
+    it('should accept next year (for future model years)', async () => {
+      const nextYear = new Date().getFullYear() + 1;
+      mockReq.body = { ...validVehicle, year: nextYear };
+      await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+      const errors = validationResult(mockReq as Request);
+      expect(errors.isEmpty()).toBe(true);
     });
   });
 
@@ -124,7 +132,7 @@ describe('Vehicle Validator', () => {
 
   describe('Required fields', () => {
     const requiredFields = ['make', 'model', 'color'];
-    
+
     requiredFields.forEach(field => {
       it(`should fail if ${field} is missing`, async () => {
         const payload = { ...validVehicle } as Record<string, unknown>;
@@ -133,6 +141,97 @@ describe('Vehicle Validator', () => {
         await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
         const errors = validationResult(mockReq as Request);
         expect(errors.array().some(e => e.msg.includes('is required'))).toBe(true);
+      });
+    });
+  });
+
+  describe('Optional field validation', () => {
+    describe('mileage', () => {
+      it('should pass when mileage is not provided', async () => {
+        mockReq.body = { ...validVehicle };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+
+      it('should pass when mileage is a valid non-negative integer', async () => {
+        mockReq.body = { ...validVehicle, mileage: 50000 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+
+      it('should fail when mileage is negative', async () => {
+        mockReq.body = { ...validVehicle, mileage: -100 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.array().some(e => e.msg === 'Mileage must be a non-negative integer')).toBe(true);
+      });
+
+      it('should fail when mileage is a float', async () => {
+        mockReq.body = { ...validVehicle, mileage: 50000.5 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.array().some(e => e.msg === 'Mileage must be a non-negative integer')).toBe(true);
+      });
+    });
+
+    describe('cost', () => {
+      it('should pass when cost is a valid non-negative number', async () => {
+        mockReq.body = { ...validVehicle, cost: 20000.50 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+
+      it('should fail when cost is negative', async () => {
+        mockReq.body = { ...validVehicle, cost: -500 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.array().some(e => e.msg === 'Cost must be a non-negative number')).toBe(true);
+      });
+    });
+
+    describe('condition', () => {
+      it('should pass when condition is a valid enum value', async () => {
+        mockReq.body = { ...validVehicle, condition: VehicleCondition.NEW };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+
+      it('should fail when condition is an invalid value', async () => {
+        mockReq.body = { ...validVehicle, condition: 'invalid-condition' };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.array().some(e => e.msg.includes('Condition must be one of'))).toBe(true);
+      });
+    });
+
+    describe('bodyType', () => {
+      it('should pass when bodyType is a valid string', async () => {
+        mockReq.body = { ...validVehicle, bodyType: 'Sedan' };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+    });
+
+    describe('transmission', () => {
+      it('should pass when transmission is a valid string', async () => {
+        mockReq.body = { ...validVehicle, transmission: 'Automatic' };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+    });
+
+    describe('fuelType', () => {
+      it('should pass when fuelType is a valid string', async () => {
+        mockReq.body = { ...validVehicle, fuelType: 'Gasoline' };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
       });
     });
   });
