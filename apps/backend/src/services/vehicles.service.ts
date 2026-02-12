@@ -6,10 +6,15 @@ import {
   VehicleFilters,
   VehicleStats,
 } from '@car-dealership/shared-types';
+import { BaseFilters } from '../models/BaseRepository.js';
 
 export const vehiclesService = {
   async getAll(filters?: VehicleFilters) {
-    return VehicleModel.findAll(filters);
+    const baseFilters: BaseFilters | undefined = filters ? {
+      ...filters,
+      sortOrder: filters.sortOrder?.toUpperCase() as 'ASC' | 'DESC' | undefined
+    } : undefined;
+    return VehicleModel.findAll(baseFilters);
   },
 
   async getById(id: string) {
@@ -27,7 +32,7 @@ export const vehiclesService = {
       throw new AppError(400, 'Vehicle with this VIN already exists');
     }
 
-    return VehicleModel.create(data, createdBy);
+    return VehicleModel.create(data as unknown as Record<string, unknown>, createdBy);
   },
 
   async update(id: string, data: UpdateVehicleDto) {

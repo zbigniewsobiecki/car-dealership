@@ -1,123 +1,65 @@
 import { query } from './db.js';
-import { Sale, CreateSaleDto, UpdateSaleDto } from '@car-dealership/shared-types';
+import { Sale, UpdateSaleDto } from '@car-dealership/shared-types';
+import { BaseRepository, BaseFilters } from './BaseRepository.js';
 
-export const SaleModel = {
-  async findAll(): Promise<Sale[]> {
-    const result = await query('SELECT * FROM sales ORDER BY created_at DESC');
-    return result.rows.map(SaleModel.mapRow);
-  },
+class SaleRepository extends BaseRepository<Sale> {
+  constructor() {
+    super({
+      tableName: 'sales',
+      defaultSortBy: 'created_at',
+      defaultSortOrder: 'DESC',
+    });
+  }
 
-  async findById(id: string): Promise<Sale | null> {
-    const result = await query('SELECT * FROM sales WHERE id = $1', [id]);
-    if (result.rows.length === 0) return null;
-    return SaleModel.mapRow(result.rows[0]);
-  },
+  async findAll(filters: BaseFilters = {}): Promise<{ data: Sale[]; total: number }> {
+    return super.findAll(filters);
+  }
 
   async findByCustomerId(customerId: string): Promise<Sale[]> {
     const result = await query(
       'SELECT * FROM sales WHERE customer_id = $1 ORDER BY created_at DESC',
       [customerId]
     );
-    return result.rows.map(SaleModel.mapRow);
-  },
+    return result.rows.map(row => this.mapRow(row));
+  }
 
-  async create(data: CreateSaleDto): Promise<Sale> {
-    const result = await query(
-      `INSERT INTO sales (
-        vehicle_id, customer_id, salesperson_id, sale_price, sale_date,
-        payment_method, financing_details, trade_in_vehicle, trade_in_value,
-        down_payment, status, notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-      RETURNING *`,
-      [
-        data.vehicleId,
-        data.customerId,
-        data.salespersonId,
-        data.salePrice,
-        data.saleDate,
-        data.paymentMethod || null,
-        data.financingDetails ? JSON.stringify(data.financingDetails) : null,
-        data.tradeInVehicle || null,
-        data.tradeInValue || null,
-        data.downPayment || null,
-        data.status,
-        data.notes || null,
-      ]
-    );
+  async create(data: Record<string, unknown>, _createdBy?: string): Promise<Sale> {
+    const dbData: Record<string, unknown> = {
+      vehicle_id: data.vehicleId,
+      customer_id: data.customerId,
+      salesperson_id: data.salespersonId,
+      sale_price: data.salePrice,
+      sale_date: data.saleDate,
+      payment_method: data.paymentMethod || null,
+      financing_details: data.financingDetails ? JSON.stringify(data.financingDetails) : null,
+      trade_in_vehicle: data.tradeInVehicle || null,
+      trade_in_value: data.tradeInValue || null,
+      down_payment: data.downPayment || null,
+      status: data.status,
+      notes: data.notes || null,
+    };
 
-    return SaleModel.mapRow(result.rows[0]);
-  },
+    return super.create(dbData);
+  }
 
   async update(id: string, data: UpdateSaleDto): Promise<Sale | null> {
-    const fields: string[] = [];
-    const values: unknown[] = [];
-    let paramCount = 1;
+    const dbData: Record<string, unknown> = {};
 
-    if (data.vehicleId !== undefined) {
-      fields.push(`vehicle_id = $${paramCount++}`);
-      values.push(data.vehicleId);
-    }
-    if (data.customerId !== undefined) {
-      fields.push(`customer_id = $${paramCount++}`);
-      values.push(data.customerId);
-    }
-    if (data.salespersonId !== undefined) {
-      fields.push(`salesperson_id = $${paramCount++}`);
-      values.push(data.salespersonId);
-    }
-    if (data.salePrice !== undefined) {
-      fields.push(`sale_price = $${paramCount++}`);
-      values.push(data.salePrice);
-    }
-    if (data.saleDate !== undefined) {
-      fields.push(`sale_date = $${paramCount++}`);
-      values.push(data.saleDate);
-    }
-    if (data.paymentMethod !== undefined) {
-      fields.push(`payment_method = $${paramCount++}`);
-      values.push(data.paymentMethod);
-    }
-    if (data.financingDetails !== undefined) {
-      fields.push(`financing_details = $${paramCount++}`);
-      values.push(JSON.stringify(data.financingDetails));
-    }
-    if (data.tradeInVehicle !== undefined) {
-      fields.push(`trade_in_vehicle = $${paramCount++}`);
-      values.push(data.tradeInVehicle);
-    }
-    if (data.tradeInValue !== undefined) {
-      fields.push(`trade_in_value = $${paramCount++}`);
-      values.push(data.tradeInValue);
-    }
-    if (data.downPayment !== undefined) {
-      fields.push(`down_payment = $${paramCount++}`);
-      values.push(data.downPayment);
-    }
-    if (data.status !== undefined) {
-      fields.push(`status = $${paramCount++}`);
-      values.push(data.status);
-    }
-    if (data.notes !== undefined) {
-      fields.push(`notes = $${paramCount++}`);
-      values.push(data.notes);
-    }
+    if (data.vehicleId !== undefined) dbData.vehicle_id = data.vehicleId;
+    if (data.customerId !== undefined) dbData.customer_id = data.customerId;
+    if (data.salespersonId !== undefined) dbData.salesperson_id = data.salespersonId;
+    if (data.salePrice !== undefined) dbData.sale_price = data.salePrice;
+    if (data.saleDate !== undefined) dbData.sale_date = data.saleDate;
+    if (data.paymentMethod !== undefined) dbData.payment_method = data.paymentMethod;
+    if (data.financingDetails !== undefined) dbData.financing_details = JSON.stringify(data.financingDetails);
+    if (data.tradeInVehicle !== undefined) dbData.trade_in_vehicle = data.tradeInVehicle;
+    if (data.tradeInValue !== undefined) dbData.trade_in_value = data.tradeInValue;
+    if (data.downPayment !== undefined) dbData.down_payment = data.downPayment;
+    if (data.status !== undefined) dbData.status = data.status;
+    if (data.notes !== undefined) dbData.notes = data.notes;
 
-    if (fields.length === 0) return this.findById(id);
-
-    values.push(id);
-    const result = await query(
-      `UPDATE sales SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
-      values
-    );
-
-    if (result.rows.length === 0) return null;
-    return SaleModel.mapRow(result.rows[0]);
-  },
-
-  async delete(id: string): Promise<boolean> {
-    const result = await query('DELETE FROM sales WHERE id = $1', [id]);
-    return (result.rowCount ?? 0) > 0;
-  },
+    return super.update(id, dbData);
+  }
 
   async getStats() {
     const result = await query(`
@@ -131,7 +73,7 @@ export const SaleModel = {
     `);
 
     return result.rows[0];
-  },
+  }
 
   async getMonthlyStats() {
     const result = await query(`
@@ -146,7 +88,7 @@ export const SaleModel = {
     `);
 
     return result.rows;
-  },
+  }
 
   async getRevenueReport(startDate: Date, endDate: Date) {
     const result = await query(
@@ -169,9 +111,9 @@ export const SaleModel = {
       saleCount: parseInt(row.sale_count, 10),
       averageSalePrice: parseFloat(row.average_sale_price),
     };
-  },
+  }
 
-  mapRow(row: Record<string, unknown>): Sale {
+  protected mapRow(row: Record<string, unknown>): Sale {
     return {
       id: row.id as string,
       vehicleId: row.vehicle_id as string,
@@ -189,5 +131,7 @@ export const SaleModel = {
       createdAt: row.created_at as Date,
       updatedAt: row.updated_at as Date,
     };
-  },
-};
+  }
+}
+
+export const SaleModel = new SaleRepository();

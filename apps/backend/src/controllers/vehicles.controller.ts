@@ -22,7 +22,7 @@ export const vehiclesController = {
         limit,
       };
 
-      const { vehicles, total } = await vehiclesService.getAll(filters);
+      const { data: vehicles, total } = await vehiclesService.getAll(filters);
       
       const response: PaginatedResponse<Vehicle> = {
         data: vehicles,
