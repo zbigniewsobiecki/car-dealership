@@ -5,12 +5,27 @@ const imageValidators = [
   body('images')
     .optional({ nullable: true })
     .isArray()
-    .withMessage('Images must be an array'),
+    .withMessage('Images must be an array')
+    .custom((images) => {
+      if (Array.isArray(images)) {
+        const primaryCount = images.filter((img: { isPrimary?: boolean }) => img.isPrimary).length;
+        if (primaryCount > 1) {
+          throw new Error('Only one image can be primary');
+        }
+      }
+      return true;
+    }),
 
   body('images.*')
     .if(body('images').isArray())
     .isObject()
     .withMessage('Each image must be an object'),
+
+  body('images.*.id')
+    .if(body('images').isArray())
+    .optional()
+    .isString()
+    .withMessage('Image ID must be a string'),
 
   body('images.*.url')
     .if(body('images').isArray())
