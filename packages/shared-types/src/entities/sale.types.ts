@@ -23,7 +23,7 @@ export interface CreateSaleDto {
   customerId: string;
   salespersonId: string;
   salePrice: number;
-  saleDate: Date;
+  saleDate: Date | string;
   paymentMethod?: string;
   financingDetails?: Record<string, unknown>;
   tradeInVehicle?: string;

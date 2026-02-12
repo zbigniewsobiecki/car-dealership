@@ -1,16 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAuthStore } from '../../../src/store/authStore';
 import { UserRole } from '@car-dealership/shared-types';
-
-// Mock localStorage
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 describe('authStore', () => {
   const mockUser = {
@@ -25,8 +16,6 @@ describe('authStore', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    localStorageMock.clear();
     // Reset the store state
     const { result } = renderHook(() => useAuthStore());
     act(() => {
@@ -64,8 +53,8 @@ describe('authStore', () => {
         result.current.login(mockUser, 'access-token', 'refresh-token');
       });
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith('token', 'access-token');
-      expect(localStorageMock.setItem).toHaveBeenCalledWith('refreshToken', 'refresh-token');
+      expect(localStorage.setItem).toHaveBeenCalledWith('token', 'access-token');
+      expect(localStorage.setItem).toHaveBeenCalledWith('refreshToken', 'refresh-token');
     });
 
     it('should handle login without refresh token', () => {
@@ -77,7 +66,7 @@ describe('authStore', () => {
 
       expect(result.current.user).toEqual(mockUser);
       expect(result.current.token).toBe('access-token');
-      expect(localStorageMock.setItem).toHaveBeenCalledWith('token', 'access-token');
+      expect(localStorage.setItem).toHaveBeenCalledWith('token', 'access-token');
     });
   });
 
@@ -111,8 +100,8 @@ describe('authStore', () => {
         result.current.logout();
       });
 
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('token');
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('refreshToken');
+      expect(localStorage.removeItem).toHaveBeenCalledWith('token');
+      expect(localStorage.removeItem).toHaveBeenCalledWith('refreshToken');
     });
   });
 
