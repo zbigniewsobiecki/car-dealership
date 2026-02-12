@@ -169,7 +169,7 @@ describe('Customers Routes Integration', () => {
   });
 
   describe('DELETE /api/customers/:id', () => {
-    it('should delete a customer', async () => {
+    it('should soft delete a customer', async () => {
       mockQuery.mockResolvedValueOnce({ rowCount: 1 });
 
       const response = await request(app)
@@ -178,6 +178,35 @@ describe('Customers Routes Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
+      
+      // Verify the query was an UPDATE instead of DELETE
+      const lastCall = mockQuery.mock.calls[mockQuery.mock.calls.length - 1];
+      expect(lastCall[0]).toContain('UPDATE customers SET deleted_at');
+      expect(lastCall[0]).toContain('WHERE id = $1 AND deleted_at IS NULL');
+    });
+
+    it('should not retrieve soft deleted customer in getAll', async () => {
+      const mockCustomers = [createMockCustomerRow({ id: 'active-1' })];
+      mockQuery.mockResolvedValueOnce({ rows: mockCustomers });
+
+      const response = await request(app)
+        .get('/api/customers')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(mockQuery.mock.calls[0][0]).toContain('WHERE deleted_at IS NULL');
+    });
+
+    it('should not retrieve soft deleted customer in getById', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const response = await request(app)
+        .get('/api/customers/deleted-1')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(mockQuery.mock.calls[0][0]).toContain('AND deleted_at IS NULL');
     });
 
     it('should return 404 for non-existent customer', async () => {
