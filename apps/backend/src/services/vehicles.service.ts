@@ -8,6 +8,12 @@ import {
 } from '@car-dealership/shared-types';
 
 export const vehiclesService = {
+  async getRecent(days: number) {
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - days);
+    return VehicleModel.findRecent(fromDate);
+  },
+
   async getAll(filters?: VehicleFilters) {
     return VehicleModel.findAll(filters);
   },

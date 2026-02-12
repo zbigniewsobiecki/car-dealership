@@ -8,6 +8,16 @@ import {
 } from '@car-dealership/shared-types';
 
 export const VehicleModel = {
+  async findRecent(fromDate: Date): Promise<Vehicle[]> {
+    const sql = `
+      SELECT * FROM vehicles 
+      WHERE date_acquired >= $1 
+      ORDER BY date_acquired DESC
+    `;
+    const result = await query(sql, [fromDate]);
+    return result.rows.map(VehicleModel.mapRow);
+  },
+
   async findAll(filters?: VehicleFilters): Promise<{ vehicles: Vehicle[]; total: number }> {
     let sql = 'SELECT *, COUNT(*) OVER() as full_count FROM vehicles WHERE 1=1';
     const values: unknown[] = [];

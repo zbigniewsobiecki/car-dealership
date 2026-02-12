@@ -124,6 +124,46 @@ describe('Vehicles Routes Integration', () => {
     });
   });
 
+  describe('GET /api/vehicles/recent', () => {
+    it('should return recently acquired vehicles', async () => {
+      const now = new Date();
+      const recentDate = new Date(now);
+      recentDate.setDate(now.getDate() - 2);
+
+      const mockVehicles = [
+        createMockVehicleRow({ id: 'v1', date_acquired: now }),
+        createMockVehicleRow({ id: 'v2', date_acquired: recentDate }),
+      ];
+      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
+
+      const response = await request(app)
+        .get('/api/vehicles/recent?days=7')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toHaveLength(2);
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('WHERE date_acquired >='),
+        expect.any(Array)
+      );
+    });
+
+    it('should use default 7 days if no parameter provided', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await request(app)
+        .get('/api/vehicles/recent')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(mockQuery).toHaveBeenCalled();
+      const callArgs = mockQuery.mock.calls[0];
+      const fromDate = callArgs[1][0];
+      const diffDays = Math.round((new Date().getTime() - fromDate.getTime()) / (1000 * 3600 * 24));
+      expect(diffDays).toBe(7);
+    });
+  });
+
   describe('GET /api/vehicles/stats', () => {
     it('should return vehicle stats with numeric values', async () => {
       const mockStats = {

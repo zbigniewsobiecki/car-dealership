@@ -3,6 +3,19 @@ import { vehiclesService } from '../services/vehicles.service.js';
 import { VehicleStatus, VehicleCondition, PaginatedResponse, Vehicle } from '@car-dealership/shared-types';
 
 export const vehiclesController = {
+  async getRecent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const vehicles = await vehiclesService.getRecent(days);
+      res.json({
+        success: true,
+        data: vehicles,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
