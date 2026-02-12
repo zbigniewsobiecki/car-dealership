@@ -2,11 +2,11 @@ pre-commit:
   parallel: true
   commands:
     lint:
-      run: pnpm run lint
+      run: CI=true pnpm run lint
     type-check:
-      run: pnpm run type-check
+      run: CI=true pnpm run type-check
 
 pre-push:
   commands:
     test:
-      run: pnpm run test
+      run: CI=true pnpm run test

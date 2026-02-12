@@ -48,7 +48,7 @@ const createAuthToken = async (role: UserRole = UserRole.ADMIN) => {
 // Sample vehicle row for mocking
 const createMockVehicleRow = (overrides = {}) => ({
   id: 'vehicle-1',
-  vin: 'ABC123456789',
+  vin: '1234567890ABCDEFG',
   make: 'Toyota',
   model: 'Camry',
   year: 2022,
@@ -72,6 +72,7 @@ const createMockVehicleRow = (overrides = {}) => ({
   created_at: new Date(),
   updated_at: new Date(),
   created_by: 'user-1',
+  full_count: '2',
   ...overrides,
 });
 
@@ -98,6 +99,8 @@ describe('Vehicles Routes Integration', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(2);
+      expect(response.body.pagination).toBeDefined();
+      expect(response.body.pagination.total).toBe(2);
     });
 
     it('should return 401 without authentication', async () => {
@@ -116,19 +119,20 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
+      expect(response.body.pagination).toBeDefined();
       expect(mockQuery).toHaveBeenCalled();
     });
   });
 
   describe('GET /api/vehicles/stats', () => {
-    it('should return vehicle stats', async () => {
+    it('should return vehicle stats with numeric values', async () => {
       const mockStats = {
         total: '10',
         available: '5',
         sold: '3',
         reserved: '1',
         maintenance: '1',
-        total_inventory_value: '250000',
+        total_inventory_value: '250000.00',
       };
       mockQuery.mockResolvedValueOnce({ rows: [mockStats] });
 
@@ -138,7 +142,14 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveProperty('total');
+      expect(response.body.data).toEqual({
+        total: 10,
+        available: 5,
+        sold: 3,
+        reserved: 1,
+        maintenance: 1,
+        total_inventory_value: 250000,
+      });
     });
   });
 
@@ -181,7 +192,7 @@ describe('Vehicles Routes Integration', () => {
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: 'ABC123456789',
+          vin: '1234567890ABCDEFG',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -192,7 +203,7 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
-      expect(response.body.data.vin).toBe('ABC123456789');
+      expect(response.body.data.vin).toBe('1234567890ABCDEFG');
     });
 
     it('should return 400 if VIN already exists', async () => {
@@ -203,7 +214,7 @@ describe('Vehicles Routes Integration', () => {
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: 'ABC123456789',
+          vin: '1234567890ABCDEFG',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,

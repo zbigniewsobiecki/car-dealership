@@ -1,8 +1,10 @@
 package DataModel {
+    import SharedTypesBarrel::*;
     import SysMLPrimitives::*;
-
+    import DomainEntities::*;
     doc /*Data Model. Domain entities, data transfer objects, and enumerations. Data structures discovered from type definitions and schemas. */
-
+    import DomainEnums::*;
+    import DataTransferObjects::*;
     // Base entity with common attributes - extends Item for standard library compatibility
     item def BaseEntity :> Item {
         doc /*Common base for domain entities. Aligns with Items::Item. */
@@ -10,12 +12,10 @@ package DataModel {
         attribute createdAt : DateTime;
         attribute updatedAt : DateTime;
     }
-
     // Base DTO for API transfers - extends Item
     item def BaseDTO :> Item {
         doc /*Common base for data transfer objects. Aligns with Items::Item. */
     }
-
     // Base event for domain events - extends Item
     item def BaseDomainEvent :> Item {
         doc /*Common base for domain events. Aligns with Items::Item. */
@@ -23,96 +23,54 @@ package DataModel {
         attribute timestamp : DateTime;
         attribute eventType : String;
     }
-
     // Relationship template for entity connections
     connection def EntityRelation {
         doc /*Template for entity relationships */
-        end source [1];
-        end target [0..*];
+        end [1] source;
+        end [0..*] target;
     }
-
-    // Entity definitions (to be populated by analysis)
+    // Entity definitions
     package Entities {
         import DataModel::*;
-
-        // Stub - attributes populated in Cycle 3
-        item def User :> BaseEntity {
-            doc /* User domain entity */
+        import DomainEntities::*;
+        item def User :> DomainEntities::User {
+            doc /* User domain entity reference */
         }
-
-        item def CreateUserDto :> BaseDTO {
-            doc /* Request DTO for creating a User */
+        item def Customer :> DomainEntities::Customer {
+            doc /* Customer domain entity reference */
         }
-
-        item def UpdateUserDto :> BaseDTO {
-            doc /* Request DTO for updating a User */
+        item def Vehicle :> DomainEntities::Vehicle {
+            doc /* Vehicle domain entity reference */
         }
-
-        // Stub - attributes populated in Cycle 3
-        item def Customer :> BaseEntity {
-            doc /* Customer domain entity */
+        item def Sale :> DomainEntities::Sale {
+            doc /* Sale domain entity reference */
         }
-
-        item def CreateCustomerDto :> BaseDTO {
-            doc /* Request DTO for creating a Customer */
-        }
-
-        item def UpdateCustomerDto :> BaseDTO {
-            doc /* Request DTO for updating a Customer */
-        }
-
-        // Stub - attributes populated in Cycle 3
-        item def Vehicle :> BaseEntity {
-            doc /* Vehicle domain entity */
-        }
-
-        item def CreateVehicleDto :> BaseDTO {
-            doc /* Request DTO for creating a Vehicle */
-        }
-
-        item def UpdateVehicleDto :> BaseDTO {
-            doc /* Request DTO for updating a Vehicle */
-        }
-
-        // Stub - attributes populated in Cycle 3
-        item def Sale :> BaseEntity {
-            doc /* Sale domain entity */
-        }
-
-        item def CreateSaleDto :> BaseDTO {
-            doc /* Request DTO for creating a Sale */
-        }
-
-        item def UpdateSaleDto :> BaseDTO {
-            doc /* Request DTO for updating a Sale */
+        item def VehicleImage :> DomainEntities::VehicleImage {
+            doc /* VehicleImage domain entity reference */
         }
     }
-
-    // Data transfer objects (to be populated by analysis)
+    // Data transfer objects
     package DTOs {
         import DataModel::*;
-
-        // Authentication types - stub for Cycle 2 ports
-        item def LoginRequest :> BaseDTO {
-            doc /* Login credentials */
-        }
-
-        item def AuthResponse :> BaseDTO {
-            doc /* Authentication response with token */
-        }
-
-        item def TokenPayload :> BaseDTO {
-            doc /* JWT token payload */
-        }
+        import DomainEntities::*;
+        import DomainEnums::*;
+        import DataTransferObjects::*;
+        item def LoginRequest :> DataTransferObjects::LoginRequest;
+        item def AuthResponse :> DataTransferObjects::AuthResponse;
+        item def CreateCustomerDto :> DataTransferObjects::CreateCustomerDto;
+        item def CreateSaleDto :> DataTransferObjects::CreateSaleDto;
+        item def CreateVehicleDto :> DataTransferObjects::CreateVehicleDto;
+        item def UpdateVehicleDto :> DataTransferObjects::UpdateVehicleDto;
+        item def UpdateCustomerDto :> DataTransferObjects::UpdateCustomerDto;
+        item def UpdateSaleDto :> DataTransferObjects::UpdateSaleDto;
     }
-
-    // Events (to be populated by analysis)
-    package Events {
-        doc /*Domain events - specialize from BaseDomainEvent */
-    }
-
-    // Enumerations (to be populated by analysis)
+    // Enumerations
     package Enums {
-        doc /*Enumeration types */
+        import DataModel::*;
+        import DomainEnums::*;
+        item def UserRole :> DomainEnums::UserRole;
+        item def VehicleStatus :> DomainEnums::VehicleStatus;
+        item def VehicleCondition :> DomainEnums::VehicleCondition;
+        item def SaleStatus :> DomainEnums::SaleStatus;
     }
 }

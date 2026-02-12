@@ -44,7 +44,8 @@ describe('useVehicles hooks', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
       expect(result.current.data).toBeDefined();
-      expect(Array.isArray(result.current.data)).toBe(true);
+      expect(Array.isArray(result.current.data?.data)).toBe(true);
+      expect(result.current.data?.pagination).toBeDefined();
     });
 
     it('should fetch vehicles with filters', async () => {

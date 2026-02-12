@@ -4,6 +4,8 @@ import {
   CreateVehicleDto,
   UpdateVehicleDto,
   VehicleFilters,
+  VehicleStats,
+  PaginatedResponse,
 } from '@car-dealership/shared-types';
 
 export const vehiclesService = {
@@ -18,9 +20,11 @@ export const vehiclesService = {
     if (filters?.status) params.append('status', filters.status);
     if (filters?.condition) params.append('condition', filters.condition);
     if (filters?.search) params.append('search', filters.search);
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
 
     const response = await api.get(`/vehicles?${params.toString()}`);
-    return response.data.data as Vehicle[];
+    return response.data as PaginatedResponse<Vehicle>;
   },
 
   async getById(id: string) {
@@ -42,8 +46,8 @@ export const vehiclesService = {
     await api.delete(`/vehicles/${id}`);
   },
 
-  async getStats() {
+  async getStats(): Promise<VehicleStats> {
     const response = await api.get('/vehicles/stats');
-    return response.data.data;
+    return response.data.data as VehicleStats;
   },
 };

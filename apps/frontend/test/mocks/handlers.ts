@@ -112,6 +112,12 @@ export const handlers = [
     return HttpResponse.json({
       success: true,
       data: [mockVehicle],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+      },
     });
   }),
 
@@ -202,6 +208,12 @@ export const handlers = [
     return HttpResponse.json({
       success: true,
       data: [mockSale],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+      },
     });
   }),
 

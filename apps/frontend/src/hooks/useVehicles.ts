@@ -4,6 +4,7 @@ import {
   CreateVehicleDto,
   UpdateVehicleDto,
   VehicleFilters,
+  VehicleStats,
 } from '@car-dealership/shared-types';
 
 export const useVehicles = (filters?: VehicleFilters) => {
@@ -56,7 +57,7 @@ export const useDeleteVehicle = () => {
 };
 
 export const useVehicleStats = () => {
-  return useQuery({
+  return useQuery<VehicleStats>({
     queryKey: ['vehicles', 'stats'],
     queryFn: () => vehiclesService.getStats(),
   });
