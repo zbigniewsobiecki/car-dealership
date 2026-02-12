@@ -18,5 +18,5 @@ package ProjectMetadata {
     attribute architectureStyle : String = "monorepo";
 
     // Discovery timestamp
-    attribute discoveredAt : DateTime = "2026-01-27T11:22:09.024Z";
+    attribute discoveredAt : DateTime = "2026-02-03T12:57:23.766Z";
 }

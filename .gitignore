@@ -57,4 +57,8 @@ Thumbs.db
 
 # Debug directories
 .sysml.debug
-.au.debug
+.au.debug*
+
+# Local database files (keep .squint.db)
+car-dealership.db
+index.db

@@ -22,6 +22,18 @@ package SystemRequirements {
 
 
 
+    // Example: requirement def FR001 :> BaseRequirement { :>> id = "FR-001"; doc /* ... */
+
+    // Functional requirements (to be populated by analysis)
+    // Example: requirement def FR001 :> BaseRequirement { :>> id = "FR-001"; doc /* ... */
+
+
+
+
+
+
+
+
     // Example: requirement def FR001 :> BaseRequirement { :>> id = "FR-001"; doc /* ... */ }
     package FunctionalRequirements {
         doc /*Functional requirements discovered from documentation */
@@ -35,81 +47,90 @@ package SystemRequirements {
 
 
     @SourceFile {
+        :>> path = "apps/backend/src/config/database.ts";
+    }
+    requirement def FR_DB_001 :> BaseRequirement {
+        doc /* The system shall persist dealership data in a PostgreSQL database with connection pooling. */
+         :>> id = "FR-DB-001";
+    }
+
+    @SourceFile {
+        :>> path = "apps/backend/src/config/jwt.ts";
+    }
+    requirement def SR_AUTH_001 :> BaseRequirement {
+        doc /* The system shall use JWT (JSON Web Tokens) for secure authentication and session management, including refresh tokens. */
+         :>> id = "SR-AUTH-001";
+    }
+
+    @SourceFile {
+        :>> path = "apps/backend/src/config/env.ts";
+    }
+    requirement def FR_UP_001 :> BaseRequirement {
+        doc /* The system shall support file uploads with a configurable maximum file size (default 5MB). */
+         :>> id = "FR-UP-001";
+    }
+
+    @SourceFile {
+        :>> path = "apps/backend/src/config/env.ts";
+    }
+    requirement def SR_CORS_001 :> BaseRequirement {
+        doc /* The system shall enforce CORS (Cross-Origin Resource Sharing) policies to restrict API access to authorized origins. */
+         :>> id = "SR-CORS-001";
+    }
+
+
+    @SourceFile {
         :>> path = "apps/backend/package.json";
     }
-    requirement def FR_AUTH :> BaseRequirement {
-        doc /* The system shall support secure user authentication using bcryptjs for password hashing and jsonwebtoken (JWT) for session management. */
-         :>> id = "FR-001";
+    requirement def FR_AUTH_001 :> BaseRequirement {
+        doc /* The system shall provide user authentication using bcryptjs for password hashing and jsonwebtoken for session tokens. */
+         :>> id = "FR-AUTH-001";
     }
 
     @SourceFile {
         :>> path = "apps/backend/package.json";
     }
-    requirement def FR_VALIDATION :> BaseRequirement {
-        doc /* The system shall perform input validation using Zod and express-validator to ensure data integrity. */
-         :>> id = "FR-002";
-    }
-
-    @SourceFile {
-        :>> path = "apps/backend/package.json";
-    }
-    requirement def FR_UPLOADS :> BaseRequirement {
-        doc /* The system shall support file uploads (e.g., vehicle images) using multer. */
-         :>> id = "FR-003";
+    requirement def FR_VAL_001 :> BaseRequirement {
+        doc /* The system shall perform input validation using express-validator and Zod to ensure data integrity. */
+         :>> id = "FR-VAL-001";
     }
 
     @SourceFile {
         :>> path = "apps/frontend/package.json";
     }
-    requirement def FR_STATE_MGMT :> BaseRequirement {
-        doc /* The frontend shall manage server state using TanStack Query and client state using Zustand. */
-         :>> id = "FR-004";
+    requirement def FR_UI_001 :> BaseRequirement {
+        doc /* The system shall provide a responsive web interface built with React, utilizing Tailwind CSS for styling and Lucide React for iconography. */
+         :>> id = "FR-UI-001";
     }
 
     @SourceFile {
-        :>> path = "packages/shared-types/src/index.ts";
+        :>> path = "apps/frontend/package.json";
     }
-    requirement def FR_DOMAIN_MODELS :> BaseRequirement {
-        doc /* The system shall manage domain entities for Users, Vehicles, Customers, and Sales. */
-         :>> id = "FR-005";
+    requirement def FR_STATE_001 :> BaseRequirement {
+        doc /* The system shall manage client-side state using Zustand and handle server-state synchronization with TanStack Query. */
+         :>> id = "FR-STATE-001";
+    }
+
+    @SourceFile {
+        :>> path = "apps/backend/src/config/env.ts";
+    }
+    requirement def SR_SEC_001 :> BaseRequirement {
+        doc /* The system shall implement security headers using Helmet and rate limiting to protect against common web vulnerabilities. */
+         :>> id = "SR-SEC-001";
+    }
+    @SourceFile {
+        :>> path = "package.json";
+    }
+    requirement def SR_TOOL_001 :> BaseRequirement {
+        doc /* The project shall use Turbo for high-performance build orchestration across the monorepo. */
+         :>> id = "SR-TOOL-001";
     }
 
     @SourceFile {
         :>> path = "package.json";
     }
-    requirement def NFR_MONOREPO :> BaseRequirement {
-        doc /* The project shall be organized as a monorepo using pnpm workspaces and Turborepo for build orchestration. */
-         :>> id = "NFR-001";
-    }
-    @SourceFile {
-        :>> path = "packages/shared-types/src/index.ts";
-    }
-    requirement def FR_VEHICLE_MGMT :> BaseRequirement {
-        doc /* The system shall track vehicle status (e.g., Available, Sold, Reserved) as defined in vehicle-status.enum. */
-         :>> id = "FR-006";
-    }
-
-    @SourceFile {
-        :>> path = "packages/shared-types/src/index.ts";
-    }
-    requirement def FR_SALE_WORKFLOW :> BaseRequirement {
-        doc /* The system shall manage the sale lifecycle including status tracking (e.g., Pending, Completed, Cancelled). */
-         :>> id = "FR-007";
-    }
-
-    @SourceFile {
-        :>> path = "apps/backend/.env.example";
-    }
-    requirement def SR_CORS :> BaseRequirement {
-        doc /* The system shall restrict cross-origin requests to authorized domains defined in the CORS_ORIGIN configuration. */
-         :>> id = "SR-001";
-    }
-
-    @SourceFile {
-        :>> path = "apps/frontend/package.json";
-    }
-    requirement def FR_RESPONSIVE_UI :> BaseRequirement {
-        doc /* The frontend shall provide a responsive user interface using Tailwind CSS. */
-         :>> id = "FR-008";
+    requirement def SR_ENV_001 :> BaseRequirement {
+        doc /* The system shall require Node.js version 18.0.0 or higher for development and runtime. */
+         :>> id = "SR-ENV-001";
     }
 }

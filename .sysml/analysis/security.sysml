@@ -1,47 +1,42 @@
 package SecurityAnalysis {
-    import SysMLPrimitives::*;
-    doc /*Security posture and controls discovered in the middleware and configuration. */
-    analysis def SecurityProfile {
-        // Authentication
-        attribute authenticationMethod : String = "jwt";
-        attribute authProvider : String = "internal";
-        // Authorization
-        attribute authorizationModel : String = "rbac";
-        attribute permissionGranularity : String = "role-based";
-        // Input validation
-        attribute hasInputValidation : Boolean = true;
-        attribute validationLibrary : String = "zod + express-validator";
-        // Encryption
-        attribute hasEncryptionAtRest : Boolean = false;
-        // Not explicitly seen in code
-        attribute hasEncryptionInTransit : Boolean = true;
-        // Assumed via HTTPS/Helmet
-        // Secrets management
-        attribute secretsManagement : String = "env";
-        // Rate limiting (security aspect)
-        attribute hasSecurityRateLimiting : Boolean = true;
-        attribute bruteForceProtection : Boolean = true;
-        // CORS
-        attribute hasCORS : Boolean = true;
-        attribute corsPolicy : String = "restricted-origin";
-        results {
-            attribute jwtExpiration : String = "1h";
-            attribute refreshExpiration : String = "7d";
-            attribute securityHeaders : String = "helmet";
+        import SysMLPrimitives::*;
+    
+        doc /*Security posture and controls. */
+    
+        analysis def SecurityProfile {
+            // Authentication
+            attribute authenticationMethod : String = "JWT";
+            attribute authProvider : String = "Internal (jsonwebtoken)";
+            
+            // Authorization
+            attribute authorizationModel : String = "RBAC";
+            attribute permissionGranularity : String = "Role-based (Admin, Salesperson)";
+    
+            // Input validation
+            attribute hasInputValidation : Boolean = true;
+            attribute validationLibrary : String = "express-validator / zod";
+    
+            // Encryption
+            attribute hasEncryptionAtRest : Boolean = false; // Not visible in app code
+            attribute hasEncryptionInTransit : Boolean = true; // Assumed via TLS/HTTPS in production
+            
+            // Secrets management
+            attribute secretsManagement : String = "Environment Variables (.env)";
+    
+            // Rate limiting
+            attribute hasSecurityRateLimiting : Boolean = true;
+            attribute bruteForceProtection : Boolean = true;
+    
+            // CORS
+            attribute hasCORS : Boolean = true;
+            @SourceFile { :>> path = "apps/backend/src/app.ts"; }
+            attribute corsPolicy : String = "Restricted to configured origin";
+    
+            // Security Headers
+            attribute usesHelmet : Boolean = true;
+    
+            results {
+                attribute securityPosture : String = "Standard web security with JWT and RBAC";
+            }
         }
-    }
-    @SourceFile {
-        :>> path = "apps/backend/src/middleware/auth.middleware.ts";
-    }
-    package AuthorizationPatterns {
-        doc /* Patterns for enforcing access control. */
-        constraint def RoleRequirement {
-            doc /* Ensures the user has one of the required roles. */
-            in userRole : String;
-            in allowedRoles : String [1..*];
-        }
-    }
-    allocation def RoutePermissions {
-        doc /* Maps endpoints to required roles/auth status. */
-    }
 }

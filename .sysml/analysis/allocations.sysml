@@ -1,22 +1,22 @@
 package BehaviorAllocations {
+    import SystemBehavior::*;
+    import SystemOperations::*;
     import SysMLPrimitives::*;
     import SystemArchitecture::*;
-    import SystemBehavior::*;
+    import SystemBehavior::SystemOperations::*;
     import SystemModules::*;
-    
     doc /*Maps operations to implementing modules for traceability. */
-    
-    allocation def OperationAllocation :> BehaviorToModule {
-        doc /*Maps an operation to its implementing module. */
-    }
-    
-    // Backend Allocations
-    allocate Login to AuthModule;
+    import DomainEntities::*;
+    import DataTransferObjects::*;
     allocate RegisterUser to AuthModule;
+    allocate LoginUser to AuthModule;
     allocate CreateVehicle to VehicleModule;
-    allocate CreateSale to SaleModule;
-    allocate CreateCustomer to CustomerModule;
-    
-    // Frontend Allocations
-    allocate FrontendLogin to MainApp;
+    allocate CreateSale to SalesModule;
+    allocate CustomerServiceOperations::getAllCustomers to CustomerModule;
+    allocate CustomerServiceOperations::createCustomer to CustomerModule;
+    allocate AuthenticateRequest to BackendApp;
+    allocate HandleError to BackendApp;
+    allocation def OperationAllocation :> BehaviorToModule;
+    // Backend Allocations
+    // Middleware Allocations
 }
