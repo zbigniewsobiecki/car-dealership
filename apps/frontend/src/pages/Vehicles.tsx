@@ -14,6 +14,8 @@ export const Vehicles = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | undefined>();
   const [searchTerm, setSearchTerm] = useState('');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
   const [filters, setFilters] = useState<VehicleFilters>({});
 
   const { data: vehicles, isLoading } = useVehicles(filters);
@@ -53,7 +55,21 @@ export const Vehicles = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setFilters({ ...filters, search: searchTerm });
+    const newFilters: VehicleFilters = { ...filters, search: searchTerm };
+
+    if (priceMin) {
+      newFilters.priceMin = Number(priceMin);
+    } else {
+      delete newFilters.priceMin;
+    }
+
+    if (priceMax) {
+      newFilters.priceMax = Number(priceMax);
+    } else {
+      delete newFilters.priceMax;
+    }
+
+    setFilters(newFilters);
   };
 
   return (
@@ -67,7 +83,7 @@ export const Vehicles = () => {
       </div>
 
       <div className="card mb-6">
-        <form onSubmit={handleSearch} className="flex space-x-3">
+        <form onSubmit={handleSearch} className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -78,21 +94,43 @@ export const Vehicles = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn btn-primary">
-            Search
-          </button>
-          {filters.search && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearchTerm('');
-                setFilters({});
-              }}
-              className="btn btn-secondary"
-            >
-              Clear
+          <div className="flex space-x-3">
+            <input
+              type="number"
+              placeholder="Min Price"
+              className="input w-32"
+              value={priceMin}
+              onChange={(e) => setPriceMin(e.target.value)}
+              min="0"
+            />
+            <input
+              type="number"
+              placeholder="Max Price"
+              className="input w-32"
+              value={priceMax}
+              onChange={(e) => setPriceMax(e.target.value)}
+              min="0"
+            />
+          </div>
+          <div className="flex space-x-3">
+            <button type="submit" className="btn btn-primary">
+              Search
             </button>
-          )}
+            {(filters.search || filters.priceMin !== undefined || filters.priceMax !== undefined) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setPriceMin('');
+                  setPriceMax('');
+                  setFilters({});
+                }}
+                className="btn btn-secondary"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -114,7 +152,9 @@ export const Vehicles = () => {
       ) : (
         <div className="card text-center py-12">
           <p className="text-gray-600">
-            {filters.search ? 'No vehicles found matching your search.' : 'No vehicles yet. Add your first vehicle!'}
+            {filters.search || filters.priceMin !== undefined || filters.priceMax !== undefined
+              ? 'No vehicles found matching your search.'
+              : 'No vehicles yet. Add your first vehicle!'}
           </p>
         </div>
       )}
