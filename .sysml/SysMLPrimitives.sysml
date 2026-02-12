@@ -107,6 +107,10 @@ library package SysMLPrimitives {
         end behavior;
         end module;
     }
+    metadata def SourceFile {
+        attribute path : FilePath;
+        attribute line : Integer;
+    }
 
     // Stereotype markers - use with semicolon: @external; or prefix: #external
     metadata def external;
@@ -496,9 +500,5 @@ library package SysMLPrimitives {
         doc /*Application to Cache connection */
         end app:~CachePort;
         end cache:CachePort;
-    }
-    metadata def SourceFile {
-        attribute path : FilePath;
-        attribute line : Integer [0..1];
     }
 }

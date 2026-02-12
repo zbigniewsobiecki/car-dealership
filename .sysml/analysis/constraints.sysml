@@ -1,27 +1,23 @@
 package PerformanceConstraints {
-    import SysMLPrimitives::*;
-    import SystemArchitecture::*;
+        import SysMLPrimitives::*;
     
-    doc /*Performance constraints with expressions based on configuration. */
+        doc /*Performance constraints with expressions. */
     
-    constraint def ResponseTimeLimit {
-        doc /*API response must be within limit. */
-        in actual : Real;
-        in limit : Real = 500.0;
-        actual <= limit
-    }
+        constraint def ResponseTimeLimit {
+            in actual : Real;
+            in limit : Real = 500.0;
+            actual <= limit
+        }
     
-    constraint def DatabaseConnectionLimit {
-        doc /*Database pool must not exceed max connections. */
-        in current : Integer;
-        in max : Integer = 20;
-        current <= max
-    }
+        constraint def DatabaseConnectionLimit {
+            in current : Integer;
+            in max : Integer = 20;
+            current <= max
+        }
     
-    constraint def RateLimitConstraint {
-        doc /*Requests per window must be within limit. */
-        in requests : Integer;
-        in limit : Integer = 100;
-        requests <= limit
-    }
+        constraint def FileUploadLimit {
+            in size : Integer;
+            in max : Integer = 5242880; // 5MB
+            size <= max
+        }
 }

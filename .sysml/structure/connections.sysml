@@ -1,18 +1,23 @@
 package SystemConnections {
     import SysMLPrimitives::*;
     import SystemModules::*;
-    doc /* Inter-module connections and wiring for the Car Dealership System. */
-    connection def BackendConnection :> APIConnection {
+    import SystemInterfaces::*;
+    doc /* Module connections and wiring for car-dealership-app */
+    connection def AppConnection :> APIConnection {
         end client;
         end server;
     }
-    connection dashboardToSales {
-        connect SystemModules::carDealershipSystem.frontendApp.api to SystemModules::carDealershipSystem.backendApp.sales.api;
+    @SourceFile {
+        :>> path = "apps/frontend/src/App.tsx";
     }
-    connection vehiclesToApi {
-        connect SystemModules::carDealershipSystem.frontendApp.api to SystemModules::carDealershipSystem.backendApp.vehicles.api;
+    connection frontendToBackend : AppConnection {
+        connect system.frontend.api to system.backend.api;
     }
-    connection customersToApi {
-        connect SystemModules::carDealershipSystem.frontendApp.api to SystemModules::carDealershipSystem.backendApp.customers.api;
+
+    @SourceFile {
+        :>> path = "apps/backend/src/app.ts";
+    }
+    connection backendToDb : DatabaseConnection {
+        connect system.backend.db to postgres.connection;
     }
 }

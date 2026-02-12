@@ -1,74 +1,10 @@
 package DataTransferObjects {
-    import SysMLPrimitives::*;
+    import DataModel::BaseDTO;
+    import DataModel::*;
     import DomainEnums::*;
+    import SysMLPrimitives::*;
+    import DomainEntities::*;
 
-    @SourceFile {
-        :>> path = "packages/shared-types/src/entities/user.types.ts";
-    }
-    item def CreateUserDto :> BaseDTO {
-        attribute email : String;
-        attribute password : String;
-        attribute firstName : String;
-        attribute lastName : String;
-        attribute role : UserRole;
-    }
-    @SourceFile {
-        :>> path = "packages/shared-types/src/entities/customer.types.ts";
-    }
-    item def CreateCustomerDto :> BaseDTO {
-        attribute firstName : String;
-        attribute lastName : String;
-        attribute email : String [0..1];
-        attribute phone : String [0..1];
-        attribute address : String [0..1];
-        attribute city : String [0..1];
-        attribute stateProvince : String [0..1];
-        attribute zipCode : String [0..1];
-        attribute notes : String [0..1];
-        attribute state : String [0..1];
-    }
-    @SourceFile {
-        :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
-    }
-    item def CreateVehicleDto :> BaseDTO {
-        attribute vin : String;
-        attribute make : String;
-        attribute model : String;
-        attribute year : Integer;
-        attribute color : String;
-        attribute mileage : Integer [0..1];
-        attribute price : Real;
-        attribute cost : Real [0..1];
-        attribute status : VehicleStatus;
-        attribute condition : VehicleCondition [0..1];
-        attribute features : JSON [0..1];
-        attribute dateAcquired : DateTime [0..1];
-        attribute bodyType : String [0..1];
-        attribute transmission : String [0..1];
-        attribute fuelType : String [0..1];
-        attribute engine : String [0..1];
-        attribute drivetrain : String [0..1];
-        attribute exteriorColor : String [0..1];
-        attribute interiorColor : String [0..1];
-        attribute description : String [0..1];
-    }
-    @SourceFile {
-        :>> path = "packages/shared-types/src/entities/sale.types.ts";
-    }
-    item def CreateSaleDto :> BaseDTO {
-        attribute vehicleId : Identifier;
-        attribute customerId : Identifier;
-        attribute salespersonId : Identifier;
-        attribute salePrice : Real;
-        attribute saleDate : DateTime;
-        attribute status : SaleStatus;
-        attribute paymentMethod : String [0..1];
-        attribute financingDetails : JSON [0..1];
-        attribute tradeInVehicle : String [0..1];
-        attribute tradeInValue : Real [0..1];
-        attribute downPayment : Real [0..1];
-        attribute notes : String [0..1];
-    }
     @SourceFile {
         :>> path = "packages/shared-types/src/api/requests.types.ts";
     }
@@ -76,7 +12,6 @@ package DataTransferObjects {
         attribute email : String;
         attribute password : String;
     }
-
     @SourceFile {
         :>> path = "packages/shared-types/src/api/requests.types.ts";
     }
@@ -85,23 +20,14 @@ package DataTransferObjects {
         attribute password : String;
         attribute firstName : String;
         attribute lastName : String;
-        attribute role : String;
+        attribute role : UserRole;
     }
 
-    @SourceFile {
-        :>> path = "packages/shared-types/src/api/requests.types.ts";
-    }
-    item def PaginationParams :> BaseDTO {
-        attribute page : Integer [0..1];
-        attribute limit : Integer [0..1];
-        attribute sortBy : String [0..1];
-        attribute sortOrder : String [0..1];
-    }
     @SourceFile {
         :>> path = "packages/shared-types/src/api/responses.types.ts";
     }
     item def AuthResponse :> BaseDTO {
-        item user : DomainEntities::User;
+        item user : User;
         attribute token : String;
         attribute refreshToken : String [0..1];
     }
@@ -116,18 +42,20 @@ package DataTransferObjects {
     }
 
     @SourceFile {
-        :>> path = "packages/shared-types/src/api/responses.types.ts";
+        :>> path = "packages/shared-types/src/api/requests.types.ts";
     }
-    item def ApiResponse :> BaseDTO {
-        attribute success : Boolean;
-        item data : AnyItem [0..1];
-        item error : ApiError [0..1];
+    item def PaginationParams :> BaseDTO {
+        attribute page : Integer [0..1];
+        attribute limit : Integer [0..1];
+        attribute sortBy : String [0..1];
+        attribute sortOrder : String [0..1];
+        // 'asc' | 'desc'
     }
 
     @SourceFile {
         :>> path = "packages/shared-types/src/api/responses.types.ts";
     }
-    item def PaginatedResponseWrapper :> BaseDTO {
+    item def PaginatedResponse :> BaseDTO {
         item data : AnyItem [0..*];
         item pagination : PaginationMetadata;
     }
@@ -141,25 +69,16 @@ package DataTransferObjects {
         attribute total : Integer;
         attribute totalPages : Integer;
     }
-    @SourceFile {
-        :>> path = "apps/backend/src/models/Sale.model.ts";
-    }
-    item def SaleStats :> BaseDTO {
-        attribute totalSales : Integer;
-        attribute completedSales : Integer;
-        attribute pendingSales : Integer;
-        attribute totalRevenue : Real;
-        attribute averageSalePrice : Real;
-    }
 
     @SourceFile {
-        :>> path = "apps/backend/src/models/Sale.model.ts";
+        :>> path = "packages/shared-types/src/api/responses.types.ts";
     }
-    item def MonthlySaleStats :> BaseDTO {
-        attribute month : DateTime;
-        attribute salesCount : Integer;
-        attribute revenue : Real;
+    item def ApiResponse :> BaseDTO {
+        attribute success : Boolean;
+        item data : AnyItem [0..1];
+        item error : ApiError [0..1];
     }
+
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
     }
@@ -171,47 +90,41 @@ package DataTransferObjects {
         attribute priceMin : Real [0..1];
         attribute priceMax : Real [0..1];
         attribute status : String [0..1];
+        // VehicleStatus
         attribute condition : String [0..1];
+        // VehicleCondition
         attribute search : String [0..1];
     }
     @SourceFile {
-        :>> path = "packages/shared-types/src/entities/user.types.ts";
+        :>> path = "packages/shared-types/src/entities/sale.types.ts";
     }
-    item def UpdateUserDto :> BaseDTO {
-        attribute email : String [0..1];
-        attribute firstName : String [0..1];
-        attribute lastName : String [0..1];
-        attribute role : UserRole [0..1];
-        attribute isActive : Boolean [0..1];
-    }
-    @SourceFile {
-        :>> path = "packages/shared-types/src/entities/customer.types.ts";
-    }
-    item def UpdateCustomerDto :> BaseDTO {
-        attribute firstName : String [0..1];
-        attribute lastName : String [0..1];
-        attribute email : String [0..1];
-        attribute phone : String [0..1];
-        attribute address : String [0..1];
-        attribute city : String [0..1];
-        attribute stateProvince : String [0..1];
-        attribute zipCode : String [0..1];
+    item def CreateSaleDto :> BaseDTO {
+        attribute vehicleId : Identifier;
+        attribute customerId : Identifier;
+        attribute salespersonId : Identifier;
+        attribute salePrice : Real;
+        attribute status : SaleStatus;
+        attribute saleDate : DateTime;
+        attribute paymentMethod : String [0..1];
+        attribute financingDetails : JSON [0..1];
+        attribute tradeInVehicle : String [0..1];
+        attribute tradeInValue : Real [0..1];
+        attribute downPayment : Real [0..1];
         attribute notes : String [0..1];
-        attribute state : String [0..1];
     }
     @SourceFile {
         :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
     }
-    item def UpdateVehicleDto :> BaseDTO {
-        attribute vin : String [0..1];
-        attribute make : String [0..1];
-        attribute model : String [0..1];
-        attribute year : Integer [0..1];
-        attribute color : String [0..1];
+    item def CreateVehicleDto :> BaseDTO {
+        attribute vin : String;
+        attribute make : String;
+        attribute model : String;
+        attribute year : Integer;
+        attribute price : Real;
+        attribute color : String;
         attribute mileage : Integer [0..1];
-        attribute price : Real [0..1];
         attribute cost : Real [0..1];
-        attribute status : VehicleStatus [0..1];
+        attribute status : VehicleStatus;
         attribute condition : VehicleCondition [0..1];
         attribute bodyType : String [0..1];
         attribute transmission : String [0..1];
@@ -225,13 +138,85 @@ package DataTransferObjects {
         attribute dateAcquired : DateTime [0..1];
     }
     @SourceFile {
+        :>> path = "packages/shared-types/src/entities/customer.types.ts";
+    }
+    item def CreateCustomerDto :> BaseDTO {
+        attribute firstName : String;
+        attribute lastName : String;
+        attribute email : String [0..1];
+        attribute phone : String [0..1];
+        attribute address : String [0..1];
+        attribute city : String [0..1];
+        attribute stateProvince : String [0..1];
+        attribute zipCode : String [0..1];
+        attribute notes : String [0..1];
+    }
+
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/customer.types.ts";
+    }
+    item def UpdateCustomerDto :> BaseDTO {
+        attribute firstName : String [0..1];
+        attribute lastName : String [0..1];
+        attribute email : String [0..1];
+        attribute phone : String [0..1];
+        attribute address : String [0..1];
+        attribute city : String [0..1];
+        attribute stateProvince : String [0..1];
+        attribute zipCode : String [0..1];
+        attribute notes : String [0..1];
+    }
+    @SourceFile {
         :>> path = "packages/shared-types/src/entities/sale.types.ts";
     }
     item def UpdateSaleDto :> BaseDTO {
         attribute salePrice : Real [0..1];
-        attribute saleDate : DateTime [0..1];
-        attribute status : SaleStatus [0..1];
-        attribute paymentMethod : String [0..1];
+        attribute status : String [0..1];
         attribute notes : String [0..1];
+    }
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/vehicle.types.ts";
+    }
+    item def UpdateVehicleDto :> CreateVehicleDto {
+        attribute price : Real [0..1];
+        attribute status : VehicleStatus [0..1];
+        attribute mileage : Integer [0..1];
+        attribute vin : String [0..1];
+        attribute make : String [0..1];
+        attribute model : String [0..1];
+        attribute year : Integer [0..1];
+        attribute color : String [0..1];
+        attribute cost : Real [0..1];
+        attribute condition : VehicleCondition [0..1];
+        attribute bodyType : String [0..1];
+        attribute transmission : String [0..1];
+        attribute fuelType : String [0..1];
+        attribute engine : String [0..1];
+        attribute drivetrain : String [0..1];
+        attribute exteriorColor : String [0..1];
+        attribute interiorColor : String [0..1];
+        attribute features : JSON [0..1];
+        attribute description : String [0..1];
+        attribute dateAcquired : DateTime [0..1];
+    }
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/user.types.ts";
+    }
+    item def CreateUserDto :> BaseDTO {
+        attribute email : String;
+        attribute password : String;
+        attribute firstName : String;
+        attribute lastName : String;
+        attribute role : UserRole;
+    }
+    @SourceFile {
+        :>> path = "packages/shared-types/src/entities/user.types.ts";
+    }
+    item def UpdateUserDto :> BaseDTO {
+        attribute email : String [0..1];
+        attribute firstName : String [0..1];
+        attribute lastName : String [0..1];
+        attribute role : UserRole [0..1];
+        attribute isActive : Boolean [0..1];
     }
 }

@@ -1,33 +1,26 @@
 package ObservabilityAnalysis {
-    import SysMLPrimitives::*;
+        import SysMLPrimitives::*;
     
-    doc /*Observability and monitoring patterns discovered in the application setup. */
+        doc /*Observability and monitoring setup. */
     
-    analysis def ObservabilityProfile {
-        // Logging
-        attribute hasStructuredLogging : Boolean = true;
-        attribute loggingLibrary : String = "morgan";
-        attribute logLevels : String = "dev/combined";
+        analysis def ObservabilityProfile {
+            // Logging
+            @SourceFile { :>> path = "apps/backend/src/app.ts"; }
+            attribute hasStructuredLogging : Boolean = false;
+            attribute loggingLibrary : String = "morgan";
+            attribute logLevels : String = "dev / combined";
     
-        // Metrics
-        attribute hasMetrics : Boolean = false;
+            // Metrics
+            attribute hasMetrics : Boolean = false;
     
-        // Tracing
-        attribute hasDistributedTracing : Boolean = false;
+            // Tracing
+            attribute hasDistributedTracing : Boolean = false;
     
-        // Alerting
-        attribute hasAlerting : Boolean = false;
+            // Alerting
+            attribute hasAlerting : Boolean = false;
     
-        results {
-            attribute hasHealthCheck : Boolean = true;
-            attribute healthEndpoint : String = "/health";
+            results {
+                attribute observabilityMaturity : String = "Basic (Request logging only)";
+            }
         }
-    }
-    
-    @SourceFile { :>> path = "apps/backend/src/app.ts"; }
-    analysis def LoggingAnalysis {
-        doc /* Analysis of HTTP request logging. */
-        attribute developmentFormat : String = "dev";
-        attribute productionFormat : String = "combined";
-    }
 }
