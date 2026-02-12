@@ -56,6 +56,7 @@ export interface CreateVehicleDto {
   interiorColor?: string;
   features?: Record<string, unknown>;
   description?: string;
+  images?: VehicleImage[];
   dateAcquired?: Date;
 }
 

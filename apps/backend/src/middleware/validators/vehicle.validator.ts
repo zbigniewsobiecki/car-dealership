@@ -1,6 +1,30 @@
 import { body } from 'express-validator';
 import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
 
+const imageValidators = [
+  body('images')
+    .optional()
+    .isArray()
+    .withMessage('Images must be an array'),
+
+  body('images.*.url')
+    .if(body('images').isArray())
+    .isURL()
+    .withMessage('Each image must have a valid URL'),
+
+  body('images.*.isPrimary')
+    .if(body('images').isArray())
+    .optional()
+    .isBoolean()
+    .withMessage('isPrimary must be a boolean'),
+
+  body('images.*.order')
+    .if(body('images').isArray())
+    .optional()
+    .isInt()
+    .withMessage('Order must be an integer'),
+];
+
 export const createVehicleValidator = [
   body('vin')
     .trim()
@@ -85,27 +109,7 @@ export const createVehicleValidator = [
     .isString()
     .withMessage('Fuel type must be a string'),
 
-  body('images')
-    .optional()
-    .isArray()
-    .withMessage('Images must be an array'),
-
-  body('images.*.url')
-    .if(body('images').isArray())
-    .isURL()
-    .withMessage('Each image must have a valid URL'),
-
-  body('images.*.isPrimary')
-    .if(body('images').isArray())
-    .optional()
-    .isBoolean()
-    .withMessage('isPrimary must be a boolean'),
-
-  body('images.*.order')
-    .if(body('images').isArray())
-    .optional()
-    .isInt()
-    .withMessage('Order must be an integer'),
+  ...imageValidators,
 ];
 
 export const updateVehicleValidator = [
@@ -190,25 +194,5 @@ export const updateVehicleValidator = [
     .isString()
     .withMessage('Fuel type must be a string'),
 
-  body('images')
-    .optional()
-    .isArray()
-    .withMessage('Images must be an array'),
-
-  body('images.*.url')
-    .if(body('images').isArray())
-    .isURL()
-    .withMessage('Each image must have a valid URL'),
-
-  body('images.*.isPrimary')
-    .if(body('images').isArray())
-    .optional()
-    .isBoolean()
-    .withMessage('isPrimary must be a boolean'),
-
-  body('images.*.order')
-    .if(body('images').isArray())
-    .optional()
-    .isInt()
-    .withMessage('Order must be an integer'),
+  ...imageValidators,
 ];

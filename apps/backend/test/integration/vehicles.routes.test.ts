@@ -306,6 +306,14 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
+      
+      // Verify that images were passed to the database query
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO vehicles'),
+        expect.arrayContaining([
+          expect.stringContaining('https://example.com/image.jpg')
+        ])
+      );
     });
   });
 
@@ -337,6 +345,35 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
+    });
+
+    it('should update vehicle images', async () => {
+      // First query: find existing vehicle
+      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
+
+      // Second query: update vehicle
+      const mockUpdatedVehicle = createMockVehicleRow({ 
+        images: [{ url: 'https://example.com/new-image.jpg', isPrimary: true, order: 1 }]
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [mockUpdatedVehicle] });
+
+      const response = await request(app)
+        .put('/api/vehicles/vehicle-1')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          images: [{ url: 'https://example.com/new-image.jpg', isPrimary: true, order: 1 }]
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      
+      // Verify that images were passed to the database query
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('UPDATE vehicles SET'),
+        expect.arrayContaining([
+          expect.stringContaining('https://example.com/new-image.jpg')
+        ])
+      );
     });
 
     it('should return 404 for non-existent vehicle', async () => {
