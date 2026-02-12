@@ -52,10 +52,21 @@ export const customersController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await customersService.delete(req.params.id);
+      const hardDelete = req.query.hard === 'true';
+      
+      // Only admins can hard delete
+      if (hardDelete && req.user?.role !== 'admin') {
+        res.status(403).json({
+          success: false,
+          error: { message: 'Only admins can perform hard deletes' }
+        });
+        return;
+      }
+
+      await customersService.delete(req.params.id, hardDelete);
       res.json({
         success: true,
-        message: 'Customer deleted successfully',
+        message: hardDelete ? 'Customer permanently deleted' : 'Customer soft deleted',
       });
     } catch (error) {
       next(error);

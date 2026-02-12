@@ -9,11 +9,12 @@ export const CustomerModel = {
     return result.rows.map(CustomerModel.mapRow);
   },
 
-  async findById(id: string): Promise<Customer | null> {
-    const result = await query(
-      'SELECT * FROM customers WHERE id = $1 AND deleted_at IS NULL',
-      [id]
-    );
+  async findById(id: string, options: { withDeleted?: boolean } = {}): Promise<Customer | null> {
+    const queryText = options.withDeleted
+      ? 'SELECT * FROM customers WHERE id = $1'
+      : 'SELECT * FROM customers WHERE id = $1 AND deleted_at IS NULL';
+      
+    const result = await query(queryText, [id]);
     if (result.rows.length === 0) return null;
     return CustomerModel.mapRow(result.rows[0]);
   },
@@ -100,6 +101,11 @@ export const CustomerModel = {
       'UPDATE customers SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
+    return (result.rowCount ?? 0) > 0;
+  },
+
+  async hardDelete(id: string): Promise<boolean> {
+    const result = await query('DELETE FROM customers WHERE id = $1', [id]);
     return (result.rowCount ?? 0) > 0;
   },
 

@@ -218,6 +218,23 @@ describe('Customers Routes Integration', () => {
 
       expect(response.status).toBe(404);
     });
+
+    it('should allow hard delete for admin', async () => {
+      // Mock admin token
+      const adminToken = await createAuthToken(UserRole.ADMIN);
+      mockQuery.mockResolvedValueOnce({ rowCount: 1 });
+
+      const response = await request(app)
+        .delete('/api/customers/customer-1?hard=true')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      
+      // Verify the query was a DELETE
+      const lastCall = mockQuery.mock.calls[mockQuery.mock.calls.length - 1];
+      expect(lastCall[0]).toContain('DELETE FROM customers WHERE id = $1');
+    });
   });
 
   describe('GET /api/customers/:id/sales', () => {

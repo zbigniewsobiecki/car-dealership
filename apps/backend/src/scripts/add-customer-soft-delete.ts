@@ -41,6 +41,38 @@ const migrate = async () => {
 
     // Drop existing index if it's not partial
     await query('DROP INDEX IF EXISTS idx_customers_email;');
+
+    // Handle duplicate emails before creating unique index
+    // We'll keep the most recently updated record and soft-delete the others
+    const duplicatesResult = await query(`
+      SELECT email, COUNT(*) 
+      FROM customers 
+      WHERE deleted_at IS NULL 
+      GROUP BY email 
+      HAVING COUNT(*) > 1;
+    `);
+
+    if (duplicatesResult.rows.length > 0) {
+      console.log(`Found ${duplicatesResult.rows.length} duplicate email(s). Resolving...`);
+      
+      for (const row of duplicatesResult.rows) {
+        const email = row.email;
+        // Keep the most recently updated one, soft delete others
+        await query(`
+          UPDATE customers 
+          SET deleted_at = CURRENT_TIMESTAMP 
+          WHERE email = $1 
+          AND id NOT IN (
+            SELECT id 
+            FROM customers 
+            WHERE email = $1 
+            ORDER BY updated_at DESC 
+            LIMIT 1
+          );
+        `, [email]);
+      }
+      console.log('✓ Resolved duplicate emails by soft-deleting older records');
+    }
     
     // Create partial unique index for email
     await query(`
