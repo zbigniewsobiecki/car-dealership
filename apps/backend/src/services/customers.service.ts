@@ -28,8 +28,11 @@ export const customersService = {
     return updated;
   },
 
-  async delete(id: string) {
-    const deleted = await CustomerModel.delete(id);
+  async delete(id: string, hardDelete = false) {
+    const deleted = hardDelete 
+      ? await CustomerModel.hardDelete(id)
+      : await CustomerModel.delete(id);
+      
     if (!deleted) {
       throw new AppError(404, 'Customer not found');
     }
