@@ -7,8 +7,8 @@ import {
 } from '@car-dealership/shared-types';
 
 export const VehicleModel = {
-  async findAll(filters?: VehicleFilters): Promise<Vehicle[]> {
-    let sql = 'SELECT * FROM vehicles WHERE 1=1';
+  async findAll(filters?: VehicleFilters): Promise<{ vehicles: Vehicle[]; total: number }> {
+    let sql = 'SELECT *, COUNT(*) OVER() as full_count FROM vehicles WHERE 1=1';
     const values: unknown[] = [];
     let paramCount = 1;
 
@@ -52,8 +52,22 @@ export const VehicleModel = {
 
     sql += ' ORDER BY created_at DESC';
 
+    if (filters?.limit) {
+      const limit = parseInt(filters.limit.toString());
+      const page = filters.page ? parseInt(filters.page.toString()) : 1;
+      const offset = (page - 1) * limit;
+
+      sql += ` LIMIT $${paramCount++} OFFSET $${paramCount++}`;
+      values.push(limit, offset);
+    }
+
     const result = await query(sql, values);
-    return result.rows.map(VehicleModel.mapRow);
+    const total = result.rows.length > 0 ? parseInt(result.rows[0].full_count) : 0;
+
+    return {
+      vehicles: result.rows.map(VehicleModel.mapRow),
+      total,
+    };
   },
 
   async findById(id: string): Promise<Vehicle | null> {

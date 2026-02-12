@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { vehiclesService } from '../services/vehicles.service.js';
-import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition, PaginatedResponse, Vehicle } from '@car-dealership/shared-types';
 
 export const vehiclesController = {
   async getAll(req: Request, res: Response, next: NextFunction) {
     try {
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
       const filters = {
         make: req.query.make as string | undefined,
         model: req.query.model as string | undefined,
@@ -15,12 +18,25 @@ export const vehiclesController = {
         status: req.query.status as VehicleStatus | undefined,
         condition: req.query.condition as VehicleCondition | undefined,
         search: req.query.search as string | undefined,
+        page,
+        limit,
       };
 
-      const vehicles = await vehiclesService.getAll(filters);
+      const { vehicles, total } = await vehiclesService.getAll(filters);
+      
+      const response: PaginatedResponse<Vehicle> = {
+        data: vehicles,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+
       res.json({
         success: true,
-        data: vehicles,
+        ...response,
       });
     } catch (error) {
       next(error);

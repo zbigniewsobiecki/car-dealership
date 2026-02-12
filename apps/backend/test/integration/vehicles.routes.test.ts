@@ -72,6 +72,7 @@ const createMockVehicleRow = (overrides = {}) => ({
   created_at: new Date(),
   updated_at: new Date(),
   created_by: 'user-1',
+  full_count: '2',
   ...overrides,
 });
 
@@ -98,6 +99,8 @@ describe('Vehicles Routes Integration', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveLength(2);
+      expect(response.body.pagination).toBeDefined();
+      expect(response.body.pagination.total).toBe(2);
     });
 
     it('should return 401 without authentication', async () => {
@@ -116,6 +119,7 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
+      expect(response.body.pagination).toBeDefined();
       expect(mockQuery).toHaveBeenCalled();
     });
   });

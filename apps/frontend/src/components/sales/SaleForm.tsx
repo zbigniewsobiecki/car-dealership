@@ -14,7 +14,8 @@ interface SaleFormProps {
 
 export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps) => {
   const user = useAuthStore((state) => state.user);
-  const { data: vehicles } = useVehicles();
+  const { data: paginatedVehicles } = useVehicles({ limit: 1000 });
+  const vehicles = paginatedVehicles?.data || [];
   const { data: customers } = useCustomers();
 
   const {
@@ -40,7 +41,7 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
   };
 
   // Filter available vehicles for new sales
-  const availableVehicles = vehicles?.filter(
+  const availableVehicles = vehicles.filter(
     (v) =>
       v.status === VehicleStatus.AVAILABLE ||
       (sale && v.id === sale.vehicleId)
