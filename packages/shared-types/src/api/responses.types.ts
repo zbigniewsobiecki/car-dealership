@@ -27,3 +27,9 @@ export interface ApiResponse<T> {
   data?: T;
   error?: ApiError;
 }
+
+export interface RevenueReport {
+  totalRevenue: number;
+  saleCount: number;
+  averageSalePrice: number;
+}

@@ -91,4 +91,18 @@ export const salesService = {
   async getMonthlyStats() {
     return SaleModel.getMonthlyStats();
   },
+
+  async getRevenueReport(from?: string, to?: string) {
+    const startDate = from ? new Date(from) : new Date(0);
+    const endDate = to ? new Date(to) : new Date();
+
+    if (isNaN(startDate.getTime())) {
+      throw new AppError(400, 'Invalid start date format');
+    }
+    if (isNaN(endDate.getTime())) {
+      throw new AppError(400, 'Invalid end date format');
+    }
+
+    return SaleModel.getRevenueReport(startDate, endDate);
+  },
 };
