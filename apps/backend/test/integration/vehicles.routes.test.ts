@@ -48,7 +48,7 @@ const createAuthToken = async (role: UserRole = UserRole.ADMIN) => {
 // Sample vehicle row for mocking
 const createMockVehicleRow = (overrides = {}) => ({
   id: 'vehicle-1',
-  vin: 'ABC123456789',
+  vin: '1234567890ABCDEFG',
   make: 'Toyota',
   model: 'Camry',
   year: 2022,
@@ -192,7 +192,7 @@ describe('Vehicles Routes Integration', () => {
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: 'ABC123456789',
+          vin: '1234567890ABCDEFG',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -203,7 +203,7 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
-      expect(response.body.data.vin).toBe('ABC123456789');
+      expect(response.body.data.vin).toBe('1234567890ABCDEFG');
     });
 
     it('should return 400 if VIN already exists', async () => {
@@ -214,7 +214,7 @@ describe('Vehicles Routes Integration', () => {
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: 'ABC123456789',
+          vin: '1234567890ABCDEFG',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
