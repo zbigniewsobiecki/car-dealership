@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { authService } from '../../../src/services/auth.service';
-import { server } from '../../mocks/server';
-import { http, HttpResponse } from 'msw';
-import { UserRole } from '@car-dealership/shared-types';
-
-const API_URL = 'http://localhost:3000/api';
 
 describe('authService', () => {
   beforeEach(() => {

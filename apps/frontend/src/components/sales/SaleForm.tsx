@@ -21,13 +21,23 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreateSaleDto>({
-    defaultValues: sale || {
+  } = useForm<Omit<CreateSaleDto, 'saleDate'> & { saleDate: string }>({
+    defaultValues: sale ? {
+      ...sale,
+      saleDate: new Date(sale.saleDate).toISOString().split('T')[0]
+    } as unknown as Omit<CreateSaleDto, 'saleDate'> & { saleDate: string } : {
       salespersonId: user?.id,
       saleDate: new Date().toISOString().split('T')[0],
       status: SaleStatus.PENDING,
     },
   });
+
+  const handleFormSubmit = (data: Omit<CreateSaleDto, 'saleDate'> & { saleDate: string }) => {
+    onSubmit({
+      ...data,
+      saleDate: new Date(data.saleDate),
+    } as CreateSaleDto);
+  };
 
   // Filter available vehicles for new sales
   const availableVehicles = vehicles?.filter(
@@ -48,7 +58,7 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Vehicle *</label>
@@ -64,7 +74,7 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
                 ))}
               </select>
               {errors.vehicleId && (
-                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message}</p>
+                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message as string}</p>
               )}
             </div>
 
@@ -81,8 +91,8 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
                   </option>
                 ))}
               </select>
-              {errors.customerId && (
-                <p className="text-red-600 text-sm mt-1">{errors.customerId.message}</p>
+              {errors.vehicleId && (
+                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message as string}</p>
               )}
             </div>
 
@@ -98,8 +108,8 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
                 className="input"
                 placeholder="28000.00"
               />
-              {errors.salePrice && (
-                <p className="text-red-600 text-sm mt-1">{errors.salePrice.message}</p>
+              {errors.vehicleId && (
+                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message as string}</p>
               )}
             </div>
 
@@ -110,8 +120,8 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
                 {...register('saleDate', { required: 'Sale date is required' })}
                 className="input"
               />
-              {errors.saleDate && (
-                <p className="text-red-600 text-sm mt-1">{errors.saleDate.message}</p>
+              {errors.vehicleId && (
+                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message as string}</p>
               )}
             </div>
 

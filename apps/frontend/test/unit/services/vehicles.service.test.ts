@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { vehiclesService } from '../../../src/services/vehicles.service';
 import { VehicleStatus } from '@car-dealership/shared-types';
-import { mockVehicle } from '../../mocks/handlers';
 
 describe('vehiclesService', () => {
   beforeEach(() => {
