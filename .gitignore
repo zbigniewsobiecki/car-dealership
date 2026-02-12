@@ -37,7 +37,6 @@ coverage
 .vite
 
 # Database (local development)
-*.db
 *.sqlite
 *.sqlite3
 
