@@ -1,14 +1,16 @@
 import { query } from './db.js';
-import { Customer, UpdateCustomerDto } from '@car-dealership/shared-types';
+import { Customer, CreateCustomerDto, UpdateCustomerDto } from '@car-dealership/shared-types';
 import { BaseRepository, BaseFilters } from './BaseRepository.js';
 
-class CustomerRepository extends BaseRepository<Customer> {
+class CustomerRepository extends BaseRepository<Customer, CreateCustomerDto, UpdateCustomerDto> {
   constructor() {
     super({
       tableName: 'customers',
       softDelete: true,
       defaultSortBy: 'created_at',
       defaultSortOrder: 'DESC',
+      allowedSortFields: ['created_at', 'first_name', 'last_name', 'email'],
+      allowedFilterFields: ['first_name', 'last_name', 'email', 'city', 'state'],
     });
   }
 
@@ -16,7 +18,7 @@ class CustomerRepository extends BaseRepository<Customer> {
     return super.findAll(filters);
   }
 
-  async create(data: Record<string, unknown>, createdBy?: string): Promise<Customer> {
+  async create(data: CreateCustomerDto, createdBy?: string): Promise<Customer> {
     const dbData: Record<string, unknown> = {
       first_name: data.firstName,
       last_name: data.lastName,

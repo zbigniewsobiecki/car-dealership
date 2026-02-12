@@ -1,13 +1,15 @@
 import { query } from './db.js';
-import { Sale, UpdateSaleDto } from '@car-dealership/shared-types';
+import { Sale, CreateSaleDto, UpdateSaleDto } from '@car-dealership/shared-types';
 import { BaseRepository, BaseFilters } from './BaseRepository.js';
 
-class SaleRepository extends BaseRepository<Sale> {
+class SaleRepository extends BaseRepository<Sale, CreateSaleDto, UpdateSaleDto> {
   constructor() {
     super({
       tableName: 'sales',
       defaultSortBy: 'created_at',
       defaultSortOrder: 'DESC',
+      allowedSortFields: ['created_at', 'sale_price', 'sale_date'],
+      allowedFilterFields: ['status', 'payment_method', 'salesperson_id', 'customer_id', 'vehicle_id'],
     });
   }
 
@@ -23,7 +25,7 @@ class SaleRepository extends BaseRepository<Sale> {
     return result.rows.map(row => this.mapRow(row));
   }
 
-  async create(data: Record<string, unknown>, _createdBy?: string): Promise<Sale> {
+  async create(data: CreateSaleDto, _createdBy?: string): Promise<Sale> {
     const dbData: Record<string, unknown> = {
       vehicle_id: data.vehicleId,
       customer_id: data.customerId,

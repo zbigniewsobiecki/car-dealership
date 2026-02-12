@@ -13,19 +13,25 @@ export interface RepositoryConfig {
   softDelete?: boolean;
   defaultSortBy?: string;
   defaultSortOrder?: 'ASC' | 'DESC';
+  allowedSortFields?: string[];
+  allowedFilterFields?: string[];
 }
 
-export abstract class BaseRepository<T> {
+export abstract class BaseRepository<T, CreateDto = Record<string, unknown>, UpdateDto = Record<string, unknown>> {
   protected tableName: string;
   protected softDelete: boolean;
   protected defaultSortBy: string;
   protected defaultSortOrder: 'ASC' | 'DESC';
+  protected allowedSortFields: string[];
+  protected allowedFilterFields: string[];
 
   constructor(config: RepositoryConfig) {
     this.tableName = config.tableName;
     this.softDelete = config.softDelete ?? false;
     this.defaultSortBy = config.defaultSortBy ?? 'created_at';
     this.defaultSortOrder = config.defaultSortOrder ?? 'DESC';
+    this.allowedSortFields = config.allowedSortFields ?? ['created_at'];
+    this.allowedFilterFields = config.allowedFilterFields ?? [];
   }
 
   protected abstract mapRow(row: Record<string, unknown>): T;
@@ -44,6 +50,11 @@ export abstract class BaseRepository<T> {
 
     for (const [key, value] of Object.entries(whereFilters)) {
       if (value !== undefined && value !== null) {
+        // Validate filter key
+        if (!this.allowedFilterFields.includes(key)) {
+          continue; // Skip disallowed filters
+        }
+
         // Handle specific filter types if needed in subclasses via a hook
         const clause = this.buildWhereClause(key, value, paramCount);
         if (clause) {
@@ -63,7 +74,11 @@ export abstract class BaseRepository<T> {
       sql += ` WHERE ${whereClauses.join(' AND ')}`;
     }
 
-    const finalSortBy = sortBy || this.defaultSortBy;
+    let finalSortBy = sortBy || this.defaultSortBy;
+    if (!this.allowedSortFields.includes(finalSortBy)) {
+      finalSortBy = this.defaultSortBy;
+    }
+
     const finalSortOrder = sortOrder || this.defaultSortOrder;
     sql += ` ORDER BY ${finalSortBy} ${finalSortOrder}`;
 
@@ -96,9 +111,12 @@ export abstract class BaseRepository<T> {
     return this.mapRow(result.rows[0]);
   }
 
-  async create(data: Record<string, unknown>, createdBy?: string): Promise<T> {
-    const fields = Object.keys(data);
-    const values = Object.values(data);
+  async create(data: CreateDto | Record<string, unknown>, createdBy?: string): Promise<T> {
+    // If data is a DTO, it should be mapped to a database record by the subclass
+    // But for the base implementation, we assume it's already a record or compatible
+    const record = data as Record<string, unknown>;
+    const fields = Object.keys(record);
+    const values = Object.values(record);
     
     if (createdBy) {
       fields.push('created_by');
@@ -116,11 +134,12 @@ export abstract class BaseRepository<T> {
     return this.mapRow(result.rows[0]);
   }
 
-  async update(id: string, data: Record<string, unknown>): Promise<T | null> {
-    const fields = Object.keys(data);
+  async update(id: string, data: UpdateDto | Record<string, unknown>): Promise<T | null> {
+    const record = data as Record<string, unknown>;
+    const fields = Object.keys(record);
     if (fields.length === 0) return this.findById(id);
 
-    const values = Object.values(data);
+    const values = Object.values(record);
     const setClauses = fields.map((field, i) => `${field} = $${i + 1}`).join(', ');
     
     let sql = `UPDATE ${this.tableName} SET ${setClauses} WHERE id = $${fields.length + 1}`;

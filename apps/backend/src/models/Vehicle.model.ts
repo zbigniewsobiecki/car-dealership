@@ -1,17 +1,23 @@
 import { query } from './db.js';
 import {
   Vehicle,
+  CreateVehicleDto,
   UpdateVehicleDto,
   VehicleStats,
 } from '@car-dealership/shared-types';
 import { BaseRepository, BaseFilters } from './BaseRepository.js';
 
-class VehicleRepository extends BaseRepository<Vehicle> {
+class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, UpdateVehicleDto> {
   constructor() {
     super({
       tableName: 'vehicles',
       defaultSortBy: 'created_at',
       defaultSortOrder: 'DESC',
+      allowedSortFields: ['created_at', 'price', 'year', 'mileage', 'make', 'model'],
+      allowedFilterFields: [
+        'make', 'model', 'yearMin', 'yearMax', 'priceMin', 'priceMax', 
+        'status', 'condition', 'search', 'bodyType', 'fuelType', 'transmission'
+      ],
     });
   }
 
@@ -25,7 +31,7 @@ class VehicleRepository extends BaseRepository<Vehicle> {
     return this.mapRow(result.rows[0]);
   }
 
-  async create(data: Record<string, unknown>, createdBy?: string): Promise<Vehicle> {
+  async create(data: CreateVehicleDto, createdBy?: string): Promise<Vehicle> {
     const dbData: Record<string, unknown> = {
       vin: data.vin,
       make: data.make,

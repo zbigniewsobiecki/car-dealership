@@ -18,6 +18,8 @@ export const vehiclesController = {
         status: req.query.status as VehicleStatus | undefined,
         condition: req.query.condition as VehicleCondition | undefined,
         search: req.query.search as string | undefined,
+        sortBy: req.query.sortBy as string | undefined,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
         page,
         limit,
       };

@@ -31,7 +31,7 @@ export const salesService = {
     }
 
     // Create sale
-    const sale = await SaleModel.create(data as unknown as Record<string, unknown>);
+    const sale = await SaleModel.create(data);
 
     // Update vehicle status if sale is completed
     if (data.status === SaleStatus.COMPLETED) {

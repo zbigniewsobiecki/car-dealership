@@ -32,7 +32,7 @@ export const vehiclesService = {
       throw new AppError(400, 'Vehicle with this VIN already exists');
     }
 
-    return VehicleModel.create(data as unknown as Record<string, unknown>, createdBy);
+    return VehicleModel.create(data, createdBy);
   },
 
   async update(id: string, data: UpdateVehicleDto) {

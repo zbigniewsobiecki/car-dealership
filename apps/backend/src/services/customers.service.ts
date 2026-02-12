@@ -17,7 +17,7 @@ export const customersService = {
   },
 
   async create(data: CreateCustomerDto, createdBy: string) {
-    return CustomerModel.create(data as unknown as Record<string, unknown>, createdBy);
+    return CustomerModel.create(data, createdBy);
   },
 
   async update(id: string, data: UpdateCustomerDto) {
