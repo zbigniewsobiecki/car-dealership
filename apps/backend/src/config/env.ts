@@ -27,6 +27,8 @@ export const env = {
   },
 
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: (process.env.CORS_ORIGIN === '*' 
+      ? '*' 
+      : (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',').map(o => o.trim())) as string | string[],
   },
 };
