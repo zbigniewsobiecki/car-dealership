@@ -148,6 +148,29 @@ export const SaleModel = {
     return result.rows;
   },
 
+  async getRevenueReport(startDate: Date, endDate: Date) {
+    const result = await query(
+      `
+      SELECT
+        COALESCE(SUM(sale_price), 0) as total_revenue,
+        COUNT(*) as sale_count,
+        COALESCE(AVG(sale_price), 0) as average_sale_price
+      FROM sales
+      WHERE status = 'completed'
+        AND sale_date >= $1
+        AND sale_date <= $2
+      `,
+      [startDate, endDate]
+    );
+
+    const row = result.rows[0];
+    return {
+      totalRevenue: parseFloat(row.total_revenue),
+      saleCount: parseInt(row.sale_count, 10),
+      averageSalePrice: parseFloat(row.average_sale_price),
+    };
+  },
+
   mapRow(row: Record<string, unknown>): Sale {
     return {
       id: row.id as string,
