@@ -4,6 +4,7 @@ import {
   CreateVehicleDto,
   UpdateVehicleDto,
   VehicleFilters,
+  VehicleStats,
 } from '@car-dealership/shared-types';
 
 export const VehicleModel = {
@@ -221,7 +222,7 @@ export const VehicleModel = {
     return (result.rowCount ?? 0) > 0;
   },
 
-  async getStats() {
+  async getStats(): Promise<VehicleStats> {
     const result = await query(`
       SELECT
         COUNT(*) as total,
@@ -233,7 +234,15 @@ export const VehicleModel = {
       FROM vehicles
     `);
 
-    return result.rows[0];
+    const row = result.rows[0];
+    return {
+      total: parseInt(row.total),
+      available: parseInt(row.available),
+      sold: parseInt(row.sold),
+      reserved: parseInt(row.reserved),
+      maintenance: parseInt(row.maintenance),
+      total_inventory_value: parseFloat(row.total_inventory_value),
+    };
   },
 
   mapRow(row: Record<string, unknown>): Vehicle {

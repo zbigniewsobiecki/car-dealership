@@ -4,6 +4,7 @@ import {
   CreateVehicleDto,
   UpdateVehicleDto,
   VehicleFilters,
+  VehicleStats,
   PaginatedResponse,
 } from '@car-dealership/shared-types';
 
@@ -45,8 +46,8 @@ export const vehiclesService = {
     await api.delete(`/vehicles/${id}`);
   },
 
-  async getStats() {
+  async getStats(): Promise<VehicleStats> {
     const response = await api.get('/vehicles/stats');
-    return response.data.data;
+    return response.data.data as VehicleStats;
   },
 };

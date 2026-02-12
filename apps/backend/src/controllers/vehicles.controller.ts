@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { vehiclesService } from '../services/vehicles.service.js';
-import { VehicleStatus, VehicleCondition, PaginatedResponse, Vehicle } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition, PaginatedResponse, Vehicle, VehicleStats } from '@car-dealership/shared-types';
 
 export const vehiclesController = {
   async getAll(req: Request, res: Response, next: NextFunction) {

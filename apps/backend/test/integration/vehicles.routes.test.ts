@@ -125,14 +125,14 @@ describe('Vehicles Routes Integration', () => {
   });
 
   describe('GET /api/vehicles/stats', () => {
-    it('should return vehicle stats', async () => {
+    it('should return vehicle stats with numeric values', async () => {
       const mockStats = {
         total: '10',
         available: '5',
         sold: '3',
         reserved: '1',
         maintenance: '1',
-        total_inventory_value: '250000',
+        total_inventory_value: '250000.00',
       };
       mockQuery.mockResolvedValueOnce({ rows: [mockStats] });
 
@@ -142,7 +142,14 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveProperty('total');
+      expect(response.body.data).toEqual({
+        total: 10,
+        available: 5,
+        sold: 3,
+        reserved: 1,
+        maintenance: 1,
+        total_inventory_value: 250000,
+      });
     });
   });
 

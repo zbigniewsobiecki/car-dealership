@@ -72,3 +72,12 @@ export interface VehicleFilters extends PaginationParams {
   condition?: VehicleCondition;
   search?: string;
 }
+
+export interface VehicleStats {
+  total: number;
+  available: number;
+  sold: number;
+  reserved: number;
+  maintenance: number;
+  total_inventory_value: number;
+}
