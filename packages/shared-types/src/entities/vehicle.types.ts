@@ -2,10 +2,10 @@ import { VehicleStatus, VehicleCondition } from '../enums/vehicle-status.enum';
 import { PaginationParams } from '../api/requests.types';
 
 export interface VehicleImage {
-  id: string;
+  id?: string;
   url: string;
-  isPrimary: boolean;
-  order: number;
+  isPrimary?: boolean;
+  order?: number;
 }
 
 export interface Vehicle {

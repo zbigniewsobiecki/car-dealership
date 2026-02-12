@@ -7,6 +7,11 @@ const imageValidators = [
     .isArray()
     .withMessage('Images must be an array'),
 
+  body('images.*')
+    .if(body('images').isArray())
+    .isObject()
+    .withMessage('Each image must be an object'),
+
   body('images.*.url')
     .if(body('images').isArray())
     .isURL()
@@ -99,12 +104,12 @@ export const createVehicleValidator = [
   rules.status().notEmpty().withMessage('Status is required'),
 
   // Optional fields
-  rules.mileage().optional(),
-  rules.cost().optional(),
-  rules.condition().optional(),
-  rules.bodyType().optional(),
-  rules.transmission().optional(),
-  rules.fuelType().optional(),
+  rules.mileage().optional({ nullable: true }),
+  rules.cost().optional({ nullable: true }),
+  rules.condition().optional({ nullable: true }),
+  rules.bodyType().optional({ nullable: true }),
+  rules.transmission().optional({ nullable: true }),
+  rules.fuelType().optional({ nullable: true }),
 
   ...imageValidators,
 ];
