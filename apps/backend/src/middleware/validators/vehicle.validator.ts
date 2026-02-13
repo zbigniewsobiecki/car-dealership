@@ -111,6 +111,17 @@ const rules = {
     .trim()
     .isString()
     .withMessage('Fuel type must be a string'),
+
+  engineDisplacement: () => body('engineDisplacement')
+    .optional({ nullable: true })
+    .isFloat({ min: 0 })
+    .withMessage('Engine displacement must be a non-negative number'),
+
+  category: () => body('category')
+    .optional({ nullable: true })
+    .trim()
+    .isString()
+    .withMessage('Category must be a string'),
 };
 
 export const createVehicleValidator = [
@@ -130,6 +141,8 @@ export const createVehicleValidator = [
   rules.bodyType().optional({ nullable: true }),
   rules.transmission().optional({ nullable: true }),
   rules.fuelType().optional({ nullable: true }),
+  rules.engineDisplacement(),
+  rules.category(),
 
   ...imageValidators,
 ];
@@ -151,6 +164,8 @@ export const updateVehicleValidator = [
   rules.bodyType().optional({ nullable: true }),
   rules.transmission().optional({ nullable: true }),
   rules.fuelType().optional({ nullable: true }),
+  rules.engineDisplacement(),
+  rules.category(),
 
   ...imageValidators,
 ];

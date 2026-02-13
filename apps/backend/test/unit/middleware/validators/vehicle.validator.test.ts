@@ -235,5 +235,30 @@ describe('Vehicle Validator', () => {
         expect(errors.isEmpty()).toBe(true);
       });
     });
+
+    describe('engineDisplacement', () => {
+      it('should pass when engineDisplacement is a valid non-negative number', async () => {
+        mockReq.body = { ...validVehicle, engineDisplacement: 1200.5 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+
+      it('should fail when engineDisplacement is negative', async () => {
+        mockReq.body = { ...validVehicle, engineDisplacement: -10 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.array().some(e => e.msg === 'Engine displacement must be a non-negative number')).toBe(true);
+      });
+    });
+
+    describe('category', () => {
+      it('should pass when category is a valid string', async () => {
+        mockReq.body = { ...validVehicle, category: 'Cruiser' };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+    });
   });
 });
