@@ -5,7 +5,8 @@ import { VehicleForm } from '../../src/components/vehicles/VehicleForm';
 import { 
   Vehicle, 
   VehicleStatus, 
-  VehicleCondition 
+  VehicleCondition,
+  VehicleType
 } from '@car-dealership/shared-types';
 
 describe('VehicleForm', () => {
@@ -193,5 +194,35 @@ describe('VehicleForm', () => {
     const submitButton = screen.getByRole('button', { name: /Saving.../i });
     expect(submitButton).toBeInTheDocument();
     expect(submitButton).toBeDisabled();
+  });
+
+  it('should show/hide fields based on vehicle type', async () => {
+    const user = userEvent.setup();
+    render(
+      <VehicleForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+      />
+    );
+
+    // Default is CAR
+    expect(screen.getByText(/Body Type/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Engine Displacement \(cc\)/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Category/i)).not.toBeInTheDocument();
+
+    // Switch to MOTORCYCLE
+    const typeSelect = screen.getByDisplayValue('Car');
+    await user.selectOptions(typeSelect, VehicleType.MOTORCYCLE);
+
+    expect(screen.queryByText(/Body Type/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Engine Displacement \(cc\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Category/i)).toBeInTheDocument();
+
+    // Switch back to CAR
+    await user.selectOptions(typeSelect, VehicleType.CAR);
+
+    expect(screen.getByText(/Body Type/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Engine Displacement \(cc\)/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Category/i)).not.toBeInTheDocument();
   });
 });
