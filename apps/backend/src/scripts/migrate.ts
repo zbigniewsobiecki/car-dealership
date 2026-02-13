@@ -58,6 +58,7 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS vehicles (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         vin VARCHAR(17) UNIQUE NOT NULL,
+        type VARCHAR(50) NOT NULL DEFAULT 'car' CHECK (type IN ('car', 'motorcycle')),
         make VARCHAR(100) NOT NULL,
         model VARCHAR(100) NOT NULL,
         year INTEGER NOT NULL CHECK (year >= 1900 AND year <= 2100),

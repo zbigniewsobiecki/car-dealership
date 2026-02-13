@@ -4,6 +4,7 @@ import {
   CreateVehicleDto,
   VehicleStatus,
   VehicleCondition,
+  VehicleType,
 } from '@car-dealership/shared-types';
 import { ModalForm } from '../shared/ModalForm';
 
@@ -26,6 +27,7 @@ export const VehicleForm = ({
     formState: { errors },
   } = useForm<CreateVehicleDto>({
     defaultValues: vehicle || {
+      type: VehicleType.CAR,
       status: VehicleStatus.AVAILABLE,
       condition: VehicleCondition.USED,
     },
@@ -40,6 +42,20 @@ export const VehicleForm = ({
       isLoading={isLoading}
     >
       <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="label">Vehicle Type *</label>
+          <select
+            {...register('type', { required: 'Vehicle type is required' })}
+            className="input"
+          >
+            <option value={VehicleType.CAR}>Car</option>
+            <option value={VehicleType.MOTORCYCLE}>Motorcycle</option>
+          </select>
+          {errors.type && (
+            <p className="text-red-600 text-sm mt-1">{errors.type.message}</p>
+          )}
+        </div>
+
         <div>
           <label className="label">VIN *</label>
           <input

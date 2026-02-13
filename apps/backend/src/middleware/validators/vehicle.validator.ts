@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
 
 const imageValidators = [
   body('images')
@@ -52,6 +52,10 @@ const rules = {
     .withMessage('VIN must be exactly 17 characters')
     .matches(/^[A-HJ-NPR-Z0-9]{17}$/)
     .withMessage('VIN must be alphanumeric and cannot contain I, O, or Q'),
+
+  type: () => body('type')
+    .isIn(Object.values(VehicleType))
+    .withMessage(`Type must be one of: ${Object.values(VehicleType).join(', ')}`),
 
   make: () => body('make')
     .trim(),
@@ -111,6 +115,7 @@ const rules = {
 
 export const createVehicleValidator = [
   rules.vin().notEmpty().withMessage('VIN is required'),
+  rules.type().notEmpty().withMessage('Type is required'),
   rules.make().notEmpty().withMessage('Make is required'),
   rules.model().notEmpty().withMessage('Model is required'),
   rules.year().notEmpty().withMessage('Year is required'),
@@ -131,6 +136,7 @@ export const createVehicleValidator = [
 
 export const updateVehicleValidator = [
   rules.vin().optional(),
+  rules.type().optional(),
   rules.make().optional().notEmpty().withMessage('Make cannot be empty'),
   rules.model().optional().notEmpty().withMessage('Model cannot be empty'),
   rules.year().optional(),

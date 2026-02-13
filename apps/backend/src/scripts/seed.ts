@@ -55,37 +55,37 @@ const seedData = async () => {
 
     // Create sample vehicles
     const vehicle1Result = await query(
-      `INSERT INTO vehicles (vin, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      `INSERT INTO vehicles (vin, type, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING id`,
-      ['1HGCM82633A123456', 'Honda', 'Accord', 2023, 'Silver', 15000, 28500.00, 25000.00, 'available', 'used', 'Sedan', 'Automatic', 'Gasoline', adminId]
+      ['1HGCM82633A123456', 'car', 'Honda', 'Accord', 2023, 'Silver', 15000, 28500.00, 25000.00, 'available', 'used', 'Sedan', 'Automatic', 'Gasoline', adminId]
     );
     const vehicle1Id = vehicle1Result.rows[0].id;
 
     const vehicle2Result = await query(
-      `INSERT INTO vehicles (vin, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      `INSERT INTO vehicles (vin, type, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING id`,
-      ['2T1BURHE9JC123789', 'Toyota', 'Camry', 2024, 'Blue', 5000, 32000.00, 28500.00, 'available', 'certified_pre_owned', 'Sedan', 'Automatic', 'Hybrid', adminId]
+      ['2T1BURHE9JC123789', 'car', 'Toyota', 'Camry', 2024, 'Blue', 5000, 32000.00, 28500.00, 'available', 'certified_pre_owned', 'Sedan', 'Automatic', 'Hybrid', adminId]
     );
     const vehicle2Id = vehicle2Result.rows[0].id;
 
     await query(
-      `INSERT INTO vehicles (vin, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-      ['1FTFW1EF5DFC12345', 'Ford', 'F-150', 2022, 'Black', 25000, 42000.00, 38000.00, 'available', 'used', 'Truck', 'Automatic', 'Gasoline', adminId]
+      `INSERT INTO vehicles (vin, type, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+      ['1FTFW1EF5DFC12345', 'car', 'Ford', 'F-150', 2022, 'Black', 25000, 42000.00, 38000.00, 'available', 'used', 'Truck', 'Automatic', 'Gasoline', adminId]
     );
 
     await query(
-      `INSERT INTO vehicles (vin, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-      ['3VWCX7AJ8EM123456', 'Volkswagen', 'Jetta', 2025, 'White', 0, 26000.00, 22000.00, 'available', 'new', 'Sedan', 'Automatic', 'Gasoline', adminId]
+      `INSERT INTO vehicles (vin, type, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+      ['3VWCX7AJ8EM123456', 'car', 'Volkswagen', 'Jetta', 2025, 'White', 0, 26000.00, 22000.00, 'available', 'new', 'Sedan', 'Automatic', 'Gasoline', adminId]
     );
 
     await query(
-      `INSERT INTO vehicles (vin, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-      ['5YJSA1E28JF123456', 'Tesla', 'Model 3', 2023, 'Red', 12000, 45000.00, 40000.00, 'reserved', 'used', 'Sedan', 'Automatic', 'Electric', adminId]
+      `INSERT INTO vehicles (vin, type, make, model, year, color, mileage, price, cost, status, condition, body_type, transmission, fuel_type, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+      ['5YJSA1E28JF123456', 'car', 'Tesla', 'Model 3', 2023, 'Red', 12000, 45000.00, 40000.00, 'reserved', 'used', 'Sedan', 'Automatic', 'Electric', adminId]
     );
     console.log('✓ Created 5 sample vehicles');
 

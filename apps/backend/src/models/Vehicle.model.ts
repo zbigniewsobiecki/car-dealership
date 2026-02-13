@@ -15,7 +15,7 @@ class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, Update
       defaultSortOrder: 'DESC',
       allowedSortFields: ['created_at', 'price', 'year', 'mileage', 'make', 'model'],
       allowedFilterFields: [
-        'make', 'model', 'yearMin', 'yearMax', 'priceMin', 'priceMax', 
+        'type', 'make', 'model', 'yearMin', 'yearMax', 'priceMin', 'priceMax', 
         'status', 'condition', 'search', 'bodyType', 'fuelType', 'transmission'
       ],
     });

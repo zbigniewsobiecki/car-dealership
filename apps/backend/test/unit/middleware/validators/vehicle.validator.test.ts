@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
-import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
 import { createVehicleValidator } from '../../../../src/middleware/validators/vehicle.validator.js';
 import { validate } from '../../../../src/middleware/validation.middleware.js';
 import { validationResult } from 'express-validator';
@@ -32,6 +32,7 @@ describe('Vehicle Validator', () => {
 
   const validVehicle = {
     vin: '1234567890ABCDEFG', // 17 chars, no I, O, Q
+    type: VehicleType.CAR,
     make: 'Toyota',
     model: 'Camry',
     year: 2023,
@@ -131,7 +132,7 @@ describe('Vehicle Validator', () => {
   });
 
   describe('Required fields', () => {
-    const requiredFields = ['make', 'model', 'color'];
+    const requiredFields = ['type', 'make', 'model', 'color'];
 
     requiredFields.forEach(field => {
       it(`should fail if ${field} is missing`, async () => {
