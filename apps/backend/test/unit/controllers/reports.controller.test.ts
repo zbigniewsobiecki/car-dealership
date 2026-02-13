@@ -80,5 +80,41 @@ describe('reportsController', () => {
       expect(next).toHaveBeenCalledWith(error);
       expect(res.json).not.toHaveBeenCalled();
     });
+
+    it('should call next with error for invalid from date format', async () => {
+      req.query = { from: 'not-a-date' };
+      const error = new Error('Invalid start date format');
+      mockSalesService.getRevenueReport.mockRejectedValue(error);
+
+      await reportsController.getRevenue(req as Request, res as Response, next);
+
+      expect(mockSalesService.getRevenueReport).toHaveBeenCalledWith('not-a-date', undefined);
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.json).not.toHaveBeenCalled();
+    });
+
+    it('should call next with error for invalid to date format', async () => {
+      req.query = { to: 'invalid' };
+      const error = new Error('Invalid end date format');
+      mockSalesService.getRevenueReport.mockRejectedValue(error);
+
+      await reportsController.getRevenue(req as Request, res as Response, next);
+
+      expect(mockSalesService.getRevenueReport).toHaveBeenCalledWith(undefined, 'invalid');
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.json).not.toHaveBeenCalled();
+    });
+
+    it('should handle unexpected service data (null)', async () => {
+      mockSalesService.getRevenueReport.mockResolvedValue(null);
+
+      await reportsController.getRevenue(req as Request, res as Response, next);
+
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: null,
+      });
+      expect(next).not.toHaveBeenCalled();
+    });
   });
 });
