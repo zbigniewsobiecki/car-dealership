@@ -4,7 +4,7 @@ import { salesService } from '../services/sales.service.js';
 export const salesController = {
   async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
-      const sales = await salesService.getAll();
+      const { data: sales } = await salesService.getAll();
       res.json({
         success: true,
         data: sales,

@@ -3,237 +3,98 @@ import {
   Vehicle,
   CreateVehicleDto,
   UpdateVehicleDto,
-  VehicleFilters,
   VehicleStats,
 } from '@car-dealership/shared-types';
+import { BaseRepository, BaseFilters } from './BaseRepository.js';
 
-export const VehicleModel = {
-  async findAll(filters?: VehicleFilters): Promise<{ vehicles: Vehicle[]; total: number }> {
-    let sql = 'SELECT *, COUNT(*) OVER() as full_count FROM vehicles WHERE 1=1';
-    const values: unknown[] = [];
-    let paramCount = 1;
+class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, UpdateVehicleDto> {
+  constructor() {
+    super({
+      tableName: 'vehicles',
+      defaultSortBy: 'created_at',
+      defaultSortOrder: 'DESC',
+      allowedSortFields: ['created_at', 'price', 'year', 'mileage', 'make', 'model'],
+      allowedFilterFields: [
+        'make', 'model', 'yearMin', 'yearMax', 'priceMin', 'priceMax', 
+        'status', 'condition', 'search', 'bodyType', 'fuelType', 'transmission'
+      ],
+    });
+  }
 
-    if (filters?.make) {
-      sql += ` AND LOWER(make) = LOWER($${paramCount++})`;
-      values.push(filters.make);
-    }
-    if (filters?.model) {
-      sql += ` AND LOWER(model) = LOWER($${paramCount++})`;
-      values.push(filters.model);
-    }
-    if (filters?.yearMin) {
-      sql += ` AND year >= $${paramCount++}`;
-      values.push(filters.yearMin);
-    }
-    if (filters?.yearMax) {
-      sql += ` AND year <= $${paramCount++}`;
-      values.push(filters.yearMax);
-    }
-    if (filters?.priceMin) {
-      sql += ` AND price >= $${paramCount++}`;
-      values.push(filters.priceMin);
-    }
-    if (filters?.priceMax) {
-      sql += ` AND price <= $${paramCount++}`;
-      values.push(filters.priceMax);
-    }
-    if (filters?.status) {
-      sql += ` AND status = $${paramCount++}`;
-      values.push(filters.status);
-    }
-    if (filters?.condition) {
-      sql += ` AND condition = $${paramCount++}`;
-      values.push(filters.condition);
-    }
-    if (filters?.search) {
-      sql += ` AND (LOWER(make) LIKE LOWER($${paramCount}) OR LOWER(model) LIKE LOWER($${paramCount}) OR LOWER(vin) LIKE LOWER($${paramCount}))`;
-      values.push(`%${filters.search}%`);
-      paramCount++;
-    }
-
-    sql += ' ORDER BY created_at DESC';
-
-    if (filters?.limit) {
-      const limit = parseInt(filters.limit.toString());
-      const page = filters.page ? parseInt(filters.page.toString()) : 1;
-      const offset = (page - 1) * limit;
-
-      sql += ` LIMIT $${paramCount++} OFFSET $${paramCount++}`;
-      values.push(limit, offset);
-    }
-
-    const result = await query(sql, values);
-    const total = result.rows.length > 0 ? parseInt(result.rows[0].full_count) : 0;
-
-    return {
-      vehicles: result.rows.map(VehicleModel.mapRow),
-      total,
-    };
-  },
-
-  async findById(id: string): Promise<Vehicle | null> {
-    const result = await query('SELECT * FROM vehicles WHERE id = $1', [id]);
-    if (result.rows.length === 0) return null;
-    return VehicleModel.mapRow(result.rows[0]);
-  },
+  async findAll(filters: BaseFilters = {}): Promise<{ data: Vehicle[]; total: number }> {
+    return super.findAll(filters);
+  }
 
   async findByVin(vin: string): Promise<Vehicle | null> {
     const result = await query('SELECT * FROM vehicles WHERE vin = $1', [vin]);
     if (result.rows.length === 0) return null;
-    return VehicleModel.mapRow(result.rows[0]);
-  },
+    return this.mapRow(result.rows[0]);
+  }
 
-  async create(data: CreateVehicleDto, createdBy: string): Promise<Vehicle> {
-    const result = await query(
-      `INSERT INTO vehicles (
-        vin, make, model, year, color, mileage, price, cost, status, condition,
-        body_type, transmission, fuel_type, engine, drivetrain, exterior_color,
-        interior_color, features, description, images, date_acquired, created_by
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
-      RETURNING *`,
-      [
-        data.vin,
-        data.make,
-        data.model,
-        data.year,
-        data.color,
-        data.mileage || null,
-        data.price,
-        data.cost || null,
-        data.status,
-        data.condition || null,
-        data.bodyType || null,
-        data.transmission || null,
-        data.fuelType || null,
-        data.engine || null,
-        data.drivetrain || null,
-        data.exteriorColor || null,
-        data.interiorColor || null,
-        data.features ? JSON.stringify(data.features) : null,
-        data.description || null,
-        data.images ? JSON.stringify(data.images) : null,
-        data.dateAcquired || null,
-        createdBy,
-      ]
-    );
+  async create(data: CreateVehicleDto, createdBy?: string): Promise<Vehicle> {
+    const dbData: Record<string, unknown> = {
+      vin: data.vin,
+      make: data.make,
+      model: data.model,
+      year: data.year,
+      color: data.color,
+      mileage: data.mileage || null,
+      price: data.price,
+      cost: data.cost || null,
+      status: data.status,
+      condition: data.condition || null,
+      body_type: data.bodyType || null,
+      transmission: data.transmission || null,
+      fuel_type: data.fuelType || null,
+      engine: data.engine || null,
+      drivetrain: data.drivetrain || null,
+      exterior_color: data.exteriorColor || null,
+      interior_color: data.interiorColor || null,
+      features: data.features ? JSON.stringify(data.features) : null,
+      description: data.description || null,
+      images: data.images ? JSON.stringify(data.images) : null,
+      date_acquired: data.dateAcquired || null,
+    };
 
-    return VehicleModel.mapRow(result.rows[0]);
-  },
+    return super.create(dbData, createdBy);
+  }
 
   async update(id: string, data: UpdateVehicleDto): Promise<Vehicle | null> {
-    const fields: string[] = [];
-    const values: unknown[] = [];
-    let paramCount = 1;
+    const dbData: Record<string, unknown> = {};
+    
+    if (data.vin !== undefined) dbData.vin = data.vin;
+    if (data.make !== undefined) dbData.make = data.make;
+    if (data.model !== undefined) dbData.model = data.model;
+    if (data.year !== undefined) dbData.year = data.year;
+    if (data.color !== undefined) dbData.color = data.color;
+    if (data.mileage !== undefined) dbData.mileage = data.mileage;
+    if (data.price !== undefined) dbData.price = data.price;
+    if (data.cost !== undefined) dbData.cost = data.cost;
+    if (data.status !== undefined) dbData.status = data.status;
+    if (data.condition !== undefined) dbData.condition = data.condition;
+    if (data.bodyType !== undefined) dbData.body_type = data.bodyType;
+    if (data.transmission !== undefined) dbData.transmission = data.transmission;
+    if (data.fuelType !== undefined) dbData.fuel_type = data.fuelType;
+    if (data.engine !== undefined) dbData.engine = data.engine;
+    if (data.drivetrain !== undefined) dbData.drivetrain = data.drivetrain;
+    if (data.exteriorColor !== undefined) dbData.exterior_color = data.exteriorColor;
+    if (data.interiorColor !== undefined) dbData.interior_color = data.interiorColor;
+    if (data.features !== undefined) dbData.features = JSON.stringify(data.features);
+    if (data.description !== undefined) dbData.description = data.description;
+    if (data.dateAcquired !== undefined) dbData.date_acquired = data.dateAcquired;
 
-    if (data.vin !== undefined) {
-      fields.push(`vin = $${paramCount++}`);
-      values.push(data.vin);
-    }
-    if (data.make !== undefined) {
-      fields.push(`make = $${paramCount++}`);
-      values.push(data.make);
-    }
-    if (data.model !== undefined) {
-      fields.push(`model = $${paramCount++}`);
-      values.push(data.model);
-    }
-    if (data.year !== undefined) {
-      fields.push(`year = $${paramCount++}`);
-      values.push(data.year);
-    }
-    if (data.color !== undefined) {
-      fields.push(`color = $${paramCount++}`);
-      values.push(data.color);
-    }
-    if (data.mileage !== undefined) {
-      fields.push(`mileage = $${paramCount++}`);
-      values.push(data.mileage);
-    }
-    if (data.price !== undefined) {
-      fields.push(`price = $${paramCount++}`);
-      values.push(data.price);
-    }
-    if (data.cost !== undefined) {
-      fields.push(`cost = $${paramCount++}`);
-      values.push(data.cost);
-    }
-    if (data.status !== undefined) {
-      fields.push(`status = $${paramCount++}`);
-      values.push(data.status);
-    }
-    if (data.condition !== undefined) {
-      fields.push(`condition = $${paramCount++}`);
-      values.push(data.condition);
-    }
-    if (data.bodyType !== undefined) {
-      fields.push(`body_type = $${paramCount++}`);
-      values.push(data.bodyType);
-    }
-    if (data.transmission !== undefined) {
-      fields.push(`transmission = $${paramCount++}`);
-      values.push(data.transmission);
-    }
-    if (data.fuelType !== undefined) {
-      fields.push(`fuel_type = $${paramCount++}`);
-      values.push(data.fuelType);
-    }
-    if (data.engine !== undefined) {
-      fields.push(`engine = $${paramCount++}`);
-      values.push(data.engine);
-    }
-    if (data.drivetrain !== undefined) {
-      fields.push(`drivetrain = $${paramCount++}`);
-      values.push(data.drivetrain);
-    }
-    if (data.exteriorColor !== undefined) {
-      fields.push(`exterior_color = $${paramCount++}`);
-      values.push(data.exteriorColor);
-    }
-    if (data.interiorColor !== undefined) {
-      fields.push(`interior_color = $${paramCount++}`);
-      values.push(data.interiorColor);
-    }
-    if (data.features !== undefined) {
-      fields.push(`features = $${paramCount++}`);
-      values.push(data.features ? JSON.stringify(data.features) : null);
-    }
-    if (data.description !== undefined) {
-      fields.push(`description = $${paramCount++}`);
-      values.push(data.description);
-    }
-    if (data.images !== undefined) {
-      fields.push(`images = $${paramCount++}`);
-      values.push(data.images ? JSON.stringify(data.images) : null);
-    }
-    if (data.dateAcquired !== undefined) {
-      fields.push(`date_acquired = $${paramCount++}`);
-      values.push(data.dateAcquired);
-    }
+    if (data.images !== undefined) dbData.images = data.images ? JSON.stringify(data.images) : null;
 
-    if (fields.length === 0) return this.findById(id);
-
-    values.push(id);
-    const result = await query(
-      `UPDATE vehicles SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
-      values
-    );
-
-    if (result.rows.length === 0) return null;
-    return VehicleModel.mapRow(result.rows[0]);
-  },
-
-  async delete(id: string): Promise<boolean> {
-    const result = await query('DELETE FROM vehicles WHERE id = $1', [id]);
-    return (result.rowCount ?? 0) > 0;
-  },
+    return super.update(id, dbData);
+  }
 
   async findRecent(limit: number): Promise<Vehicle[]> {
     const result = await query(
       'SELECT * FROM vehicles ORDER BY created_at DESC LIMIT $1',
       [limit]
     );
-    return result.rows.map(VehicleModel.mapRow);
-  },
+    return result.rows.map(row => this.mapRow(row));
+  }
 
   async getStats(): Promise<VehicleStats> {
     const result = await query(`
@@ -256,9 +117,35 @@ export const VehicleModel = {
       maintenance: parseInt(row.maintenance),
       total_inventory_value: parseFloat(row.total_inventory_value),
     };
-  },
+  }
 
-  mapRow(row: Record<string, unknown>): Vehicle {
+  protected buildWhereClause(key: string, value: unknown, paramCount: number): { sql: string; value: unknown } | null {
+    switch (key) {
+      case 'make':
+      case 'model':
+        return { sql: `LOWER(${key}) = LOWER($${paramCount})`, value };
+      case 'yearMin':
+        return { sql: `year >= $${paramCount}`, value };
+      case 'yearMax':
+        return { sql: `year <= $${paramCount}`, value };
+      case 'priceMin':
+        return { sql: `price >= $${paramCount}`, value };
+      case 'priceMax':
+        return { sql: `price <= $${paramCount}`, value };
+      case 'search':
+        return {
+          sql: `(LOWER(make) LIKE LOWER($${paramCount}) OR LOWER(model) LIKE LOWER($${paramCount}) OR LOWER(vin) LIKE LOWER($${paramCount}))`,
+          value: `%${value}%`
+        };
+      case 'status':
+      case 'condition':
+        return { sql: `${key} = $${paramCount}`, value };
+      default:
+        return super.buildWhereClause(key, value, paramCount);
+    }
+  }
+
+  protected mapRow(row: Record<string, unknown>): Vehicle {
     return {
       id: row.id as string,
       vin: row.vin as string,
@@ -286,5 +173,7 @@ export const VehicleModel = {
       updatedAt: row.updated_at as Date,
       createdBy: row.created_by as string | undefined,
     };
-  },
-};
+  }
+}
+
+export const VehicleModel = new VehicleRepository();

@@ -18,11 +18,13 @@ export const vehiclesController = {
         status: req.query.status as VehicleStatus | undefined,
         condition: req.query.condition as VehicleCondition | undefined,
         search: req.query.search as string | undefined,
+        sortBy: req.query.sortBy as string | undefined,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
         page,
         limit,
       };
 
-      const { vehicles, total } = await vehiclesService.getAll(filters);
+      const { data: vehicles, total } = await vehiclesService.getAll(filters);
       
       const response: PaginatedResponse<Vehicle> = {
         data: vehicles,

@@ -1,115 +1,61 @@
 import { query } from './db.js';
 import { Customer, CreateCustomerDto, UpdateCustomerDto } from '@car-dealership/shared-types';
+import { BaseRepository, BaseFilters } from './BaseRepository.js';
 
-export const CustomerModel = {
-  async findAll(): Promise<Customer[]> {
-    const result = await query(
-      'SELECT * FROM customers WHERE deleted_at IS NULL ORDER BY created_at DESC'
-    );
-    return result.rows.map(CustomerModel.mapRow);
-  },
+class CustomerRepository extends BaseRepository<Customer, CreateCustomerDto, UpdateCustomerDto> {
+  constructor() {
+    super({
+      tableName: 'customers',
+      softDelete: true,
+      defaultSortBy: 'created_at',
+      defaultSortOrder: 'DESC',
+      allowedSortFields: ['created_at', 'first_name', 'last_name', 'email'],
+      allowedFilterFields: ['first_name', 'last_name', 'email', 'city', 'state'],
+    });
+  }
 
-  async findById(id: string, options: { withDeleted?: boolean } = {}): Promise<Customer | null> {
-    const queryText = options.withDeleted
-      ? 'SELECT * FROM customers WHERE id = $1'
-      : 'SELECT * FROM customers WHERE id = $1 AND deleted_at IS NULL';
-      
-    const result = await query(queryText, [id]);
-    if (result.rows.length === 0) return null;
-    return CustomerModel.mapRow(result.rows[0]);
-  },
+  async findAll(filters: BaseFilters = {}): Promise<{ data: Customer[]; total: number }> {
+    return super.findAll(filters);
+  }
 
-  async create(data: CreateCustomerDto, createdBy: string): Promise<Customer> {
-    const result = await query(
-      `INSERT INTO customers (
-        first_name, last_name, email, phone, address, city, state, zip_code, notes, created_by
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING *`,
-      [
-        data.firstName,
-        data.lastName,
-        data.email || null,
-        data.phone || null,
-        data.address || null,
-        data.city || null,
-        data.state || null,
-        data.zipCode || null,
-        data.notes || null,
-        createdBy,
-      ]
-    );
+  async create(data: CreateCustomerDto, createdBy?: string): Promise<Customer> {
+    const dbData: Record<string, unknown> = {
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email || null,
+      phone: data.phone || null,
+      address: data.address || null,
+      city: data.city || null,
+      state: data.state || null,
+      zip_code: data.zipCode || null,
+      notes: data.notes || null,
+    };
 
-    return CustomerModel.mapRow(result.rows[0]);
-  },
+    return super.create(dbData, createdBy);
+  }
 
   async update(id: string, data: UpdateCustomerDto): Promise<Customer | null> {
-    const fields: string[] = [];
-    const values: unknown[] = [];
-    let paramCount = 1;
+    const dbData: Record<string, unknown> = {};
 
-    if (data.firstName !== undefined) {
-      fields.push(`first_name = $${paramCount++}`);
-      values.push(data.firstName);
-    }
-    if (data.lastName !== undefined) {
-      fields.push(`last_name = $${paramCount++}`);
-      values.push(data.lastName);
-    }
-    if (data.email !== undefined) {
-      fields.push(`email = $${paramCount++}`);
-      values.push(data.email);
-    }
-    if (data.phone !== undefined) {
-      fields.push(`phone = $${paramCount++}`);
-      values.push(data.phone);
-    }
-    if (data.address !== undefined) {
-      fields.push(`address = $${paramCount++}`);
-      values.push(data.address);
-    }
-    if (data.city !== undefined) {
-      fields.push(`city = $${paramCount++}`);
-      values.push(data.city);
-    }
-    if (data.state !== undefined) {
-      fields.push(`state = $${paramCount++}`);
-      values.push(data.state);
-    }
-    if (data.zipCode !== undefined) {
-      fields.push(`zip_code = $${paramCount++}`);
-      values.push(data.zipCode);
-    }
-    if (data.notes !== undefined) {
-      fields.push(`notes = $${paramCount++}`);
-      values.push(data.notes);
-    }
+    if (data.firstName !== undefined) dbData.first_name = data.firstName;
+    if (data.lastName !== undefined) dbData.last_name = data.lastName;
+    if (data.email !== undefined) dbData.email = data.email;
+    if (data.phone !== undefined) dbData.phone = data.phone;
+    if (data.address !== undefined) dbData.address = data.address;
+    if (data.city !== undefined) dbData.city = data.city;
+    if (data.state !== undefined) dbData.state = data.state;
+    if (data.zipCode !== undefined) dbData.zip_code = data.zipCode;
+    if (data.notes !== undefined) dbData.notes = data.notes;
 
-    if (fields.length === 0) return this.findById(id);
-
-    values.push(id);
-    const result = await query(
-      `UPDATE customers SET ${fields.join(', ')} WHERE id = $${paramCount} AND deleted_at IS NULL RETURNING *`,
-      values
-    );
-
-    if (result.rows.length === 0) return null;
-    return CustomerModel.mapRow(result.rows[0]);
-  },
-
-  async delete(id: string): Promise<boolean> {
-    const result = await query(
-      'UPDATE customers SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL',
-      [id]
-    );
-    return (result.rowCount ?? 0) > 0;
-  },
+    return super.update(id, dbData);
+  }
 
   async hardDelete(id: string): Promise<boolean> {
     const result = await query('DELETE FROM customers WHERE id = $1', [id]);
     return (result.rowCount ?? 0) > 0;
-  },
+  }
 
-  mapRow(row: Record<string, unknown>): Customer {
+  protected mapRow(row: Record<string, unknown>): Customer {
     return {
       id: row.id as string,
       firstName: row.first_name as string,
@@ -126,5 +72,7 @@ export const CustomerModel = {
       deletedAt: row.deleted_at as Date | undefined,
       createdBy: row.created_by as string | undefined,
     };
-  },
-};
+  }
+}
+
+export const CustomerModel = new CustomerRepository();

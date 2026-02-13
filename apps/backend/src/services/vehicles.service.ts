@@ -6,10 +6,15 @@ import {
   VehicleFilters,
   VehicleStats,
 } from '@car-dealership/shared-types';
+import { BaseFilters } from '../models/BaseRepository.js';
 
 export const vehiclesService = {
   async getAll(filters?: VehicleFilters) {
-    return VehicleModel.findAll(filters);
+    const baseFilters: BaseFilters | undefined = filters ? {
+      ...filters,
+      sortOrder: filters.sortOrder?.toUpperCase() as 'ASC' | 'DESC' | undefined
+    } : undefined;
+    return VehicleModel.findAll(baseFilters);
   },
 
   async getById(id: string) {
