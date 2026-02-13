@@ -97,10 +97,6 @@ const rules = {
     .isIn(Object.values(VehicleType))
     .withMessage(`Type must be one of: ${Object.values(VehicleType).join(', ')}`),
 
-  type: () => body('type')
-    .isIn(Object.values(VehicleType))
-    .withMessage(`Type must be one of: ${Object.values(VehicleType).join(', ')}`),
-
   bodyType: () => body('bodyType')
     .trim()
     .isString()
@@ -124,7 +120,6 @@ export const createVehicleValidator = [
   rules.year().notEmpty().withMessage('Year is required'),
   rules.color().notEmpty().withMessage('Color is required'),
   rules.price().notEmpty().withMessage('Price is required'),
-  rules.price().notEmpty().withMessage('Price is required'),
   rules.type().notEmpty().withMessage('Type is required'),
   rules.status().notEmpty().withMessage('Status is required'),
 
@@ -145,7 +140,6 @@ export const updateVehicleValidator = [
   rules.model().optional().notEmpty().withMessage('Model cannot be empty'),
   rules.year().optional(),
   rules.color().optional().notEmpty().withMessage('Color cannot be empty'),
-  rules.price().optional(),
   rules.price().optional(),
   rules.type().optional(),
   rules.status().optional(),

@@ -4,6 +4,7 @@ import {
   UpdateVehicleDto,
   VehicleStatus,
   VehicleCondition,
+  VehicleType,
 } from '@car-dealership/shared-types';
 
 let vehicleIdCounter = 1;
@@ -18,6 +19,7 @@ export const createMockVehicle = (overrides: Partial<Vehicle> = {}): Vehicle => 
   mileage: 15000,
   price: 25000,
   cost: 20000,
+  type: VehicleType.CAR,
   status: VehicleStatus.AVAILABLE,
   condition: VehicleCondition.USED,
   bodyType: 'Sedan',
@@ -39,6 +41,7 @@ export const createMockCreateVehicleDto = (
   mileage: 0,
   price: 30000,
   cost: 25000,
+  type: VehicleType.CAR,
   status: VehicleStatus.AVAILABLE,
   condition: VehicleCondition.NEW,
   ...overrides,
