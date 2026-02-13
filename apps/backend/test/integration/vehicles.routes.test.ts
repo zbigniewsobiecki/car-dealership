@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import { UserRole, VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
+import { UserRole, VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
 
 // Mock environment config
 vi.mock('../../src/config/env.js', () => ({
@@ -56,6 +56,7 @@ const createMockVehicleRow = (overrides = {}) => ({
   mileage: 15000,
   price: '25000.00',
   cost: '20000.00',
+  type: VehicleType.CAR,
   status: VehicleStatus.AVAILABLE,
   condition: VehicleCondition.USED,
   body_type: 'Sedan',
@@ -234,6 +235,7 @@ describe('Vehicles Routes Integration', () => {
           year: 2022,
           color: 'Blue',
           price: 25000,
+          type: VehicleType.CAR,
           status: VehicleStatus.AVAILABLE,
         });
 
@@ -256,6 +258,7 @@ describe('Vehicles Routes Integration', () => {
           year: 2022,
           color: 'Blue',
           price: 25000,
+          type: VehicleType.CAR,
           status: VehicleStatus.AVAILABLE,
         });
 
@@ -274,6 +277,7 @@ describe('Vehicles Routes Integration', () => {
           year: 2022,
           color: 'Blue',
           price: 25000,
+          type: VehicleType.CAR,
           status: VehicleStatus.AVAILABLE,
           images: [{ url: 'not-a-url' }]
         });
@@ -300,6 +304,7 @@ describe('Vehicles Routes Integration', () => {
           year: 2022,
           color: 'Blue',
           price: 25000,
+          type: VehicleType.CAR,
           status: VehicleStatus.AVAILABLE,
           images: [{ url: 'https://example.com/image.jpg', isPrimary: true, order: 1 }]
         });

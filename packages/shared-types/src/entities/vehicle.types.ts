@@ -1,4 +1,5 @@
 import { VehicleStatus, VehicleCondition } from '../enums/vehicle-status.enum';
+import { VehicleType } from '../enums/vehicle-type.enum';
 import { PaginationParams } from '../api/requests.types';
 
 export interface VehicleImage {
@@ -18,6 +19,7 @@ export interface Vehicle {
   mileage?: number;
   price: number;
   cost?: number;
+  type: VehicleType;
   status: VehicleStatus;
   condition?: VehicleCondition;
   bodyType?: string;
@@ -45,6 +47,7 @@ export interface CreateVehicleDto {
   mileage?: number;
   price: number;
   cost?: number;
+  type: VehicleType;
   status: VehicleStatus;
   condition?: VehicleCondition;
   bodyType?: string;
@@ -71,6 +74,7 @@ export interface VehicleFilters extends PaginationParams {
   priceMax?: number;
   status?: VehicleStatus;
   condition?: VehicleCondition;
+  type?: VehicleType;
   search?: string;
 }
 
