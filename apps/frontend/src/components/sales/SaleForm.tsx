@@ -62,8 +62,9 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
         <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Vehicle *</label>
+              <label htmlFor="vehicleId" className="label">Vehicle *</label>
               <select
+                id="vehicleId"
                 {...register('vehicleId', { required: 'Vehicle is required' })}
                 className="input"
               >
@@ -80,8 +81,9 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
             </div>
 
             <div>
-              <label className="label">Customer *</label>
+              <label htmlFor="customerId" className="label">Customer *</label>
               <select
+                id="customerId"
                 {...register('customerId', { required: 'Customer is required' })}
                 className="input"
               >
@@ -92,14 +94,15 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
                   </option>
                 ))}
               </select>
-              {errors.vehicleId && (
-                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message as string}</p>
+              {errors.customerId && (
+                <p className="text-red-600 text-sm mt-1">{errors.customerId.message as string}</p>
               )}
             </div>
 
             <div>
-              <label className="label">Sale Price *</label>
+              <label htmlFor="salePrice" className="label">Sale Price *</label>
               <input
+                id="salePrice"
                 type="number"
                 step="0.01"
                 {...register('salePrice', {
@@ -109,26 +112,27 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
                 className="input"
                 placeholder="28000.00"
               />
-              {errors.vehicleId && (
-                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message as string}</p>
+              {errors.salePrice && (
+                <p className="text-red-600 text-sm mt-1">{errors.salePrice.message as string}</p>
               )}
             </div>
 
             <div>
-              <label className="label">Sale Date *</label>
+              <label htmlFor="saleDate" className="label">Sale Date *</label>
               <input
+                id="saleDate"
                 type="date"
                 {...register('saleDate', { required: 'Sale date is required' })}
                 className="input"
               />
-              {errors.vehicleId && (
-                <p className="text-red-600 text-sm mt-1">{errors.vehicleId.message as string}</p>
+              {errors.saleDate && (
+                <p className="text-red-600 text-sm mt-1">{errors.saleDate.message as string}</p>
               )}
             </div>
 
             <div>
-              <label className="label">Payment Method</label>
-              <select {...register('paymentMethod')} className="input">
+              <label htmlFor="paymentMethod" className="label">Payment Method</label>
+              <select id="paymentMethod" {...register('paymentMethod')} className="input">
                 <option value="">Select payment method</option>
                 <option value="Cash">Cash</option>
                 <option value="Financing">Financing</option>
@@ -138,8 +142,8 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
             </div>
 
             <div>
-              <label className="label">Status *</label>
-              <select {...register('status')} className="input">
+              <label htmlFor="status" className="label">Status *</label>
+              <select id="status" {...register('status')} className="input">
                 <option value={SaleStatus.PENDING}>Pending</option>
                 <option value={SaleStatus.COMPLETED}>Completed</option>
                 <option value={SaleStatus.CANCELLED}>Cancelled</option>
@@ -147,8 +151,9 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
             </div>
 
             <div>
-              <label className="label">Down Payment</label>
+              <label htmlFor="downPayment" className="label">Down Payment</label>
               <input
+                id="downPayment"
                 type="number"
                 step="0.01"
                 {...register('downPayment', { valueAsNumber: true })}
@@ -158,8 +163,9 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
             </div>
 
             <div>
-              <label className="label">Trade-In Value</label>
+              <label htmlFor="tradeInValue" className="label">Trade-In Value</label>
               <input
+                id="tradeInValue"
                 type="number"
                 step="0.01"
                 {...register('tradeInValue', { valueAsNumber: true })}
@@ -170,8 +176,9 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
           </div>
 
           <div>
-            <label className="label">Trade-In Vehicle</label>
+            <label htmlFor="tradeInVehicle" className="label">Trade-In Vehicle</label>
             <input
+              id="tradeInVehicle"
               {...register('tradeInVehicle')}
               className="input"
               placeholder="2015 Honda Civic"
@@ -179,8 +186,9 @@ export const SaleForm = ({ sale, onSubmit, onCancel, isLoading }: SaleFormProps)
           </div>
 
           <div>
-            <label className="label">Notes</label>
+            <label htmlFor="notes" className="label">Notes</label>
             <textarea
+              id="notes"
               {...register('notes')}
               className="input"
               rows={3}
