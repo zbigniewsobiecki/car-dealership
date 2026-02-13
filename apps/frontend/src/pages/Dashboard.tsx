@@ -1,7 +1,8 @@
 import { useVehicleStats, useRecentVehicles } from '../hooks/useVehicles';
 import { useSalesStats } from '../hooks/useSales';
-import { Car, DollarSign, TrendingUp, Package, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Car, DollarSign, TrendingUp, Package } from 'lucide-react';
+import { StatsCard } from '../components/dashboard/StatsCard';
+import { RecentVehiclesTable } from '../components/dashboard/RecentVehiclesTable';
 
 export const Dashboard = () => {
   const { data: vehicleStats, isLoading: vehicleStatsLoading } = useVehicleStats();
@@ -23,61 +24,30 @@ export const Dashboard = () => {
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-blue-600">Total Vehicles</p>
-              <p className="text-3xl font-bold text-blue-900 mt-2">
-                {vehicleStats?.total || 0}
-              </p>
-            </div>
-            <div className="bg-blue-200 p-3 rounded-full">
-              <Car className="h-8 w-8 text-blue-700" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-600">Available</p>
-              <p className="text-3xl font-bold text-green-900 mt-2">
-                {vehicleStats?.available || 0}
-              </p>
-            </div>
-            <div className="bg-green-200 p-3 rounded-full">
-              <Package className="h-8 w-8 text-green-700" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-purple-600">Total Sales</p>
-              <p className="text-3xl font-bold text-purple-900 mt-2">
-                {salesStats?.completed_sales || 0}
-              </p>
-            </div>
-            <div className="bg-purple-200 p-3 rounded-full">
-              <TrendingUp className="h-8 w-8 text-purple-700" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-amber-600">Total Revenue</p>
-              <p className="text-3xl font-bold text-amber-900 mt-2">
-                ${Number(salesStats?.total_revenue || 0).toLocaleString()}
-              </p>
-            </div>
-            <div className="bg-amber-200 p-3 rounded-full">
-              <DollarSign className="h-8 w-8 text-amber-700" />
-            </div>
-          </div>
-        </div>
+        <StatsCard
+          title="Total Vehicles"
+          value={vehicleStats?.total || 0}
+          icon={Car}
+          variant="blue"
+        />
+        <StatsCard
+          title="Available"
+          value={vehicleStats?.available || 0}
+          icon={Package}
+          variant="green"
+        />
+        <StatsCard
+          title="Total Sales"
+          value={salesStats?.completed_sales || 0}
+          icon={TrendingUp}
+          variant="purple"
+        />
+        <StatsCard
+          title="Total Revenue"
+          value={`$${Number(salesStats?.total_revenue || 0).toLocaleString()}`}
+          icon={DollarSign}
+          variant="amber"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -164,84 +134,7 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      <div className="mt-8 card">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
-            <Clock className="h-6 w-6 text-primary-600" />
-            <h2 className="text-xl font-bold text-gray-900">Recently Added Vehicles</h2>
-          </div>
-          <Link
-            to="/vehicles"
-            className="text-sm font-medium text-primary-600 hover:text-primary-700"
-          >
-            View All
-          </Link>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicle
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  VIN
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Added
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {recentVehicles?.map((vehicle) => (
-                <tr key={vehicle.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {vehicle.year} {vehicle.make} {vehicle.model}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                    {vehicle.vin}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                    ${vehicle.price.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        vehicle.status === 'available'
-                          ? 'bg-green-100 text-green-800'
-                          : vehicle.status === 'sold'
-                          ? 'bg-gray-100 text-gray-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {vehicle.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(vehicle.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-              {(!recentVehicles || recentVehicles.length === 0) && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                    No vehicles found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <RecentVehiclesTable vehicles={recentVehicles} />
 
       <div className="mt-8 card bg-gradient-to-r from-primary-50 to-blue-50 border-primary-200">
         <div className="flex items-center space-x-4">
