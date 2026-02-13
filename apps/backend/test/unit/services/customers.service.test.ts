@@ -40,9 +40,9 @@ describe('customersService', () => {
       const customers = [createMockCustomer(), createMockCustomer()];
       mockCustomerModel.findAll.mockResolvedValue(customers);
 
-      const result = await customersService.getAll();
+      const result = await customersService.getAll({});
 
-      expect(mockCustomerModel.findAll).toHaveBeenCalled();
+      expect(mockCustomerModel.findAll).toHaveBeenCalledWith({});
       expect(result).toEqual(customers);
     });
   });
