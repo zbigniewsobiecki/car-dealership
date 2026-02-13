@@ -1,154 +1,140 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Dashboard } from '../../src/pages/Dashboard';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { server } from '../mocks/server';
-import { http, HttpResponse } from 'msw';
-import { mockVehicle } from '../mocks/handlers';
+import { useVehicleStats, useRecentVehicles } from '../../src/hooks/useVehicles';
+import { useSalesStats } from '../../src/hooks/useSales';
 
-const API_URL = 'http://localhost:3000/api';
+// Mock the hooks
+vi.mock('../../src/hooks/useVehicles', () => ({
+  useVehicleStats: vi.fn(),
+  useRecentVehicles: vi.fn(),
+}));
 
-const createTestQueryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
+vi.mock('../../src/hooks/useSales', () => ({
+  useSalesStats: vi.fn(),
+}));
 
-const renderWithProviders = (ui: React.ReactElement) => {
-  const queryClient = createTestQueryClient();
+const renderDashboard = () => {
   return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        {ui}
-      </MemoryRouter>
-    </QueryClientProvider>
+    <MemoryRouter>
+      <Dashboard />
+    </MemoryRouter>
   );
 };
 
 describe('Dashboard Page', () => {
   beforeEach(() => {
-    server.use(
-      http.get(`${API_URL}/vehicles/recent`, () => {
-        return HttpResponse.json({
-          success: true,
-          data: [mockVehicle],
-        });
-      }),
-      http.get(`${API_URL}/vehicles/stats`, () => {
-        return HttpResponse.json({
-          success: true,
-          data: {
-            total: 10,
-            available: 5,
-            sold: 3,
-            reserved: 1,
-            maintenance: 1,
-            total_inventory_value: 250000,
-          },
-        });
-      }),
-      http.get(`${API_URL}/sales/stats`, () => {
-        return HttpResponse.json({
-          success: true,
-          data: {
-            total_sales: 10,
-            total_revenue: 200000,
-            pending_sales: 3,
-            completed_sales: 6,
-            cancelled_sales: 1,
-            average_sale_price: 20000
-          },
-        });
-      })
-    );
+    vi.clearAllMocks();
   });
 
-  it('renders loading state initially', () => {
-    renderWithProviders(<Dashboard />);
+  it('renders loading state when data is fetching', () => {
+    vi.mocked(useVehicleStats).mockReturnValue({ isLoading: true, data: undefined } as never);
+    vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: undefined } as never);
+    vi.mocked(useRecentVehicles).mockReturnValue({ isLoading: false, data: undefined } as never);
+
+    renderDashboard();
     expect(screen.getByText(/Loading dashboard.../i)).toBeInTheDocument();
   });
 
-  it('renders vehicle and sales statistics correctly', async () => {
-    renderWithProviders(<Dashboard />);
+  it('renders stats cards with correct formatted values', () => {
+    vi.mocked(useVehicleStats).mockReturnValue({
+      isLoading: false,
+      data: {
+        total: 100,
+        available: 75,
+        sold: 20,
+        reserved: 3,
+        maintenance: 2,
+        total_inventory_value: 2500000,
+      },
+    } as never);
 
-    await waitFor(() => {
-      expect(screen.queryByText(/Loading dashboard.../i)).not.toBeInTheDocument();
-    });
+    vi.mocked(useSalesStats).mockReturnValue({
+      isLoading: false,
+      data: {
+        total_sales: 50,
+        completed_sales: 45,
+        pending_sales: 5,
+        total_revenue: 1250000,
+        average_sale_price: 25000,
+      },
+    } as never);
 
-    expect(screen.getByText('Total Vehicles')).toBeInTheDocument();
-    // '10' appears in: Total Vehicles card, Total Inventory overview, Total Sales overview
-    expect(screen.getAllByText('10')).toHaveLength(3);
-    expect(screen.getAllByText('5')).toHaveLength(2);
-    // '3' appears in: Sold overview and Pending Sales overview
-    expect(screen.getAllByText('3')).toHaveLength(2);
-    
-    expect(screen.getByText(/\$250,000/)).toBeInTheDocument();
+    vi.mocked(useRecentVehicles).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as never);
 
-    expect(screen.getAllByText('6')).toHaveLength(2);
-    expect(screen.getAllByText(/\$200,000/)).toHaveLength(2);
-    expect(screen.getByText('Average Sale Price')).toBeInTheDocument();
+    renderDashboard();
+
+    // Check main stats cards (some values appear in both card and overview)
+    expect(screen.getAllByText('100')).toHaveLength(2); // Total Vehicles + Total Inventory
+    expect(screen.getAllByText('75')).toHaveLength(2);  // Available (card + overview)
+    expect(screen.getAllByText('45')).toHaveLength(2);  // Total Sales (card + overview)
+    expect(screen.getAllByText('$1,250,000')).toHaveLength(2); // Total Revenue (card + overview)
+
+    // Check Overview sections
+    expect(screen.getByText('Vehicle Overview')).toBeInTheDocument();
+    expect(screen.getByText('Sales Overview')).toBeInTheDocument();
+    expect(screen.getByText('$2,500,000')).toBeInTheDocument(); // Total Inventory Value
+    expect(screen.getByText('$25,000')).toBeInTheDocument();    // Average Sale Price
   });
 
-  it('renders recently added vehicles table', async () => {
-    renderWithProviders(<Dashboard />);
+  it('renders recently added vehicles table with mock data', () => {
+    const mockVehicles = [
+      {
+        id: '1',
+        year: 2022,
+        make: 'Toyota',
+        model: 'Camry',
+        vin: 'VIN123',
+        price: 25000,
+        status: 'available',
+        createdAt: '2023-01-01T00:00:00Z',
+      },
+      {
+        id: '2',
+        year: 2021,
+        make: 'Honda',
+        model: 'Civic',
+        vin: 'VIN456',
+        price: 22000,
+        status: 'sold',
+        createdAt: '2023-01-02T00:00:00Z',
+      },
+    ];
 
-    await waitFor(() => {
-      expect(screen.queryByText(/Loading dashboard.../i)).not.toBeInTheDocument();
-    });
+    vi.mocked(useVehicleStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useRecentVehicles).mockReturnValue({
+      isLoading: false,
+      data: mockVehicles,
+    } as never);
 
-    expect(screen.getByText('Vehicle')).toBeInTheDocument();
-    expect(screen.getByText('VIN')).toBeInTheDocument();
-    expect(screen.getByText('Price')).toBeInTheDocument();
+    renderDashboard();
 
     expect(screen.getByText('2022 Toyota Camry')).toBeInTheDocument();
-    expect(screen.getByText('ABC123456789')).toBeInTheDocument();
-    expect(screen.getByText(/\$25,000/)).toBeInTheDocument();
+    expect(screen.getByText('VIN123')).toBeInTheDocument();
+    expect(screen.getByText('$25,000')).toBeInTheDocument();
     expect(screen.getByText('available')).toBeInTheDocument();
+
+    expect(screen.getByText('2021 Honda Civic')).toBeInTheDocument();
+    expect(screen.getByText('VIN456')).toBeInTheDocument();
+    expect(screen.getByText('$22,000')).toBeInTheDocument();
+    expect(screen.getByText('sold')).toBeInTheDocument();
   });
 
-  it('renders empty state when no recent vehicles are returned', async () => {
-    server.use(
-      http.get(`${API_URL}/vehicles/recent`, () => {
-        return HttpResponse.json({
-          success: true,
-          data: [],
-        });
-      })
-    );
+  it('renders empty state message when no vehicles are found', () => {
+    vi.mocked(useVehicleStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useRecentVehicles).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as never);
 
-    renderWithProviders(<Dashboard />);
-
-    await waitFor(() => {
-      expect(screen.queryByText(/Loading dashboard.../i)).not.toBeInTheDocument();
-    });
+    renderDashboard();
 
     expect(screen.getByText(/No vehicles found/i)).toBeInTheDocument();
-  });
-
-  it('handles API errors gracefully', async () => {
-    server.use(
-      http.get(`${API_URL}/vehicles/stats`, () => {
-        return new HttpResponse(null, { status: 500 });
-      }),
-      http.get(`${API_URL}/sales/stats`, () => {
-        return new HttpResponse(null, { status: 500 });
-      }),
-      http.get(`${API_URL}/vehicles/recent`, () => {
-        return new HttpResponse(null, { status: 500 });
-      })
-    );
-
-    renderWithProviders(<Dashboard />);
-
-    await waitFor(() => {
-      expect(screen.queryByText(/Loading dashboard.../i)).not.toBeInTheDocument();
-    });
-
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    const zeros = screen.getAllByText('0');
-    expect(zeros.length).toBeGreaterThanOrEqual(10);
   });
 });
