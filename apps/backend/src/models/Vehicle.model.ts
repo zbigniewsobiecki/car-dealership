@@ -31,61 +31,17 @@ class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, Update
     return this.mapRow(result.rows[0]);
   }
 
-  async create(data: CreateVehicleDto, createdBy?: string): Promise<Vehicle> {
-    const dbData: Record<string, unknown> = {
-      vin: data.vin,
-      make: data.make,
-      model: data.model,
-      year: data.year,
-      color: data.color,
-      mileage: data.mileage || null,
-      price: data.price,
-      cost: data.cost || null,
-      status: data.status,
-      condition: data.condition || null,
-      body_type: data.bodyType || null,
-      transmission: data.transmission || null,
-      fuel_type: data.fuelType || null,
-      engine: data.engine || null,
-      drivetrain: data.drivetrain || null,
-      exterior_color: data.exteriorColor || null,
-      interior_color: data.interiorColor || null,
-      features: data.features ? JSON.stringify(data.features) : null,
-      description: data.description || null,
-      images: data.images ? JSON.stringify(data.images) : null,
-      date_acquired: data.dateAcquired || null,
-    };
+  protected mapToDb(data: Partial<CreateVehicleDto | UpdateVehicleDto>): Record<string, unknown> {
+    const record = super.mapToDb(data);
 
-    return super.create(dbData, createdBy);
-  }
+    if (data.features !== undefined) {
+      record.features = data.features ? JSON.stringify(data.features) : null;
+    }
+    if (data.images !== undefined) {
+      record.images = data.images ? JSON.stringify(data.images) : null;
+    }
 
-  async update(id: string, data: UpdateVehicleDto): Promise<Vehicle | null> {
-    const dbData: Record<string, unknown> = {};
-    
-    if (data.vin !== undefined) dbData.vin = data.vin;
-    if (data.make !== undefined) dbData.make = data.make;
-    if (data.model !== undefined) dbData.model = data.model;
-    if (data.year !== undefined) dbData.year = data.year;
-    if (data.color !== undefined) dbData.color = data.color;
-    if (data.mileage !== undefined) dbData.mileage = data.mileage;
-    if (data.price !== undefined) dbData.price = data.price;
-    if (data.cost !== undefined) dbData.cost = data.cost;
-    if (data.status !== undefined) dbData.status = data.status;
-    if (data.condition !== undefined) dbData.condition = data.condition;
-    if (data.bodyType !== undefined) dbData.body_type = data.bodyType;
-    if (data.transmission !== undefined) dbData.transmission = data.transmission;
-    if (data.fuelType !== undefined) dbData.fuel_type = data.fuelType;
-    if (data.engine !== undefined) dbData.engine = data.engine;
-    if (data.drivetrain !== undefined) dbData.drivetrain = data.drivetrain;
-    if (data.exteriorColor !== undefined) dbData.exterior_color = data.exteriorColor;
-    if (data.interiorColor !== undefined) dbData.interior_color = data.interiorColor;
-    if (data.features !== undefined) dbData.features = JSON.stringify(data.features);
-    if (data.description !== undefined) dbData.description = data.description;
-    if (data.dateAcquired !== undefined) dbData.date_acquired = data.dateAcquired;
-
-    if (data.images !== undefined) dbData.images = data.images ? JSON.stringify(data.images) : null;
-
-    return super.update(id, dbData);
+    return record;
   }
 
   async findRecent(limit: number): Promise<Vehicle[]> {
