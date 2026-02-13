@@ -24,6 +24,7 @@ export const VehicleForm = ({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<CreateVehicleDto>({
     defaultValues: vehicle || {
@@ -32,6 +33,8 @@ export const VehicleForm = ({
       condition: VehicleCondition.USED,
     },
   });
+
+  const vehicleType = watch('type');
 
   return (
     <ModalForm
@@ -196,14 +199,38 @@ export const VehicleForm = ({
           />
         </div>
 
-        <div>
-          <label className="label">Body Type</label>
-          <input
-            {...register('bodyType')}
-            className="input"
-            placeholder="Sedan"
-          />
-        </div>
+        {vehicleType === VehicleType.CAR && (
+          <div>
+            <label className="label">Body Type</label>
+            <input
+              {...register('bodyType')}
+              className="input"
+              placeholder="Sedan"
+            />
+          </div>
+        )}
+
+        {vehicleType === VehicleType.MOTORCYCLE && (
+          <>
+            <div>
+              <label className="label">Engine Displacement (cc)</label>
+              <input
+                type="number"
+                {...register('engineDisplacement', { valueAsNumber: true })}
+                className="input"
+                placeholder="600"
+              />
+            </div>
+            <div>
+              <label className="label">Category</label>
+              <input
+                {...register('category')}
+                className="input"
+                placeholder="Sport"
+              />
+            </div>
+          </>
+        )}
 
         <div>
           <label className="label">Engine</label>
