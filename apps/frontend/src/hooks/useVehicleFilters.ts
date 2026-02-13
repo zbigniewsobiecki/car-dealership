@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { VehicleFilters } from '@car-dealership/shared-types';
+import { VehicleFilters, VehicleType } from '@car-dealership/shared-types';
 
 export const useVehicleFilters = (initialLimit = 10) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
+  const [type, setType] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<VehicleFilters>({ page: 1, limit: initialLimit });
 
@@ -24,6 +25,12 @@ export const useVehicleFilters = (initialLimit = 10) => {
       delete newFilters.priceMax;
     }
 
+    if (type) {
+      newFilters.type = type as VehicleType;
+    } else {
+      delete newFilters.type;
+    }
+
     setPage(1);
     setFilters(newFilters);
   };
@@ -38,11 +45,17 @@ export const useVehicleFilters = (initialLimit = 10) => {
     setSearchTerm('');
     setPriceMin('');
     setPriceMax('');
+    setType('');
     setPage(1);
     setFilters({ page: 1, limit: initialLimit });
   };
 
-  const isFiltered = !!(filters.search || filters.priceMin !== undefined || filters.priceMax !== undefined);
+  const isFiltered = !!(
+    filters.search ||
+    filters.priceMin !== undefined ||
+    filters.priceMax !== undefined ||
+    filters.type !== undefined
+  );
 
   return {
     searchTerm,
@@ -51,6 +64,8 @@ export const useVehicleFilters = (initialLimit = 10) => {
     setPriceMin,
     priceMax,
     setPriceMax,
+    type,
+    setType,
     page,
     filters,
     handleSearch,
