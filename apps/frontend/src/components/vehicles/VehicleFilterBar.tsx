@@ -1,9 +1,12 @@
 import React from 'react';
 import { Search } from 'lucide-react';
+import { VehicleType } from '@car-dealership/shared-types';
 
 interface VehicleFilterBarProps {
   searchTerm: string;
   onSearchTermChange: (value: string) => void;
+  type: string;
+  onTypeChange: (value: string) => void;
   priceMin: string;
   onPriceMinChange: (value: string) => void;
   priceMax: string;
@@ -16,6 +19,8 @@ interface VehicleFilterBarProps {
 export const VehicleFilterBar: React.FC<VehicleFilterBarProps> = ({
   searchTerm,
   onSearchTermChange,
+  type,
+  onTypeChange,
   priceMin,
   onPriceMinChange,
   priceMax,
@@ -36,6 +41,20 @@ export const VehicleFilterBar: React.FC<VehicleFilterBarProps> = ({
             value={searchTerm}
             onChange={(e) => onSearchTermChange(e.target.value)}
           />
+        </div>
+        <div className="flex space-x-3">
+          <select
+            className="input w-40"
+            value={type}
+            onChange={(e) => onTypeChange(e.target.value)}
+          >
+            <option value="">All Types</option>
+            {Object.values(VehicleType).map((v) => (
+              <option key={v} value={v}>
+                {v.charAt(0).toUpperCase() + v.slice(1)}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex space-x-3">
           <input

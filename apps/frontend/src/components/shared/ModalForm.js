@@ -1,6 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { X } from 'lucide-react';
-export const ModalForm = ({ title, onCancel, onSubmit, submitLabel, isLoading, children, }) => {
-    return (_jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4", children: _jsxs("div", { className: "bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto", children: [_jsxs("div", { className: "sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between", children: [_jsx("h2", { className: "text-xl font-bold text-gray-900", children: title }), _jsx("button", { type: "button", onClick: onCancel, className: "text-gray-400 hover:text-gray-600", children: _jsx(X, { className: "h-6 w-6" }) })] }), _jsxs("form", { onSubmit: onSubmit, className: "p-6 space-y-4", children: [children, _jsxs("div", { className: "flex space-x-3 pt-4", children: [_jsx("button", { type: "submit", disabled: isLoading, className: "flex-1 btn btn-primary disabled:opacity-50", children: isLoading ? 'Saving...' : submitLabel }), _jsx("button", { type: "button", onClick: onCancel, className: "flex-1 btn btn-secondary", children: "Cancel" })] })] })] }) }));
-};
-//# sourceMappingURL=ModalForm.js.map

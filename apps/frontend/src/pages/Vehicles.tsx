@@ -20,6 +20,8 @@ export const Vehicles = () => {
   const {
     searchTerm,
     setSearchTerm,
+    type,
+    setType,
     priceMin,
     setPriceMin,
     priceMax,
@@ -83,6 +85,8 @@ export const Vehicles = () => {
       <VehicleFilterBar
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
+        type={type}
+        onTypeChange={setType as (value: string) => void}
         priceMin={priceMin}
         onPriceMinChange={setPriceMin}
         priceMax={priceMax}

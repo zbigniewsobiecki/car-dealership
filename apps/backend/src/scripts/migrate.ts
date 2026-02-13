@@ -1,4 +1,5 @@
 import { pool, query } from '../models/db.js';
+import { VehicleType } from '@car-dealership/shared-types';
 
 const createTables = async () => {
   console.log('Starting database migration...');
@@ -58,7 +59,7 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS vehicles (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         vin VARCHAR(17) UNIQUE NOT NULL,
-        type VARCHAR(50) NOT NULL DEFAULT 'car' CHECK (type IN ('car', 'motorcycle')),
+        type VARCHAR(50) NOT NULL DEFAULT '${VehicleType.CAR}' CHECK (type IN ('${Object.values(VehicleType).join("', '")}')),
         make VARCHAR(100) NOT NULL,
         model VARCHAR(100) NOT NULL,
         year INTEGER NOT NULL CHECK (year >= 1900 AND year <= 2100),

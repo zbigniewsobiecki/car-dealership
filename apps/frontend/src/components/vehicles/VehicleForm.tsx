@@ -48,8 +48,11 @@ export const VehicleForm = ({
             {...register('type', { required: 'Vehicle type is required' })}
             className="input"
           >
-            <option value={VehicleType.CAR}>Car</option>
-            <option value={VehicleType.MOTORCYCLE}>Motorcycle</option>
+            {Object.values(VehicleType).map((type) => (
+              <option key={type} value={type}>
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </option>
+            ))}
           </select>
           {errors.type && (
             <p className="text-red-600 text-sm mt-1">{errors.type.message}</p>
