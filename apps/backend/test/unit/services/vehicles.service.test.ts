@@ -34,9 +34,9 @@ describe('vehiclesService', () => {
       const vehicles = [createMockVehicle(), createMockVehicle()];
       mockVehicleModel.findAll.mockResolvedValue({ vehicles, total: 2 });
 
-      const result = await vehiclesService.getAll();
+      const result = await vehiclesService.getAll({});
 
-      expect(mockVehicleModel.findAll).toHaveBeenCalledWith(undefined);
+      expect(mockVehicleModel.findAll).toHaveBeenCalledWith({});
       expect(result).toEqual({ vehicles, total: 2 });
     });
 
