@@ -22,14 +22,14 @@ Follow a top-down drill-down. Start broad, then narrow based on what you find:
 4. `squint interactions show <id> --json` — drill into a specific module-to-module interaction
 5. `squint modules show <path> --json` — see a module's members, interactions, flows
 6. `squint symbols show <name> --json` — see a symbol's module, relationships, dependencies, interactions, source code, call sites
-7. `squint symbols show --file <path> --json` — aggregate all data across every symbol in a file
+7. `squint symbols list --file <path> --json` — aggregate all data across every symbol in a file
 
 ### When to Use Squint vs. Reading Code
 
 - **Understanding what a module does** — `squint modules show` is faster than scanning files
 - **Finding how two parts of the system connect** — `squint interactions list --json` or drill into a flow
 - **Understanding a symbol's role** — `squint symbols show` gives module context, relationships, interactions, and flows in one call
-- **Understanding a file's responsibilities** — `squint symbols show --file` aggregates relationships, interactions, and flows for all symbols in the file
+- **Understanding a file's responsibilities** — `squint symbols list --file` aggregates relationships, interactions, and flows for all symbols in the file
 - **Tracing a user journey** — `squint flows show` gives the ordered interaction chain
 - **Checking what calls what** — `squint symbols show` includes dependencies, dependents, and call sites with source context
 
