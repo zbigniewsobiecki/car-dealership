@@ -92,6 +92,7 @@ const createTables = async () => {
     await query('CREATE INDEX IF NOT EXISTS idx_vehicles_make_model ON vehicles(make, model);');
     await query('CREATE INDEX IF NOT EXISTS idx_vehicles_year ON vehicles(year);');
     await query('CREATE INDEX IF NOT EXISTS idx_vehicles_price ON vehicles(price);');
+    await query('CREATE INDEX IF NOT EXISTS idx_vehicles_type ON vehicles(type);');
     console.log('✓ Created vehicles indexes');
 
     // Create sales table
