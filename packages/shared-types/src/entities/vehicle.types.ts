@@ -23,6 +23,8 @@ export interface Vehicle {
   status: VehicleStatus;
   condition?: VehicleCondition;
   bodyType?: string;
+  engineDisplacement?: number;
+  category?: string;
   transmission?: string;
   fuelType?: string;
   engine?: string;
@@ -51,6 +53,8 @@ export interface CreateVehicleDto {
   status: VehicleStatus;
   condition?: VehicleCondition;
   bodyType?: string;
+  engineDisplacement?: number;
+  category?: string;
   transmission?: string;
   fuelType?: string;
   engine?: string;
@@ -75,6 +79,8 @@ export interface VehicleFilters extends PaginationParams {
   status?: VehicleStatus;
   condition?: VehicleCondition;
   type?: VehicleType;
+  engineDisplacement?: number;
+  category?: string;
   search?: string;
 }
 

@@ -62,6 +62,8 @@ const createMockVehicleRow = (overrides = {}) => ({
   body_type: 'Sedan',
   transmission: 'Automatic',
   fuel_type: 'Gasoline',
+  engine_displacement: '1200.50',
+  category: 'Cruiser',
   engine: null,
   drivetrain: null,
   exterior_color: null,
