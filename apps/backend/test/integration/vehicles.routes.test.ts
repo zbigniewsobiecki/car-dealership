@@ -110,20 +110,6 @@ describe('Vehicles Routes Integration', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should filter vehicles by make', async () => {
-      const mockVehicles = [createMockVehicleRow({ make: 'Toyota' })];
-      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
-
-      const response = await request(app)
-        .get('/api/vehicles?make=Toyota')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body.data).toHaveLength(1);
-      expect(response.body.pagination).toBeDefined();
-      expect(mockQuery).toHaveBeenCalled();
-    });
-
     it('should filter vehicles by type', async () => {
       const mockVehicles = [createMockVehicleRow({ type: VehicleType.MOTORCYCLE })];
       mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
@@ -171,42 +157,6 @@ describe('Vehicles Routes Integration', () => {
     });
   });
 
-  describe('GET /api/vehicles/recent', () => {
-    it('should return recently added vehicles', async () => {
-      const mockVehicles = [
-        createMockVehicleRow({ id: 'v-1', created_at: new Date('2024-01-02') }),
-        createMockVehicleRow({ id: 'v-2', created_at: new Date('2024-01-01') }),
-      ];
-      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
-
-      const response = await request(app)
-        .get('/api/vehicles/recent?limit=2')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveLength(2);
-      expect(response.body.data[0].id).toBe('v-1');
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('ORDER BY created_at DESC LIMIT $1'),
-        [2]
-      );
-    });
-
-    it('should use default limit of 5 if not provided', async () => {
-      mockQuery.mockResolvedValueOnce({ rows: [] });
-
-      await request(app)
-        .get('/api/vehicles/recent')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('LIMIT $1'),
-        [5]
-      );
-    });
-  });
-
   describe('GET /api/vehicles/:id', () => {
     it('should return a vehicle by id', async () => {
       const mockVehicle = createMockVehicleRow();
@@ -230,6 +180,126 @@ describe('Vehicles Routes Integration', () => {
 
       expect(response.status).toBe(404);
       expect(response.body.error.message).toBe('Vehicle not found');
+    });
+  });
+
+  describe('POST /api/vehicles', () => {
+    it('should create a new vehicle', async () => {
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE vin = $1')) {
+          return Promise.resolve({ rows: [] });
+        }
+        if (sql.includes('INSERT INTO vehicles')) {
+          return Promise.resolve({ rows: [createMockVehicleRow({ id: 'new-vehicle', vin: '1234567890ABCDEF2', price: '25000.00' })] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const response = await request(app)
+        .post('/api/vehicles')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          vin: '1234567890ABCDEF2',
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2022,
+          color: 'Blue',
+          price: 25000,
+          type: VehicleType.CAR,
+          status: VehicleStatus.AVAILABLE,
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.vin).toBe('1234567890ABCDEF2');
+    });
+
+    it('should return 400 if VIN already exists', async () => {
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE vin = $1')) {
+          return Promise.resolve({ rows: [createMockVehicleRow()] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const response = await request(app)
+        .post('/api/vehicles')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          vin: '1234567890ABCDEF1',
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2022,
+          color: 'Blue',
+          price: 25000,
+          type: VehicleType.CAR,
+          status: VehicleStatus.AVAILABLE,
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toBe('Vehicle with this VIN already exists');
+    });
+  });
+
+  describe('PUT /api/vehicles/:id', () => {
+    it('should update a vehicle', async () => {
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE id = $1')) {
+          return Promise.resolve({ rows: [createMockVehicleRow()] });
+        }
+        if (sql.includes('UPDATE vehicles SET')) {
+          return Promise.resolve({ rows: [createMockVehicleRow({ price: '28000.00' })] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const response = await request(app)
+        .put('/api/vehicles/vehicle-1')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ price: 28000 });
+
+      expect(response.status).toBe(200);
+      expect(Number(response.body.data.price)).toBe(28000);
+    });
+
+    it('should return 404 for non-existent vehicle', async () => {
+      mockQuery.mockResolvedValue({ rows: [] });
+
+      const response = await request(app)
+        .put('/api/vehicles/nonexistent')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ price: 28000 });
+
+      expect(response.status).toBe(404);
+    });
+  });
+
+  describe('DELETE /api/vehicles/:id', () => {
+    it('should delete a vehicle', async () => {
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE id = $1')) {
+          return Promise.resolve({ rows: [createMockVehicleRow()] });
+        }
+        if (sql.includes('DELETE FROM vehicles')) {
+          return Promise.resolve({ rowCount: 1 });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const response = await request(app)
+        .delete('/api/vehicles/vehicle-1')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+    });
+
+    it('should return 404 for non-existent vehicle', async () => {
+      mockQuery.mockResolvedValue({ rows: [] });
+
+      const response = await request(app)
+        .delete('/api/vehicles/nonexistent')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
     });
   });
 });

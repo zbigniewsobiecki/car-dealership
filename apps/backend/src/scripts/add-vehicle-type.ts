@@ -23,9 +23,10 @@ const migrate = async () => {
     `);
     console.log('✓ Set type column to NOT NULL');
 
-    // Create index for type
-    await query('CREATE INDEX IF NOT EXISTS idx_vehicles_type ON vehicles(type);');
-    console.log('✓ Created index for vehicle type');
+    // Create functional index for case-insensitive filtering on type
+    await query('DROP INDEX IF EXISTS idx_vehicles_type;');
+    await query('CREATE INDEX idx_vehicles_type_lower ON vehicles(LOWER(type));');
+    console.log('✓ Created functional index for LOWER(type)');
 
     console.log('\n✅ Migration completed successfully!');
   } catch (error) {
