@@ -59,9 +59,22 @@ export const VehicleCard = ({ vehicle, onEdit, onDelete }: VehicleCardProps) => 
             </p>
           </div>
         )}
+        {vehicle.type === VehicleType.MOTORCYCLE && vehicle.engineDisplacement && (
+          <div>
+            <p className="text-sm text-gray-500">Engine</p>
+            <p className="text-lg font-semibold text-gray-900">
+              {vehicle.engineDisplacement} cc
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
+        {vehicle.type === VehicleType.MOTORCYCLE && vehicle.category && (
+          <span className="px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium">
+            {vehicle.category}
+          </span>
+        )}
         {vehicle.condition && (
           <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs capitalize">
             {vehicle.condition.replace('_', ' ')}

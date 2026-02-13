@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { VehicleCard } from '../../src/components/vehicles/VehicleCard';
-import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
 
 describe('VehicleCard', () => {
   const mockVehicle = {
@@ -114,5 +114,45 @@ describe('VehicleCard', () => {
     );
 
     expect(screen.queryByText(/mi$/)).not.toBeInTheDocument();
+  });
+
+  it('should render motorcycle-specific fields', () => {
+    const motorcycle = {
+      ...mockVehicle,
+      type: VehicleType.MOTORCYCLE,
+      engineDisplacement: 1000,
+      category: 'Sport',
+    };
+
+    render(
+      <VehicleCard
+        vehicle={motorcycle}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+      />
+    );
+
+    expect(screen.getByText('1000 cc')).toBeInTheDocument();
+    expect(screen.getByText('Sport')).toBeInTheDocument();
+  });
+
+  it('should not render motorcycle fields for cars', () => {
+    const carWithMotorcycleFields = {
+      ...mockVehicle,
+      type: VehicleType.CAR,
+      engineDisplacement: 2000,
+      category: 'Sedan',
+    };
+
+    render(
+      <VehicleCard
+        vehicle={carWithMotorcycleFields}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+      />
+    );
+
+    expect(screen.queryByText('2000 cc')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sedan')).not.toBeInTheDocument();
   });
 });
