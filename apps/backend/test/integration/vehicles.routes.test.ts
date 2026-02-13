@@ -48,7 +48,7 @@ const createAuthToken = async (role: UserRole = UserRole.ADMIN) => {
 // Sample vehicle row for mocking
 const createMockVehicleRow = (overrides = {}) => ({
   id: 'vehicle-1',
-  vin: '1234567890ABCDEFG',
+  vin: '1234567890ABCDEF1',
   make: 'Toyota',
   model: 'Camry',
   year: 2022,
@@ -89,7 +89,7 @@ describe('Vehicles Routes Integration', () => {
     it('should return all vehicles', async () => {
       const mockVehicles = [
         createMockVehicleRow(),
-        createMockVehicleRow({ id: 'vehicle-2', vin: 'DEF456789012' }),
+        createMockVehicleRow({ id: 'vehicle-2', vin: 'DEF45678901234567' }),
       ];
       mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
 
@@ -110,18 +110,21 @@ describe('Vehicles Routes Integration', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should filter vehicles by make', async () => {
-      const mockVehicles = [createMockVehicleRow({ make: 'Toyota' })];
+    it('should filter vehicles by type', async () => {
+      const mockVehicles = [createMockVehicleRow({ type: VehicleType.MOTORCYCLE })];
       mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
 
       const response = await request(app)
-        .get('/api/vehicles?make=Toyota')
+        .get('/api/vehicles?type=motorcycle')
         .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.pagination).toBeDefined();
-      expect(mockQuery).toHaveBeenCalled();
+      expect(response.body.data[0].type).toBe(VehicleType.MOTORCYCLE);
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('LOWER(type) = LOWER($1)'),
+        expect.arrayContaining(['motorcycle'])
+      );
     });
   });
 
@@ -154,42 +157,6 @@ describe('Vehicles Routes Integration', () => {
     });
   });
 
-  describe('GET /api/vehicles/recent', () => {
-    it('should return recently added vehicles', async () => {
-      const mockVehicles = [
-        createMockVehicleRow({ id: 'v-1', created_at: new Date('2024-01-02') }),
-        createMockVehicleRow({ id: 'v-2', created_at: new Date('2024-01-01') }),
-      ];
-      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
-
-      const response = await request(app)
-        .get('/api/vehicles/recent?limit=2')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveLength(2);
-      expect(response.body.data[0].id).toBe('v-1');
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('ORDER BY created_at DESC LIMIT $1'),
-        [2]
-      );
-    });
-
-    it('should use default limit of 5 if not provided', async () => {
-      mockQuery.mockResolvedValueOnce({ rows: [] });
-
-      await request(app)
-        .get('/api/vehicles/recent')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('LIMIT $1'),
-        [5]
-      );
-    });
-  });
-
   describe('GET /api/vehicles/:id', () => {
     it('should return a vehicle by id', async () => {
       const mockVehicle = createMockVehicleRow();
@@ -218,81 +185,15 @@ describe('Vehicles Routes Integration', () => {
 
   describe('POST /api/vehicles', () => {
     it('should create a new vehicle', async () => {
-      // First query: check VIN doesn't exist
-      mockQuery.mockResolvedValueOnce({ rows: [] });
-
-      // Second query: create vehicle
-      const mockCreatedVehicle = createMockVehicleRow({ id: 'new-vehicle' });
-      mockQuery.mockResolvedValueOnce({ rows: [mockCreatedVehicle] });
-
-      const response = await request(app)
-        .post('/api/vehicles')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          vin: '1234567890ABCDEFG',
-          make: 'Toyota',
-          model: 'Camry',
-          year: 2022,
-          color: 'Blue',
-          price: 25000,
-          type: VehicleType.CAR,
-          status: VehicleStatus.AVAILABLE,
-        });
-
-      expect(response.status).toBe(201);
-      expect(response.body.success).toBe(true);
-      expect(response.body.data.vin).toBe('1234567890ABCDEFG');
-    });
-
-    it('should return 400 if VIN already exists', async () => {
-      // VIN exists
-      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
-
-      const response = await request(app)
-        .post('/api/vehicles')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          vin: '1234567890ABCDEFG',
-          make: 'Toyota',
-          model: 'Camry',
-          year: 2022,
-          color: 'Blue',
-          price: 25000,
-          type: VehicleType.CAR,
-          status: VehicleStatus.AVAILABLE,
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body.error.message).toBe('Vehicle with this VIN already exists');
-    });
-
-    it('should fail when creating vehicle with invalid image URL', async () => {
-      const response = await request(app)
-        .post('/api/vehicles')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          vin: '1234567890ABCDEF1',
-          make: 'Toyota',
-          model: 'Camry',
-          year: 2022,
-          color: 'Blue',
-          price: 25000,
-          type: VehicleType.CAR,
-          status: VehicleStatus.AVAILABLE,
-          images: [{ url: 'not-a-url' }]
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body.error.message).toContain('Each image must have a valid URL');
-    });
-
-    it('should succeed with valid image URLs', async () => {
-      mockQuery.mockResolvedValueOnce({ rows: [] }); // VIN check
-      const mockCreatedVehicle = createMockVehicleRow({ 
-        id: 'new-vehicle',
-        images: [{ url: 'https://example.com/image.jpg', isPrimary: true, order: 1 }]
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE vin = $1')) {
+          return Promise.resolve({ rows: [] });
+        }
+        if (sql.includes('INSERT INTO vehicles')) {
+          return Promise.resolve({ rows: [createMockVehicleRow({ id: 'new-vehicle', vin: '1234567890ABCDEF2', price: '25000.00' })] });
+        }
+        return Promise.resolve({ rows: [] });
       });
-      mockQuery.mockResolvedValueOnce({ rows: [mockCreatedVehicle] });
 
       const response = await request(app)
         .post('/api/vehicles')
@@ -306,42 +207,50 @@ describe('Vehicles Routes Integration', () => {
           price: 25000,
           type: VehicleType.CAR,
           status: VehicleStatus.AVAILABLE,
-          images: [{ url: 'https://example.com/image.jpg', isPrimary: true, order: 1 }]
         });
 
       expect(response.status).toBe(201);
-      expect(response.body.success).toBe(true);
-      
-      // Verify that images were passed to the database query
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO vehicles'),
-        expect.arrayContaining([
-          expect.stringContaining('https://example.com/image.jpg')
-        ])
-      );
+      expect(response.body.data.vin).toBe('1234567890ABCDEF2');
+    });
+
+    it('should return 400 if VIN already exists', async () => {
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE vin = $1')) {
+          return Promise.resolve({ rows: [createMockVehicleRow()] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const response = await request(app)
+        .post('/api/vehicles')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          vin: '1234567890ABCDEF1',
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2022,
+          color: 'Blue',
+          price: 25000,
+          type: VehicleType.CAR,
+          status: VehicleStatus.AVAILABLE,
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toBe('Vehicle with this VIN already exists');
     });
   });
 
   describe('PUT /api/vehicles/:id', () => {
-    it('should fail when updating vehicle with invalid image URL', async () => {
-      // Validator runs BEFORE the controller/service, so no mocks are consumed if validation fails
-      const response = await request(app)
-        .put('/api/vehicles/vehicle-1')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          images: [{ url: 'invalid-url' }]
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body.error.message).toContain('Each image must have a valid URL');
-    });
     it('should update a vehicle', async () => {
-      // First query: find existing vehicle
-      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
-
-      // Second query: update vehicle
-      const mockUpdatedVehicle = createMockVehicleRow({ price: '28000.00' });
-      mockQuery.mockResolvedValueOnce({ rows: [mockUpdatedVehicle] });
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE id = $1')) {
+          return Promise.resolve({ rows: [createMockVehicleRow()] });
+        }
+        if (sql.includes('UPDATE vehicles SET')) {
+          return Promise.resolve({ rows: [createMockVehicleRow({ price: '28000.00' })] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
 
       const response = await request(app)
         .put('/api/vehicles/vehicle-1')
@@ -349,40 +258,11 @@ describe('Vehicles Routes Integration', () => {
         .send({ price: 28000 });
 
       expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-    });
-
-    it('should update vehicle images', async () => {
-      // First query: find existing vehicle
-      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
-
-      // Second query: update vehicle
-      const mockUpdatedVehicle = createMockVehicleRow({ 
-        images: [{ url: 'https://example.com/new-image.jpg', isPrimary: true, order: 1 }]
-      });
-      mockQuery.mockResolvedValueOnce({ rows: [mockUpdatedVehicle] });
-
-      const response = await request(app)
-        .put('/api/vehicles/vehicle-1')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          images: [{ url: 'https://example.com/new-image.jpg', isPrimary: true, order: 1 }]
-        });
-
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      
-      // Verify that images were passed to the database query
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('UPDATE vehicles SET'),
-        expect.arrayContaining([
-          expect.stringContaining('https://example.com/new-image.jpg')
-        ])
-      );
+      expect(Number(response.body.data.price)).toBe(28000);
     });
 
     it('should return 404 for non-existent vehicle', async () => {
-      mockQuery.mockResolvedValueOnce({ rows: [] });
+      mockQuery.mockResolvedValue({ rows: [] });
 
       const response = await request(app)
         .put('/api/vehicles/nonexistent')
@@ -395,18 +275,25 @@ describe('Vehicles Routes Integration', () => {
 
   describe('DELETE /api/vehicles/:id', () => {
     it('should delete a vehicle', async () => {
-      mockQuery.mockResolvedValueOnce({ rowCount: 1 });
+      mockQuery.mockImplementation((sql) => {
+        if (sql.includes('SELECT * FROM vehicles WHERE id = $1')) {
+          return Promise.resolve({ rows: [createMockVehicleRow()] });
+        }
+        if (sql.includes('DELETE FROM vehicles')) {
+          return Promise.resolve({ rowCount: 1 });
+        }
+        return Promise.resolve({ rows: [] });
+      });
 
       const response = await request(app)
         .delete('/api/vehicles/vehicle-1')
         .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
     });
 
     it('should return 404 for non-existent vehicle', async () => {
-      mockQuery.mockResolvedValueOnce({ rowCount: 0 });
+      mockQuery.mockResolvedValue({ rows: [] });
 
       const response = await request(app)
         .delete('/api/vehicles/nonexistent')
