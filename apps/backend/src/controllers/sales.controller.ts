@@ -5,7 +5,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 class SalesController extends BaseController {
   getAll = asyncHandler(async (_req: Request, res: Response) => {
-    const { data: sales } = await salesService.getAll();
+    const { data: sales } = await salesService.getAll({});
     return this.ok(res, sales);
   });
 

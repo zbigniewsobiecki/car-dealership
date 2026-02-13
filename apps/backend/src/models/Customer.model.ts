@@ -1,6 +1,6 @@
 import { query } from './db.js';
 import { Customer, CreateCustomerDto, UpdateCustomerDto } from '@car-dealership/shared-types';
-import { BaseRepository, BaseFilters } from './BaseRepository.js';
+import { BaseRepository } from './BaseRepository.js';
 
 class CustomerRepository extends BaseRepository<Customer, CreateCustomerDto, UpdateCustomerDto> {
   constructor() {
@@ -14,34 +14,9 @@ class CustomerRepository extends BaseRepository<Customer, CreateCustomerDto, Upd
     });
   }
 
-  async findAll(filters: BaseFilters = {}): Promise<{ data: Customer[]; total: number }> {
-    return super.findAll(filters);
-  }
-
-
-
   async hardDelete(id: string): Promise<boolean> {
     const result = await query('DELETE FROM customers WHERE id = $1', [id]);
     return (result.rowCount ?? 0) > 0;
-  }
-
-  protected mapRow(row: Record<string, unknown>): Customer {
-    return {
-      id: row.id as string,
-      firstName: row.first_name as string,
-      lastName: row.last_name as string,
-      email: row.email as string | undefined,
-      phone: row.phone as string | undefined,
-      address: row.address as string | undefined,
-      city: row.city as string | undefined,
-      state: row.state as string | undefined,
-      zipCode: row.zip_code as string | undefined,
-      notes: row.notes as string | undefined,
-      createdAt: row.created_at as Date,
-      updatedAt: row.updated_at as Date,
-      deletedAt: row.deleted_at as Date | undefined,
-      createdBy: row.created_by as string | undefined,
-    };
   }
 }
 

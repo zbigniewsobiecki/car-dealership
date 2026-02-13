@@ -6,7 +6,7 @@ import { AppError } from '../middleware/errorHandler.middleware.js';
 
 class CustomersController extends BaseController {
   getAll = asyncHandler(async (_req: Request, res: Response) => {
-    const { data: customers } = await customersService.getAll();
+    const { data: customers } = await customersService.getAll({});
     return this.ok(res, customers);
   });
 
