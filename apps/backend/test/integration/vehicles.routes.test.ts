@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import { UserRole, VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
+import { UserRole, VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
 
 // Mock environment config
 vi.mock('../../src/config/env.js', () => ({
@@ -49,6 +49,7 @@ const createAuthToken = async (role: UserRole = UserRole.ADMIN) => {
 const createMockVehicleRow = (overrides = {}) => ({
   id: 'vehicle-1',
   vin: '1234567890ABCDEFG',
+  type: VehicleType.CAR,
   make: 'Toyota',
   model: 'Camry',
   year: 2022,
@@ -229,6 +230,7 @@ describe('Vehicles Routes Integration', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           vin: '1234567890ABCDEFG',
+          type: VehicleType.CAR,
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -251,6 +253,7 @@ describe('Vehicles Routes Integration', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           vin: '1234567890ABCDEFG',
+          type: VehicleType.CAR,
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -269,6 +272,7 @@ describe('Vehicles Routes Integration', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           vin: '1234567890ABCDEF1',
+          type: VehicleType.CAR,
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -295,6 +299,7 @@ describe('Vehicles Routes Integration', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           vin: '1234567890ABCDEF2',
+          type: VehicleType.CAR,
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
