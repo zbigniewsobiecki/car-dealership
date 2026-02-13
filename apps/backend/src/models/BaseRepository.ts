@@ -111,10 +111,24 @@ export abstract class BaseRepository<T, CreateDto = Record<string, unknown>, Upd
     return this.mapRow(result.rows[0]);
   }
 
+  protected mapToDb(data: Partial<CreateDto | UpdateDto>): Record<string, unknown> {
+    const record: Record<string, unknown> = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+      if (value === undefined) continue;
+      
+      // Convert camelCase to snake_case
+      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+      record[snakeKey] = value;
+    }
+    
+    return record;
+  }
+
   async create(data: CreateDto | Record<string, unknown>, createdBy?: string): Promise<T> {
-    // If data is a DTO, it should be mapped to a database record by the subclass
-    // But for the base implementation, we assume it's already a record or compatible
-    const record = data as Record<string, unknown>;
+    // Use mapToDb if it's likely a DTO (has camelCase or we want to be safe)
+    // Subclasses can override create or mapToDb for custom logic
+    const record = this.mapToDb(data as Partial<CreateDto>);
     const fields = Object.keys(record);
     const values = Object.values(record);
     
@@ -135,7 +149,7 @@ export abstract class BaseRepository<T, CreateDto = Record<string, unknown>, Upd
   }
 
   async update(id: string, data: UpdateDto | Record<string, unknown>): Promise<T | null> {
-    const record = data as Record<string, unknown>;
+    const record = this.mapToDb(data as Partial<UpdateDto>);
     const fields = Object.keys(record);
     if (fields.length === 0) return this.findById(id);
 

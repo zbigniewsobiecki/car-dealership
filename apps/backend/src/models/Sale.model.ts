@@ -25,42 +25,14 @@ class SaleRepository extends BaseRepository<Sale, CreateSaleDto, UpdateSaleDto> 
     return result.rows.map(row => this.mapRow(row));
   }
 
-  async create(data: CreateSaleDto, _createdBy?: string): Promise<Sale> {
-    const dbData: Record<string, unknown> = {
-      vehicle_id: data.vehicleId,
-      customer_id: data.customerId,
-      salesperson_id: data.salespersonId,
-      sale_price: data.salePrice,
-      sale_date: data.saleDate,
-      payment_method: data.paymentMethod || null,
-      financing_details: data.financingDetails ? JSON.stringify(data.financingDetails) : null,
-      trade_in_vehicle: data.tradeInVehicle || null,
-      trade_in_value: data.tradeInValue || null,
-      down_payment: data.downPayment || null,
-      status: data.status,
-      notes: data.notes || null,
-    };
+  protected mapToDb(data: Partial<CreateSaleDto | UpdateSaleDto>): Record<string, unknown> {
+    const record = super.mapToDb(data);
 
-    return super.create(dbData);
-  }
+    if (data.financingDetails !== undefined) {
+      record.financing_details = data.financingDetails ? JSON.stringify(data.financingDetails) : null;
+    }
 
-  async update(id: string, data: UpdateSaleDto): Promise<Sale | null> {
-    const dbData: Record<string, unknown> = {};
-
-    if (data.vehicleId !== undefined) dbData.vehicle_id = data.vehicleId;
-    if (data.customerId !== undefined) dbData.customer_id = data.customerId;
-    if (data.salespersonId !== undefined) dbData.salesperson_id = data.salespersonId;
-    if (data.salePrice !== undefined) dbData.sale_price = data.salePrice;
-    if (data.saleDate !== undefined) dbData.sale_date = data.saleDate;
-    if (data.paymentMethod !== undefined) dbData.payment_method = data.paymentMethod;
-    if (data.financingDetails !== undefined) dbData.financing_details = JSON.stringify(data.financingDetails);
-    if (data.tradeInVehicle !== undefined) dbData.trade_in_vehicle = data.tradeInVehicle;
-    if (data.tradeInValue !== undefined) dbData.trade_in_value = data.tradeInValue;
-    if (data.downPayment !== undefined) dbData.down_payment = data.downPayment;
-    if (data.status !== undefined) dbData.status = data.status;
-    if (data.notes !== undefined) dbData.notes = data.notes;
-
-    return super.update(id, dbData);
+    return record;
   }
 
   async getStats() {
