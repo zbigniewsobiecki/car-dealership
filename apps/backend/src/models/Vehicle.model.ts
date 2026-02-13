@@ -52,6 +52,7 @@ class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, Update
       interior_color: data.interiorColor || null,
       features: data.features ? JSON.stringify(data.features) : null,
       description: data.description || null,
+      images: data.images ? JSON.stringify(data.images) : null,
       date_acquired: data.dateAcquired || null,
     };
 
@@ -81,6 +82,8 @@ class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, Update
     if (data.features !== undefined) dbData.features = JSON.stringify(data.features);
     if (data.description !== undefined) dbData.description = data.description;
     if (data.dateAcquired !== undefined) dbData.date_acquired = data.dateAcquired;
+
+    if (data.images !== undefined) dbData.images = data.images ? JSON.stringify(data.images) : null;
 
     return super.update(id, dbData);
   }

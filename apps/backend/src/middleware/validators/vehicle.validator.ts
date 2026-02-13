@@ -1,29 +1,65 @@
 import { body } from 'express-validator';
 import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
 
-export const createVehicleValidator = [
-  body('vin')
+const imageValidators = [
+  body('images')
+    .optional({ nullable: true })
+    .isArray()
+    .withMessage('Images must be an array')
+    .custom((images) => {
+      if (Array.isArray(images)) {
+        const primaryCount = images.filter((img: { isPrimary?: boolean }) => img.isPrimary).length;
+        if (primaryCount > 1) {
+          throw new Error('Only one image can be primary');
+        }
+      }
+      return true;
+    }),
+
+  body('images.*')
+    .if(body('images').isArray())
+    .isObject()
+    .withMessage('Each image must be an object'),
+
+  body('images.*.id')
+    .if(body('images').isArray())
+    .optional()
+    .isString()
+    .withMessage('Image ID must be a string'),
+
+  body('images.*.url')
+    .if(body('images').isArray())
+    .isURL()
+    .withMessage('Each image must have a valid URL'),
+
+  body('images.*.isPrimary')
+    .if(body('images').isArray())
+    .optional()
+    .isBoolean()
+    .withMessage('isPrimary must be a boolean'),
+
+  body('images.*.order')
+    .if(body('images').isArray())
+    .optional()
+    .isInt()
+    .withMessage('Order must be an integer'),
+];
+
+const rules = {
+  vin: () => body('vin')
     .trim()
-    .notEmpty()
-    .withMessage('VIN is required')
     .isLength({ min: 17, max: 17 })
     .withMessage('VIN must be exactly 17 characters')
     .matches(/^[A-HJ-NPR-Z0-9]{17}$/)
     .withMessage('VIN must be alphanumeric and cannot contain I, O, or Q'),
 
-  body('make')
-    .trim()
-    .notEmpty()
-    .withMessage('Make is required'),
+  make: () => body('make')
+    .trim(),
 
-  body('model')
-    .trim()
-    .notEmpty()
-    .withMessage('Model is required'),
+  model: () => body('model')
+    .trim(),
 
-  body('year')
-    .notEmpty()
-    .withMessage('Year is required')
+  year: () => body('year')
     .isInt({ min: 1900 })
     .withMessage('Year must be at least 1900')
     .custom((value: number) => {
@@ -34,54 +70,81 @@ export const createVehicleValidator = [
       return true;
     }),
 
-  body('color')
-    .trim()
-    .notEmpty()
-    .withMessage('Color is required'),
+  color: () => body('color')
+    .trim(),
 
-  body('price')
-    .notEmpty()
-    .withMessage('Price is required')
+  price: () => body('price')
     .isFloat({ min: 0 })
     .withMessage('Price must be a positive number'),
 
-  body('status')
-    .notEmpty()
-    .withMessage('Status is required')
+  status: () => body('status')
     .isIn(Object.values(VehicleStatus))
     .withMessage(`Status must be one of: ${Object.values(VehicleStatus).join(', ')}`),
 
-  // Optional field validations
-  body('mileage')
-    .optional()
+  mileage: () => body('mileage')
     .isInt({ min: 0 })
     .withMessage('Mileage must be a non-negative integer'),
 
-  body('cost')
-    .optional()
+  cost: () => body('cost')
     .isFloat({ min: 0 })
     .withMessage('Cost must be a non-negative number'),
 
-  body('condition')
-    .optional()
+  condition: () => body('condition')
     .isIn(Object.values(VehicleCondition))
     .withMessage(`Condition must be one of: ${Object.values(VehicleCondition).join(', ')}`),
 
-  body('bodyType')
-    .optional()
+  bodyType: () => body('bodyType')
     .trim()
     .isString()
     .withMessage('Body type must be a string'),
 
-  body('transmission')
-    .optional()
+  transmission: () => body('transmission')
     .trim()
     .isString()
     .withMessage('Transmission must be a string'),
 
-  body('fuelType')
-    .optional()
+  fuelType: () => body('fuelType')
     .trim()
     .isString()
     .withMessage('Fuel type must be a string'),
+};
+
+export const createVehicleValidator = [
+  rules.vin().notEmpty().withMessage('VIN is required'),
+  rules.make().notEmpty().withMessage('Make is required'),
+  rules.model().notEmpty().withMessage('Model is required'),
+  rules.year().notEmpty().withMessage('Year is required'),
+  rules.color().notEmpty().withMessage('Color is required'),
+  rules.price().notEmpty().withMessage('Price is required'),
+  rules.status().notEmpty().withMessage('Status is required'),
+
+  // Optional fields
+  rules.mileage().optional({ nullable: true }),
+  rules.cost().optional({ nullable: true }),
+  rules.condition().optional({ nullable: true }),
+  rules.bodyType().optional({ nullable: true }),
+  rules.transmission().optional({ nullable: true }),
+  rules.fuelType().optional({ nullable: true }),
+
+  ...imageValidators,
+];
+
+export const updateVehicleValidator = [
+  rules.vin().optional(),
+  rules.make().optional().notEmpty().withMessage('Make cannot be empty'),
+  rules.model().optional().notEmpty().withMessage('Model cannot be empty'),
+  rules.year().optional(),
+  rules.color().optional().notEmpty().withMessage('Color cannot be empty'),
+  rules.price().optional(),
+  rules.status().optional(),
+
+  // Nullable fields - allow null to clear the value
+  rules.mileage().optional({ nullable: true }),
+  rules.cost().optional({ nullable: true }),
+  rules.condition().optional({ nullable: true }),
+  rules.bodyType().optional({ nullable: true }),
+  rules.transmission().optional({ nullable: true }),
+  rules.fuelType().optional({ nullable: true }),
+
+  ...imageValidators,
 ];
