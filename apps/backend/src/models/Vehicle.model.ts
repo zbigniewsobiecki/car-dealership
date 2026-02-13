@@ -62,6 +62,7 @@ class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, Update
     switch (key) {
       case 'make':
       case 'model':
+      case 'type':
         return { sql: `LOWER(${key}) = LOWER($${paramCount})`, value };
       case 'yearMin':
         return { sql: `year >= $${paramCount}`, value };

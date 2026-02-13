@@ -48,7 +48,7 @@ const createAuthToken = async (role: UserRole = UserRole.ADMIN) => {
 // Sample vehicle row for mocking
 const createMockVehicleRow = (overrides = {}) => ({
   id: 'vehicle-1',
-  vin: '1234567890ABCDEFG',
+  vin: '1234567890ABCDEF1',
   make: 'Toyota',
   model: 'Camry',
   year: 2022,
@@ -122,6 +122,23 @@ describe('Vehicles Routes Integration', () => {
       expect(response.body.data).toHaveLength(1);
       expect(response.body.pagination).toBeDefined();
       expect(mockQuery).toHaveBeenCalled();
+    });
+
+    it('should filter vehicles by type', async () => {
+      const mockVehicles = [createMockVehicleRow({ type: VehicleType.MOTORCYCLE })];
+      mockQuery.mockResolvedValueOnce({ rows: mockVehicles });
+
+      const response = await request(app)
+        .get('/api/vehicles?type=motorcycle')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].type).toBe(VehicleType.MOTORCYCLE);
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('LOWER(type) = LOWER($1)'),
+        expect.arrayContaining(['motorcycle'])
+      );
     });
   });
 
@@ -229,7 +246,7 @@ describe('Vehicles Routes Integration', () => {
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: '1234567890ABCDEFG',
+          vin: '1234567890ABCDEF1',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -244,15 +261,47 @@ describe('Vehicles Routes Integration', () => {
       expect(response.body.data.vin).toBe('1234567890ABCDEFG');
     });
 
-    it('should return 400 if VIN already exists', async () => {
-      // VIN exists
-      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
+    it('should create a new motorcycle', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] }); // VIN check
+      const mockCreatedMotorcycle = createMockVehicleRow({ 
+        id: 'new-moto', 
+        type: VehicleType.MOTORCYCLE,
+        vin: 'MOTO1234567890ABC'
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [mockCreatedMotorcycle] });
 
       const response = await request(app)
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: '1234567890ABCDEFG',
+          vin: 'MOTO1234567890ABC',
+          make: 'Harley-Davidson',
+          model: 'Iron 883',
+          year: 2021,
+          color: 'Black',
+          price: 9000,
+          type: VehicleType.MOTORCYCLE,
+          status: VehicleStatus.AVAILABLE,
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.type).toBe(VehicleType.MOTORCYCLE);
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO vehicles'),
+        expect.arrayContaining([VehicleType.MOTORCYCLE])
+      );
+    });
+
+    it('should return 400 if VIN already exists', async () => {
+      // VIN exists
+      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow({ vin: '1234567890ABCDEF1' })] });
+
+      const response = await request(app)
+        .post('/api/vehicles')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          vin: '1234567890ABCDEF1',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -271,7 +320,7 @@ describe('Vehicles Routes Integration', () => {
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: '1234567890ABCDEF1',
+          vin: '1234567890ABCDEF2',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -298,7 +347,7 @@ describe('Vehicles Routes Integration', () => {
         .post('/api/vehicles')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          vin: '1234567890ABCDEF2',
+          vin: '1234567890ABCDEF3',
           make: 'Toyota',
           model: 'Camry',
           year: 2022,
@@ -336,11 +385,11 @@ describe('Vehicles Routes Integration', () => {
       expect(response.body.error.message).toContain('Each image must have a valid URL');
     });
     it('should update a vehicle', async () => {
-      // First query: find existing vehicle
-      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
+      // First query: find existing vehicle (BaseService.update calls getById)
+      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow({ id: 'vehicle-1' })] });
 
       // Second query: update vehicle
-      const mockUpdatedVehicle = createMockVehicleRow({ price: '28000.00' });
+      const mockUpdatedVehicle = createMockVehicleRow({ id: 'vehicle-1', price: '28000.00' });
       mockQuery.mockResolvedValueOnce({ rows: [mockUpdatedVehicle] });
 
       const response = await request(app)
@@ -353,11 +402,12 @@ describe('Vehicles Routes Integration', () => {
     });
 
     it('should update vehicle images', async () => {
-      // First query: find existing vehicle
-      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow()] });
+      // First query: find existing vehicle (BaseService.update calls getById)
+      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow({ id: 'vehicle-1' })] });
 
       // Second query: update vehicle
       const mockUpdatedVehicle = createMockVehicleRow({ 
+        id: 'vehicle-1',
         images: [{ url: 'https://example.com/new-image.jpg', isPrimary: true, order: 1 }]
       });
       mockQuery.mockResolvedValueOnce({ rows: [mockUpdatedVehicle] });
@@ -395,6 +445,9 @@ describe('Vehicles Routes Integration', () => {
 
   describe('DELETE /api/vehicles/:id', () => {
     it('should delete a vehicle', async () => {
+      // First query: find existing vehicle (BaseService.delete calls getById)
+      mockQuery.mockResolvedValueOnce({ rows: [createMockVehicleRow({ id: 'vehicle-1' })] });
+      // Second query: delete
       mockQuery.mockResolvedValueOnce({ rowCount: 1 });
 
       const response = await request(app)
