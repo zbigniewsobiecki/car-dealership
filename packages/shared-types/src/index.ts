@@ -2,6 +2,7 @@
 export * from './enums/roles.enum';
 export * from './enums/vehicle-status.enum';
 export * from './enums/sale-status.enum';
+export * from './enums/vehicle-type.enum';
 
 // Entities
 export * from './entities/user.types';
