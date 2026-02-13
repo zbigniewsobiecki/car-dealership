@@ -24,6 +24,8 @@ export const Vehicles = () => {
     setPriceMin,
     priceMax,
     setPriceMax,
+    type,
+    setType,
     page,
     filters,
     handleSearch,
@@ -87,6 +89,8 @@ export const Vehicles = () => {
         onPriceMinChange={setPriceMin}
         priceMax={priceMax}
         onPriceMaxChange={setPriceMax}
+        type={type}
+        onTypeChange={setType}
         onSearch={handleSearch}
         onClear={handleClear}
         isFiltered={isFiltered}

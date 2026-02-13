@@ -1,5 +1,5 @@
-import { Vehicle } from '@car-dealership/shared-types';
-import { Edit, Trash2, Car } from 'lucide-react';
+import { Vehicle, VehicleType } from '@car-dealership/shared-types';
+import { Edit, Trash2, Car, Bike } from 'lucide-react';
 import clsx from 'clsx';
 
 interface VehicleCardProps {
@@ -21,7 +21,11 @@ export const VehicleCard = ({ vehicle, onEdit, onDelete }: VehicleCardProps) => 
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="bg-primary-100 p-3 rounded-lg">
-            <Car className="h-6 w-6 text-primary-600" />
+            {vehicle.type === VehicleType.MOTORCYCLE ? (
+              <Bike className="h-6 w-6 text-primary-600" />
+            ) : (
+              <Car className="h-6 w-6 text-primary-600" />
+            )}
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
