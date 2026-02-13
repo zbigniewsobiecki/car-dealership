@@ -65,6 +65,7 @@ const createTables = async () => {
         mileage INTEGER,
         price DECIMAL(12, 2) NOT NULL,
         cost DECIMAL(12, 2),
+        type VARCHAR(50) NOT NULL DEFAULT 'car' CHECK (type IN ('car', 'motorcycle')),
         status VARCHAR(50) NOT NULL CHECK (status IN ('available', 'sold', 'reserved', 'maintenance')),
         condition VARCHAR(50) CHECK (condition IN ('new', 'used', 'certified_pre_owned')),
         body_type VARCHAR(50),
