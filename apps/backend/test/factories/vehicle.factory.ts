@@ -23,6 +23,8 @@ export const createMockVehicle = (overrides: Partial<Vehicle> = {}): Vehicle => 
   status: VehicleStatus.AVAILABLE,
   condition: VehicleCondition.USED,
   bodyType: 'Sedan',
+  engineDisplacement: undefined,
+  category: undefined,
   transmission: 'Automatic',
   fuelType: 'Gasoline',
   createdAt: new Date(),
@@ -54,6 +56,30 @@ export const createMockUpdateVehicleDto = (
   status: VehicleStatus.RESERVED,
   ...overrides,
 });
+
+export const createMockMotorcycle = (overrides: Partial<Vehicle> = {}): Vehicle =>
+  createMockVehicle({
+    make: 'Yamaha',
+    model: 'MT-07',
+    type: VehicleType.MOTORCYCLE,
+    category: 'Naked',
+    engineDisplacement: 689,
+    bodyType: 'Motorcycle',
+    ...overrides,
+  });
+
+export const createMockCreateMotorcycleDto = (
+  overrides: Partial<CreateVehicleDto> = {}
+): CreateVehicleDto =>
+  createMockCreateVehicleDto({
+    make: 'Kawasaki',
+    model: 'Ninja 400',
+    type: VehicleType.MOTORCYCLE,
+    category: 'Sport',
+    engineDisplacement: 399,
+    bodyType: 'Motorcycle',
+    ...overrides,
+  });
 
 export const resetVehicleIdCounter = () => {
   vehicleIdCounter = 1;
