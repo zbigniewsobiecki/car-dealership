@@ -62,7 +62,7 @@ squint symbols show <name> --file <path> --json
 squint symbols show --id <id> --json
 
 # Aggregate all data for every symbol in a file
-squint symbols show --file <path> --json
+squint symbols list --file <path> --json
 
 # List symbols with filters
 squint symbols --kind <kind> --json
@@ -107,7 +107,7 @@ squint gaps --json
 | What does module M do? | `squint modules show <path> --json` |
 | How do modules A and B interact? | `squint interactions show <id> --json` |
 | What does symbol S do and who uses it? | `squint symbols show <name> --json` |
-| What's in this file and how does it connect? | `squint symbols show --file <path> --json` |
+| What's in this file and how does it connect? | `squint symbols list --file <path> --json` |
 | What does this symbol depend on? | `squint symbols show <name> --json` (check `dependencies`) |
 | What depends on this symbol? | `squint symbols show <name> --json` (check `dependents`, `callSites`) |
 | Which interactions involve this symbol? | `squint symbols show <name> --json` (check `interactions`) |
@@ -117,7 +117,7 @@ squint gaps --json
 
 - Always use `--json` when processing output programmatically.
 - Start from the top (overview/features) and drill down. Don't jump straight to symbol-level queries without context.
-- `squint symbols show --file <path> --json` is the most efficient way to understand a file's full architectural role.
+- `squint symbols list --file <path> --json` is the most efficient way to understand a file's full architectural role.
 - When a symbol name is ambiguous, the error message lists all matches with IDs and file paths. Use `--id` or `--file` to disambiguate.
 - Interaction IDs appear in `flows show` output (each step references one). Use them to drill into `interactions show`.
 - Don't cache or hardcode Squint results — always query live. The index is rebuilt as the codebase evolves.
