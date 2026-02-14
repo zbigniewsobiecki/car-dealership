@@ -1,3 +1,5 @@
+import { DataMapper } from './dataMapper.js';
+
 export interface QueryBuilderOptions {
   tableName: string;
   softDelete?: boolean;
@@ -42,7 +44,7 @@ export function buildSelectQuery(
 
     // Default equality if no custom clause
     if (!clause) {
-      const column = fieldMap[key] || key.replace(/[A-Z]/g, l => `_${l.toLowerCase()}`);
+      const column = fieldMap[key] || DataMapper.camelToSnake(key);
       clause = {
         sql: `${column} = $${paramCount}`,
         value

@@ -25,7 +25,7 @@ class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, Update
   async findByVin(vin: string): Promise<Vehicle | null> {
     const result = await query('SELECT * FROM vehicles WHERE vin = $1', [vin]);
     if (result.rows.length === 0) return null;
-    return this.mapRow(result.rows[0]);
+    return this.dataMapper.mapRow<Vehicle>(result.rows[0]);
   }
 
   async findRecent(limit: number): Promise<Vehicle[]> {
@@ -33,7 +33,7 @@ class VehicleRepository extends BaseRepository<Vehicle, CreateVehicleDto, Update
       'SELECT * FROM vehicles ORDER BY created_at DESC LIMIT $1',
       [limit]
     );
-    return result.rows.map(row => this.mapRow(row));
+    return result.rows.map(row => this.dataMapper.mapRow<Vehicle>(row));
   }
 
   async getStats(): Promise<VehicleStats> {
