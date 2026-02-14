@@ -27,11 +27,11 @@ interface TestEntity {
 class TestRepository extends BaseRepository<TestEntity> {
   // Expose protected methods for testing
   public testMapRow(row: Record<string, unknown>): TestEntity {
-    return this.mapRow(row);
+    return this.dataMapper.mapRow<TestEntity>(row);
   }
 
   public testMapToDb(data: Record<string, unknown>): Record<string, unknown> {
-    return this.mapToDb(data);
+    return this.dataMapper.mapToDb(data);
   }
 
   public testBuildWhereClause(key: string, value: unknown, paramCount: number): { sql: string; value: unknown } | null {
@@ -553,7 +553,7 @@ describe('BaseRepository', () => {
         protected buildWhereClause(key: string, value: unknown, paramCount: number) {
           if (key === 'customField') {
             return {
-              sql: `${this.fieldMap[key] || key} ILIKE $${paramCount}`,
+              sql: `${this.dataMapper.fieldMap[key] || key} ILIKE $${paramCount}`,
               value: `%${value}%`
             };
           }

@@ -18,7 +18,7 @@ class SaleRepository extends BaseRepository<Sale, CreateSaleDto, UpdateSaleDto> 
       'SELECT * FROM sales WHERE customer_id = $1 ORDER BY created_at DESC',
       [customerId]
     );
-    return result.rows.map(row => this.mapRow(row));
+    return result.rows.map(row => this.dataMapper.mapRow<Sale>(row));
   }
 
   async getStats() {
