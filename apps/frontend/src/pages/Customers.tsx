@@ -35,7 +35,11 @@ export const Customers = () => {
         `Are you sure you want to delete ${customer.firstName} ${customer.lastName}?`
       )
     ) {
-      await deleteMutation.mutateAsync(customer.id);
+      try {
+        await deleteMutation.mutateAsync(customer.id);
+      } catch (error) {
+        console.error('Failed to delete customer:', error);
+      }
     }
   };
 

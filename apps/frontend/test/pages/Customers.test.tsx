@@ -297,4 +297,100 @@ describe('Customers Page', () => {
       });
     });
   });
+
+  it('handles error when customer creation fails', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const mockError = new Error('Creation failed');
+    const mockCreateMutation = vi.fn().mockRejectedValue(mockError);
+    
+    vi.mocked(useCreateCustomer).mockReturnValue({
+      mutateAsync: mockCreateMutation,
+      isPending: false,
+      error: mockError,
+      isError: true,
+      isSuccess: false,
+    } as never);
+
+    renderCustomers();
+    fireEvent.click(screen.getByText('Add Customer'));
+    fireEvent.click(screen.getByText('Submit'));
+
+    await waitFor(() => {
+      expect(mockCreateMutation).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to save customer:', mockError);
+    });
+    
+    consoleSpy.mockRestore();
+  });
+
+  it('handles error when customer update fails', async () => {
+    vi.mocked(useCustomers).mockReturnValue({
+      data: mockCustomers,
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      refetch: vi.fn(),
+    } as never);
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const mockError = new Error('Update failed');
+    const mockUpdateMutation = vi.fn().mockRejectedValue(mockError);
+    
+    vi.mocked(useUpdateCustomer).mockReturnValue({
+      mutateAsync: mockUpdateMutation,
+      isPending: false,
+      error: mockError,
+      isError: true,
+      isSuccess: false,
+    } as never);
+
+    renderCustomers();
+    const editButtons = screen.getAllByText('Edit');
+    fireEvent.click(editButtons[0]);
+    fireEvent.click(screen.getByText('Submit'));
+
+    await waitFor(() => {
+      expect(mockUpdateMutation).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to save customer:', mockError);
+    });
+    
+    consoleSpy.mockRestore();
+  });
+
+  it('handles error when customer deletion fails', async () => {
+    vi.mocked(useCustomers).mockReturnValue({
+      data: mockCustomers,
+      isLoading: false,
+      error: null,
+      isError: false,
+      isSuccess: true,
+      refetch: vi.fn(),
+    } as never);
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const mockConfirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const mockError = new Error('Delete failed');
+    const mockDeleteMutation = vi.fn().mockRejectedValue(mockError);
+    
+    vi.mocked(useDeleteCustomer).mockReturnValue({
+      mutateAsync: mockDeleteMutation,
+      isPending: false,
+      error: mockError,
+      isError: true,
+      isSuccess: false,
+    } as never);
+
+    renderCustomers();
+    const deleteButtons = screen.getAllByText('Delete');
+    fireEvent.click(deleteButtons[0]);
+
+    await waitFor(() => {
+      expect(mockDeleteMutation).toHaveBeenCalledWith('1');
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to delete customer:', mockError);
+    });
+    
+    mockConfirm.mockRestore();
+    consoleSpy.mockRestore();
+  });
 });
