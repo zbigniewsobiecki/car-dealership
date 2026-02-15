@@ -54,15 +54,12 @@ class RepairsService extends BaseService<Repair, CreateRepairDto, UpdateRepairDt
     const repair = await this.getById(id);
     await super.delete(id);
 
-    // If the deleted repair was in progress, check if we need to reset vehicle status
-    if (repair.status === RepairStatus.IN_PROGRESS) {
+    // If the deleted repair was active, check if we need to reset vehicle status
+    if (repair.status === RepairStatus.IN_PROGRESS || repair.status === RepairStatus.PENDING) {
       const activeRepairs = await RepairModel.findActive();
-      const otherActiveRepairsForVehicle = activeRepairs.filter(
-        (r) => r.vehicleId === repair.vehicleId && r.id !== id
-      );
-
-      // If no other active repairs for this vehicle, set it back to available
-      if (otherActiveRepairsForVehicle.length === 0) {
+      const hasOtherActiveRepairs = activeRepairs.some(r => r.vehicleId === repair.vehicleId);
+      
+      if (!hasOtherActiveRepairs) {
         await this.updateVehicleStatus(repair.vehicleId, VehicleStatus.AVAILABLE);
       }
     }
@@ -105,18 +102,25 @@ class RepairsService extends BaseService<Repair, CreateRepairDto, UpdateRepairDt
       await this.updateVehicleStatus(vehicleId, VehicleStatus.MAINTENANCE);
     }
 
-    // When repair is moved back to pending from in progress, set vehicle back to available
-    // (assuming no other in-progress repairs, but for simplicity we follow the existing pattern)
-    if (newStatus === RepairStatus.PENDING && oldStatus === RepairStatus.IN_PROGRESS) {
-      await this.updateVehicleStatus(vehicleId, VehicleStatus.AVAILABLE);
-    }
-
     // When repair completes or is cancelled, set vehicle back to available
     if (
       (newStatus === RepairStatus.COMPLETED || newStatus === RepairStatus.CANCELLED) &&
       (oldStatus === RepairStatus.IN_PROGRESS || oldStatus === RepairStatus.PENDING)
     ) {
       await this.updateVehicleStatus(vehicleId, VehicleStatus.AVAILABLE);
+    }
+
+    // If moving from IN_PROGRESS back to PENDING, set vehicle back to available
+    // (assuming no other IN_PROGRESS repairs exist for this vehicle)
+    if (newStatus === RepairStatus.PENDING && oldStatus === RepairStatus.IN_PROGRESS) {
+      const activeRepairs = await RepairModel.findActive();
+      const hasOtherInProgressRepairs = activeRepairs.some(
+        r => r.vehicleId === vehicleId && r.status === RepairStatus.IN_PROGRESS
+      );
+      
+      if (!hasOtherInProgressRepairs) {
+        await this.updateVehicleStatus(vehicleId, VehicleStatus.AVAILABLE);
+      }
     }
   }
 }

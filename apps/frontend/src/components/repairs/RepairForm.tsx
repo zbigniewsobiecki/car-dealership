@@ -42,6 +42,7 @@ export const RepairForm = ({
     (v) => v.status !== VehicleStatus.SOLD || v.id === repair?.vehicleId
   );
   const customers = customersData || [];
+  const isDataLoading = vehiclesLoading || customersLoading;
 
   return (
     <ModalForm
@@ -49,7 +50,7 @@ export const RepairForm = ({
       onCancel={onCancel}
       onSubmit={handleSubmit(onSubmit)}
       submitLabel={repair ? 'Update Repair' : 'Add Repair'}
-      isLoading={isLoading}
+      isLoading={isLoading || isDataLoading}
     >
       <div className="grid grid-cols-2 gap-4">
         <div>

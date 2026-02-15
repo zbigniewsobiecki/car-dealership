@@ -60,7 +60,7 @@ export const RepairCard = ({ repair, onEdit, onDelete }: RepairCardProps) => {
           </span>
         </div>
 
-        {repair.actualCost && (
+        {repair.actualCost !== undefined && (
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-2 text-gray-500">
               <DollarSign className="h-4 w-4" />
