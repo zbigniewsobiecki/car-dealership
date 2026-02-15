@@ -205,6 +205,7 @@ describe('repairsService', () => {
       const updatedRepair = { ...existingRepair, ...updateDto };
 
       mockRepairModel.findById.mockResolvedValue(existingRepair);
+      mockRepairModel.findAll.mockResolvedValue({ data: [], total: 0 });
       mockRepairModel.update.mockResolvedValue(updatedRepair);
 
       const result = await repairsService.update(existingRepair.id, updateDto);
@@ -256,6 +257,7 @@ describe('repairsService', () => {
       const updatedRepair = { ...existingRepair, ...updateDto };
 
       mockRepairModel.findById.mockResolvedValue(existingRepair);
+      mockRepairModel.findAll.mockResolvedValue({ data: [], total: 0 });
       mockRepairModel.update.mockResolvedValue(updatedRepair);
 
       await repairsService.update(existingRepair.id, updateDto);
@@ -271,6 +273,7 @@ describe('repairsService', () => {
       const updatedRepair = { ...existingRepair, ...updateDto };
 
       mockRepairModel.findById.mockResolvedValue(existingRepair);
+      mockRepairModel.findAll.mockResolvedValue({ data: [], total: 0 });
       mockRepairModel.update.mockResolvedValue(updatedRepair);
 
       await repairsService.update(existingRepair.id, updateDto);
@@ -286,6 +289,7 @@ describe('repairsService', () => {
       const updatedRepair = { ...existingRepair, ...updateDto };
 
       mockRepairModel.findById.mockResolvedValue(existingRepair);
+      mockRepairModel.findAll.mockResolvedValue({ data: [], total: 0 });
       mockRepairModel.update.mockResolvedValue(updatedRepair);
 
       await repairsService.update(existingRepair.id, updateDto);
@@ -301,6 +305,7 @@ describe('repairsService', () => {
       const updatedRepair = { ...existingRepair, ...updateDto };
 
       mockRepairModel.findById.mockResolvedValue(existingRepair);
+      mockRepairModel.findAll.mockResolvedValue({ data: [], total: 0 });
       mockRepairModel.update.mockResolvedValue(updatedRepair);
 
       await repairsService.update(existingRepair.id, updateDto);
@@ -332,6 +337,62 @@ describe('repairsService', () => {
         repairsService.update(existingRepair.id, createMockUpdateRepairDto())
       ).rejects.toThrow('Repair not found');
     });
+
+    it('should NOT revert vehicle status when completing repair if another active repair exists', async () => {
+      const vehicleId = 'vehicle-123';
+      const existingRepair = createMockRepair({
+        id: 'repair-1',
+        status: RepairStatus.IN_PROGRESS,
+        vehicleId
+      });
+      const otherActiveRepair = createMockRepair({
+        id: 'repair-2',
+        status: RepairStatus.PENDING,
+        vehicleId
+      });
+      const updateDto = { status: RepairStatus.COMPLETED };
+      const updatedRepair = { ...existingRepair, ...updateDto };
+
+      mockRepairModel.findById.mockResolvedValue(existingRepair);
+      // First call for PENDING status, second call for IN_PROGRESS status
+      mockRepairModel.findAll
+        .mockResolvedValueOnce({ data: [otherActiveRepair], total: 1 })
+        .mockResolvedValueOnce({ data: [], total: 0 });
+      mockRepairModel.update.mockResolvedValue(updatedRepair);
+
+      await repairsService.update(existingRepair.id, updateDto);
+
+      // Vehicle status should NOT be updated because another active repair exists
+      expect(mockVehicleModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should NOT revert vehicle status when cancelling repair if another active repair exists', async () => {
+      const vehicleId = 'vehicle-123';
+      const existingRepair = createMockRepair({
+        id: 'repair-1',
+        status: RepairStatus.PENDING,
+        vehicleId
+      });
+      const otherActiveRepair = createMockRepair({
+        id: 'repair-2',
+        status: RepairStatus.IN_PROGRESS,
+        vehicleId
+      });
+      const updateDto = { status: RepairStatus.CANCELLED };
+      const updatedRepair = { ...existingRepair, ...updateDto };
+
+      mockRepairModel.findById.mockResolvedValue(existingRepair);
+      // First call for PENDING status, second call for IN_PROGRESS status
+      mockRepairModel.findAll
+        .mockResolvedValueOnce({ data: [], total: 0 })
+        .mockResolvedValueOnce({ data: [otherActiveRepair], total: 1 });
+      mockRepairModel.update.mockResolvedValue(updatedRepair);
+
+      await repairsService.update(existingRepair.id, updateDto);
+
+      // Vehicle status should NOT be updated because another active repair exists
+      expect(mockVehicleModel.update).not.toHaveBeenCalled();
+    });
   });
 
   describe('delete', () => {
@@ -358,6 +419,7 @@ describe('repairsService', () => {
     it('should revert vehicle status when deleting PENDING repair', async () => {
       const repair = createMockRepair({ status: RepairStatus.PENDING });
       mockRepairModel.findById.mockResolvedValue(repair);
+      mockRepairModel.findAll.mockResolvedValue({ data: [], total: 0 });
       mockRepairModel.delete.mockResolvedValue(true);
 
       await repairsService.delete(repair.id);
@@ -370,6 +432,7 @@ describe('repairsService', () => {
     it('should revert vehicle status when deleting IN_PROGRESS repair', async () => {
       const repair = createMockRepair({ status: RepairStatus.IN_PROGRESS });
       mockRepairModel.findById.mockResolvedValue(repair);
+      mockRepairModel.findAll.mockResolvedValue({ data: [], total: 0 });
       mockRepairModel.delete.mockResolvedValue(true);
 
       await repairsService.delete(repair.id);
@@ -405,6 +468,58 @@ describe('repairsService', () => {
       mockRepairModel.delete.mockResolvedValue(false);
 
       await expect(repairsService.delete(repair.id)).rejects.toThrow('Repair not found');
+    });
+
+    it('should NOT revert vehicle status when deleting PENDING repair if another active repair exists', async () => {
+      const vehicleId = 'vehicle-123';
+      const repair = createMockRepair({
+        id: 'repair-1',
+        status: RepairStatus.PENDING,
+        vehicleId
+      });
+      const otherActiveRepair = createMockRepair({
+        id: 'repair-2',
+        status: RepairStatus.IN_PROGRESS,
+        vehicleId
+      });
+
+      mockRepairModel.findById.mockResolvedValue(repair);
+      // First call for PENDING status, second call for IN_PROGRESS status
+      mockRepairModel.findAll
+        .mockResolvedValueOnce({ data: [], total: 0 })
+        .mockResolvedValueOnce({ data: [otherActiveRepair], total: 1 });
+      mockRepairModel.delete.mockResolvedValue(true);
+
+      await repairsService.delete(repair.id);
+
+      // Vehicle status should NOT be updated because another active repair exists
+      expect(mockVehicleModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should NOT revert vehicle status when deleting IN_PROGRESS repair if another active repair exists', async () => {
+      const vehicleId = 'vehicle-123';
+      const repair = createMockRepair({
+        id: 'repair-1',
+        status: RepairStatus.IN_PROGRESS,
+        vehicleId
+      });
+      const otherActiveRepair = createMockRepair({
+        id: 'repair-2',
+        status: RepairStatus.PENDING,
+        vehicleId
+      });
+
+      mockRepairModel.findById.mockResolvedValue(repair);
+      // First call for PENDING status, second call for IN_PROGRESS status
+      mockRepairModel.findAll
+        .mockResolvedValueOnce({ data: [otherActiveRepair], total: 1 })
+        .mockResolvedValueOnce({ data: [], total: 0 });
+      mockRepairModel.delete.mockResolvedValue(true);
+
+      await repairsService.delete(repair.id);
+
+      // Vehicle status should NOT be updated because another active repair exists
+      expect(mockVehicleModel.update).not.toHaveBeenCalled();
     });
   });
 });
