@@ -1,15 +1,18 @@
 import { useVehicleStats, useRecentVehicles } from '../hooks/useVehicles';
 import { useSalesStats } from '../hooks/useSales';
-import { Car, DollarSign, TrendingUp, Package } from 'lucide-react';
+import { useRepairStats, useActiveRepairs } from '../hooks/useRepairs';
+import { Car, DollarSign, TrendingUp, Package, Wrench } from 'lucide-react';
 import { StatsCard } from '../components/dashboard/StatsCard';
 import { RecentVehiclesTable } from '../components/dashboard/RecentVehiclesTable';
 
 export const Dashboard = () => {
   const { data: vehicleStats, isLoading: vehicleStatsLoading } = useVehicleStats();
   const { data: salesStats, isLoading: salesStatsLoading } = useSalesStats();
+  const { data: repairStats, isLoading: repairStatsLoading } = useRepairStats();
+  const { data: activeRepairs, isLoading: activeRepairsLoading } = useActiveRepairs(5);
   const { data: recentVehicles, isLoading: recentVehiclesLoading } = useRecentVehicles(5);
 
-  const isLoading = vehicleStatsLoading || salesStatsLoading || recentVehiclesLoading;
+  const isLoading = vehicleStatsLoading || salesStatsLoading || repairStatsLoading || recentVehiclesLoading || activeRepairsLoading;
 
   if (isLoading) {
     return (
@@ -50,7 +53,7 @@ export const Dashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="card">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Vehicle Overview</h2>
           <div className="space-y-3">
@@ -132,7 +135,78 @@ export const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        <div className="card">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Repairs Overview</h2>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <span className="text-sm font-medium text-gray-700">Total Repairs</span>
+              <span className="text-lg font-bold text-gray-900">
+                {repairStats?.total || 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-yellow-50 rounded">
+              <span className="text-sm font-medium text-yellow-700">Pending</span>
+              <span className="text-lg font-bold text-yellow-900">
+                {repairStats?.pending || 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded">
+              <span className="text-sm font-medium text-blue-700">In Progress</span>
+              <span className="text-lg font-bold text-blue-900">
+                {repairStats?.in_progress || 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded">
+              <span className="text-sm font-medium text-green-700">Completed</span>
+              <span className="text-lg font-bold text-green-900">
+                {repairStats?.completed || 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-primary-50 rounded border-t-2 border-primary-200">
+              <span className="text-sm font-medium text-primary-700">
+                Total Actual Cost
+              </span>
+              <span className="text-lg font-bold text-primary-900">
+                ${Number(repairStats?.total_actual_cost || 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {activeRepairs && activeRepairs.length > 0 && (
+        <div className="mt-8 card">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Active Repairs</h2>
+          <div className="space-y-3">
+            {activeRepairs.map((repair) => (
+              <div
+                key={repair.id}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex items-center space-x-3">
+                  <Wrench className="h-5 w-5 text-primary-600" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                      {repair.description}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Status: {repair.status.replace('_', ' ')}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  {repair.estimatedCost && (
+                    <p className="text-sm font-semibold text-gray-900">
+                      ${repair.estimatedCost.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <RecentVehiclesTable vehicles={recentVehicles} />
 

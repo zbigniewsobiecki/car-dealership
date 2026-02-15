@@ -125,6 +125,33 @@ const createTables = async () => {
     await query('CREATE INDEX IF NOT EXISTS idx_sales_status ON sales(status);');
     console.log('✓ Created sales indexes');
 
+    // Create repairs table
+    await query(`
+      CREATE TABLE IF NOT EXISTS repairs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        vehicle_id UUID NOT NULL REFERENCES vehicles(id),
+        customer_id UUID NOT NULL REFERENCES customers(id),
+        description TEXT NOT NULL,
+        status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'cancelled')),
+        estimated_cost DECIMAL(12, 2),
+        actual_cost DECIMAL(12, 2),
+        estimated_completion_date DATE,
+        actual_completion_date DATE,
+        notes TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        created_by UUID REFERENCES users(id)
+      );
+    `);
+    console.log('✓ Created repairs table');
+
+    // Create indexes for repairs
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_vehicle_id ON repairs(vehicle_id);');
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_customer_id ON repairs(customer_id);');
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_status ON repairs(status);');
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_created_at ON repairs(created_at);');
+    console.log('✓ Created repairs indexes');
+
     // Create trigger function for updated_at
     await query(`
       CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -159,6 +186,12 @@ const createTables = async () => {
     await query(`
       DROP TRIGGER IF EXISTS update_sales_updated_at ON sales;
       CREATE TRIGGER update_sales_updated_at BEFORE UPDATE ON sales
+        FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    `);
+
+    await query(`
+      DROP TRIGGER IF EXISTS update_repairs_updated_at ON repairs;
+      CREATE TRIGGER update_repairs_updated_at BEFORE UPDATE ON repairs
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     `);
     console.log('✓ Created triggers for all tables');

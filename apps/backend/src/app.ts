@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.routes.js';
 import vehiclesRoutes from './routes/vehicles.routes.js';
 import customersRoutes from './routes/customers.routes.js';
 import salesRoutes from './routes/sales.routes.js';
+import repairsRoutes from './routes/repairs.routes.js';
 import reportsRoutes from './routes/reports.routes.js';
 import healthRoutes from './routes/health.routes.js';
 
@@ -52,6 +53,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehiclesRoutes);
 app.use('/api/customers', customersRoutes);
 app.use('/api/sales', salesRoutes);
+app.use('/api/repairs', repairsRoutes);
 app.use('/api/reports', reportsRoutes);
 
 // 404 handler
