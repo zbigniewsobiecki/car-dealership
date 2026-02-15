@@ -139,16 +139,16 @@ start_postgres_linux() {
   if [ -z "$pg_ctl_path" ]; then
     log_info "PostgreSQL server not found, installing..."
     if command -v apt-get &> /dev/null; then
-      apt-get update && apt-get install -y postgresql postgresql-client
+      sudo apt-get update && sudo apt-get install -y postgresql postgresql-client
       local pg_version
       pg_version=$(ls /usr/lib/postgresql/ | sort -V | tail -1)
       log_info "Installed PostgreSQL version: $pg_version"
 
       # Initialize if needed
       if [ ! -d /var/lib/postgresql/data ] || [ -z "$(ls -A /var/lib/postgresql/data 2>/dev/null)" ]; then
-        mkdir -p /var/lib/postgresql/data
-        chown postgres:postgres /var/lib/postgresql/data
-        su postgres -c "/usr/lib/postgresql/$pg_version/bin/initdb -D /var/lib/postgresql/data"
+        sudo mkdir -p /var/lib/postgresql/data
+        sudo chown postgres:postgres /var/lib/postgresql/data
+        sudo su postgres -c "/usr/lib/postgresql/$pg_version/bin/initdb -D /var/lib/postgresql/data"
         log_info "PostgreSQL data directory initialized"
       fi
     else
@@ -169,12 +169,12 @@ start_postgres_linux() {
       pg_ctl=$(find /usr/lib/postgresql -name pg_ctl 2>/dev/null | head -1 || echo "pg_ctl")
 
       # Ensure runtime directory exists
-      mkdir -p /run/postgresql 2>/dev/null || true
-      chown postgres:postgres /run/postgresql 2>/dev/null || true
+      sudo mkdir -p /run/postgresql 2>/dev/null || true
+      sudo chown postgres:postgres /run/postgresql 2>/dev/null || true
 
       # Start server
-      if ! su postgres -c "$pg_ctl status -D $pg_data" 2>&1 | grep -q "server is running"; then
-        su postgres -c "$pg_ctl start -D $pg_data -l $pg_log -w" 2>&1 || {
+      if ! sudo su postgres -c "$pg_ctl status -D $pg_data" 2>&1 | grep -q "server is running"; then
+        sudo su postgres -c "$pg_ctl start -D $pg_data -l $pg_log -w" 2>&1 || {
           log_error "pg_ctl start failed"
           cat "$pg_log" 2>/dev/null || true
         }
@@ -184,7 +184,7 @@ start_postgres_linux() {
       local cluster_info
       cluster_info=$(pg_lsclusters -h 2>/dev/null | head -1)
       if [ -n "$cluster_info" ]; then
-        pg_ctlcluster $(echo "$cluster_info" | awk '{print $1, $2}') start 2>/dev/null || true
+        sudo pg_ctlcluster $(echo "$cluster_info" | awk '{print $1, $2}') start 2>/dev/null || true
       fi
     fi
 
@@ -221,18 +221,18 @@ if pg_isready -q 2>/dev/null; then
   echo ""
   echo "--- Setting up PostgreSQL databases ---"
 
-  # Determine psql connection args based on OS
-  PSQL_ARGS=""
+  # Determine psql command based on OS
+  PSQL_CMD="psql"
   if [ "$OS" = "linux" ]; then
-    PSQL_ARGS="-U postgres"
+    PSQL_CMD="sudo -u postgres psql"
   fi
   # On macOS, connect as current user (typically has superuser rights)
 
   # Create car_dealership database
-  if ! psql $PSQL_ARGS -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw car_dealership; then
+  if ! $PSQL_CMD -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw car_dealership; then
     log_info "Creating car_dealership database..."
     if [ "$OS" = "linux" ]; then
-      psql -U postgres -c "CREATE DATABASE car_dealership;" 2>/dev/null || true
+      $PSQL_CMD -c "CREATE DATABASE car_dealership;" 2>/dev/null || true
     else
       createdb car_dealership 2>/dev/null || true
     fi
@@ -241,10 +241,10 @@ if pg_isready -q 2>/dev/null; then
   fi
 
   # Create car_dealership_test database
-  if ! psql $PSQL_ARGS -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw car_dealership_test; then
+  if ! $PSQL_CMD -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw car_dealership_test; then
     log_info "Creating car_dealership_test database..."
     if [ "$OS" = "linux" ]; then
-      psql -U postgres -c "CREATE DATABASE car_dealership_test;" 2>/dev/null || true
+      $PSQL_CMD -c "CREATE DATABASE car_dealership_test;" 2>/dev/null || true
     else
       createdb car_dealership_test 2>/dev/null || true
     fi
@@ -254,7 +254,7 @@ if pg_isready -q 2>/dev/null; then
 
   # On Linux, ensure postgres user has a known password for app connections
   if [ "$OS" = "linux" ]; then
-    psql -U postgres -c "ALTER USER postgres WITH PASSWORD 'postgres';" 2>/dev/null || true
+    $PSQL_CMD -c "ALTER USER postgres WITH PASSWORD 'postgres';" 2>/dev/null || true
   fi
 
   log_info "PostgreSQL database setup complete"
