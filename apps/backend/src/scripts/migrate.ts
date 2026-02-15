@@ -125,6 +125,30 @@ const createTables = async () => {
     await query('CREATE INDEX IF NOT EXISTS idx_sales_status ON sales(status);');
     console.log('✓ Created sales indexes');
 
+    // Create repairs table
+    await query(`
+      CREATE TABLE IF NOT EXISTS repairs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        vehicle_id UUID NOT NULL REFERENCES vehicles(id),
+        customer_id UUID NOT NULL REFERENCES customers(id),
+        description TEXT NOT NULL,
+        cost DECIMAL(12, 2) NOT NULL,
+        status VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'in_progress', 'completed', 'cancelled')),
+        service_date DATE NOT NULL,
+        notes TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('✓ Created repairs table');
+
+    // Create indexes for repairs
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_vehicle_id ON repairs(vehicle_id);');
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_customer_id ON repairs(customer_id);');
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_status ON repairs(status);');
+    await query('CREATE INDEX IF NOT EXISTS idx_repairs_service_date ON repairs(service_date);');
+    console.log('✓ Created repairs indexes');
+
     // Create trigger function for updated_at
     await query(`
       CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -159,6 +183,12 @@ const createTables = async () => {
     await query(`
       DROP TRIGGER IF EXISTS update_sales_updated_at ON sales;
       CREATE TRIGGER update_sales_updated_at BEFORE UPDATE ON sales
+        FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    `);
+
+    await query(`
+      DROP TRIGGER IF EXISTS update_repairs_updated_at ON repairs;
+      CREATE TRIGGER update_repairs_updated_at BEFORE UPDATE ON repairs
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     `);
     console.log('✓ Created triggers for all tables');
