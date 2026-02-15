@@ -4,6 +4,7 @@ import { Dashboard } from '../../src/pages/Dashboard';
 import { MemoryRouter } from 'react-router-dom';
 import { useVehicleStats, useRecentVehicles } from '../../src/hooks/useVehicles';
 import { useSalesStats } from '../../src/hooks/useSales';
+import { useRepairStats, useActiveRepairs } from '../../src/hooks/useRepairs';
 
 // Mock the hooks
 vi.mock('../../src/hooks/useVehicles', () => ({
@@ -13,6 +14,11 @@ vi.mock('../../src/hooks/useVehicles', () => ({
 
 vi.mock('../../src/hooks/useSales', () => ({
   useSalesStats: vi.fn(),
+}));
+
+vi.mock('../../src/hooks/useRepairs', () => ({
+  useRepairStats: vi.fn(),
+  useActiveRepairs: vi.fn(),
 }));
 
 const renderDashboard = () => {
@@ -31,6 +37,8 @@ describe('Dashboard Page', () => {
   it('renders loading state when data is fetching', () => {
     vi.mocked(useVehicleStats).mockReturnValue({ isLoading: true, data: undefined } as never);
     vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: undefined } as never);
+    vi.mocked(useRepairStats).mockReturnValue({ isLoading: false, data: undefined } as never);
+    vi.mocked(useActiveRepairs).mockReturnValue({ isLoading: false, data: undefined } as never);
     vi.mocked(useRecentVehicles).mockReturnValue({ isLoading: false, data: undefined } as never);
 
     renderDashboard();
@@ -59,6 +67,24 @@ describe('Dashboard Page', () => {
         total_revenue: 1250000,
         average_sale_price: 25000,
       },
+    } as never);
+
+    vi.mocked(useRepairStats).mockReturnValue({
+      isLoading: false,
+      data: {
+        total: 10,
+        pending: 3,
+        in_progress: 2,
+        completed: 5,
+        cancelled: 0,
+        total_estimated_cost: 5000,
+        total_actual_cost: 4500,
+      },
+    } as never);
+
+    vi.mocked(useActiveRepairs).mockReturnValue({
+      isLoading: false,
+      data: [],
     } as never);
 
     vi.mocked(useRecentVehicles).mockReturnValue({
@@ -107,6 +133,8 @@ describe('Dashboard Page', () => {
 
     vi.mocked(useVehicleStats).mockReturnValue({ isLoading: false, data: {} } as never);
     vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useRepairStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useActiveRepairs).mockReturnValue({ isLoading: false, data: [] } as never);
     vi.mocked(useRecentVehicles).mockReturnValue({
       isLoading: false,
       data: mockVehicles,
@@ -128,6 +156,8 @@ describe('Dashboard Page', () => {
   it('renders empty state message when no vehicles are found', () => {
     vi.mocked(useVehicleStats).mockReturnValue({ isLoading: false, data: {} } as never);
     vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useRepairStats).mockReturnValue({ isLoading: false, data: {} } as never);
+    vi.mocked(useActiveRepairs).mockReturnValue({ isLoading: false, data: [] } as never);
     vi.mocked(useRecentVehicles).mockReturnValue({
       isLoading: false,
       data: [],
