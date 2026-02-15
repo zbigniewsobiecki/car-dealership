@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { UserRole, VehicleStatus, SaleStatus } from '@car-dealership/shared-types';
+import { UserRole, VehicleStatus, SaleStatus, RepairStatus } from '@car-dealership/shared-types';
 
 const API_URL = 'http://localhost:3000/api';
 
@@ -46,6 +46,19 @@ export const mockSale = {
   salePrice: 24000,
   status: SaleStatus.PENDING,
   saleDate: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
+
+export const mockRepair = {
+  id: 'repair-1',
+  vehicleId: 'vehicle-1',
+  customerId: 'customer-1',
+  description: 'Oil change and tire rotation',
+  status: RepairStatus.IN_PROGRESS,
+  cost: 150,
+  startDate: new Date().toISOString(),
+  technician: 'John Smith',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
@@ -267,6 +280,44 @@ export const handlers = [
     return HttpResponse.json({
       success: true,
       data: { success: true },
+    });
+  }),
+
+  // Repairs handlers
+  http.get(`${API_URL}/repairs`, () => {
+    return HttpResponse.json({
+      success: true,
+      data: [mockRepair],
+    });
+  }),
+
+  http.get(`${API_URL}/repairs/:id`, ({ params }) => {
+    return HttpResponse.json({
+      success: true,
+      data: { ...mockRepair, id: params.id },
+    });
+  }),
+
+  http.post(`${API_URL}/repairs`, async ({ request }) => {
+    const body = await request.json();
+    return HttpResponse.json({
+      success: true,
+      data: { ...mockRepair, ...(body as object), id: 'new-repair-id' },
+    }, { status: 201 });
+  }),
+
+  http.patch(`${API_URL}/repairs/:id`, async ({ params, request }) => {
+    const body = await request.json();
+    return HttpResponse.json({
+      success: true,
+      data: { ...mockRepair, ...(body as object), id: params.id },
+    });
+  }),
+
+  http.delete(`${API_URL}/repairs/:id`, () => {
+    return HttpResponse.json({
+      success: true,
+      message: 'Repair deleted successfully',
     });
   }),
 ];
