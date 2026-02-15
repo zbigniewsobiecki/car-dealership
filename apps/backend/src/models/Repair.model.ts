@@ -41,9 +41,9 @@ class RepairRepository extends BaseRepository<Repair, CreateRepairDto, UpdateRep
       SELECT * FROM repairs
       WHERE status IN ('pending', 'in_progress')
       ORDER BY created_at DESC
-      ${limit ? `LIMIT $1` : ''}
+      ${limit !== undefined ? `LIMIT $1` : ''}
     `;
-    const result = await query(sql, limit ? [limit] : []);
+    const result = await query(sql, limit !== undefined ? [limit] : []);
     return result.rows.map(row => this.dataMapper.mapRow<Repair>(row));
   }
 

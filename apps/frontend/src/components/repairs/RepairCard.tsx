@@ -56,7 +56,7 @@ export const RepairCard = ({ repair, onEdit, onDelete }: RepairCardProps) => {
             <span>Estimated Cost</span>
           </div>
           <span className="font-semibold text-gray-900">
-            {repair.estimatedCost ? `$${repair.estimatedCost.toLocaleString()}` : 'N/A'}
+            {repair.estimatedCost !== undefined ? `$${repair.estimatedCost.toLocaleString()}` : 'N/A'}
           </span>
         </div>
 

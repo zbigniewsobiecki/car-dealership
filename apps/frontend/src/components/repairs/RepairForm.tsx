@@ -4,6 +4,7 @@ import {
   CreateRepairDto,
   RepairStatus,
   Customer,
+  VehicleStatus,
 } from '@car-dealership/shared-types';
 import { ModalForm } from '../shared/ModalForm';
 import { useVehicles } from '../../hooks/useVehicles';
@@ -33,10 +34,13 @@ export const RepairForm = ({
   });
 
   // Fetch vehicles and customers for dropdowns
-  const { data: vehiclesData } = useVehicles({ limit: 1000 });
-  const { data: customersData } = useCustomers();
+  const { data: vehiclesData, isLoading: vehiclesLoading } = useVehicles({ limit: 1000 });
+  const { data: customersData, isLoading: customersLoading } = useCustomers();
 
-  const vehicles = vehiclesData?.data || [];
+  // Filter out SOLD vehicles, but keep the current vehicle if editing
+  const vehicles = (vehiclesData?.data || []).filter(
+    (v) => v.status !== VehicleStatus.SOLD || v.id === repair?.vehicleId
+  );
   const customers = customersData || [];
 
   return (
@@ -53,9 +57,11 @@ export const RepairForm = ({
           <select
             {...register('vehicleId', { required: 'Vehicle is required' })}
             className="input"
-            disabled={!!repair}
+            disabled={!!repair || vehiclesLoading}
           >
-            <option value="">Select a vehicle</option>
+            <option value="">
+              {vehiclesLoading ? 'Loading vehicles...' : 'Select a vehicle'}
+            </option>
             {vehicles.map((vehicle) => (
               <option key={vehicle.id} value={vehicle.id}>
                 {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.vin}
@@ -72,9 +78,11 @@ export const RepairForm = ({
           <select
             {...register('customerId', { required: 'Customer is required' })}
             className="input"
-            disabled={!!repair}
+            disabled={!!repair || customersLoading}
           >
-            <option value="">Select a customer</option>
+            <option value="">
+              {customersLoading ? 'Loading customers...' : 'Select a customer'}
+            </option>
             {customers.map((customer: Customer) => (
               <option key={customer.id} value={customer.id}>
                 {customer.firstName} {customer.lastName}

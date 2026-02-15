@@ -105,7 +105,10 @@ export const Repairs = () => {
           <div className="w-full md:w-48">
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as RepairStatus | '')}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as RepairStatus | '');
+                setPage(1);
+              }}
               className="input"
             >
               <option value="">All Statuses</option>
