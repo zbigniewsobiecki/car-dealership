@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { VehicleCard } from '../../src/components/vehicles/VehicleCard';
 import { VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
 
@@ -30,11 +31,13 @@ describe('VehicleCard', () => {
 
   it('should render vehicle information', () => {
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={mockVehicle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText('2022 Toyota Camry')).toBeInTheDocument();
@@ -46,11 +49,13 @@ describe('VehicleCard', () => {
 
   it('should render condition, transmission, and fuel type badges', () => {
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={mockVehicle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText('used')).toBeInTheDocument();
@@ -60,11 +65,13 @@ describe('VehicleCard', () => {
 
   it('should call onEdit when Edit button is clicked', () => {
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={mockVehicle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     fireEvent.click(screen.getByRole('button', { name: /edit/i }));
@@ -75,11 +82,13 @@ describe('VehicleCard', () => {
 
   it('should call onDelete when Delete button is clicked', () => {
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={mockVehicle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     fireEvent.click(screen.getByRole('button', { name: /delete/i }));
@@ -92,11 +101,13 @@ describe('VehicleCard', () => {
     const soldVehicle = { ...mockVehicle, status: VehicleStatus.SOLD };
 
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={soldVehicle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText('sold')).toBeInTheDocument();
@@ -106,11 +117,13 @@ describe('VehicleCard', () => {
     const vehicleWithoutMileage = { ...mockVehicle, mileage: undefined };
 
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={vehicleWithoutMileage}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     expect(screen.queryByText(/mi$/)).not.toBeInTheDocument();
@@ -125,11 +138,13 @@ describe('VehicleCard', () => {
     };
 
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={motorcycle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText('1000 cc')).toBeInTheDocument();
@@ -145,11 +160,13 @@ describe('VehicleCard', () => {
     };
 
     render(
-      <VehicleCard
+      <MemoryRouter>
+        <VehicleCard
         vehicle={carWithMotorcycleFields}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+        />
+      </MemoryRouter>
     );
 
     expect(screen.queryByText('2000 cc')).not.toBeInTheDocument();
