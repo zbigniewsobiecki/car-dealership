@@ -20,6 +20,7 @@ describe('Sidebar', () => {
       { name: 'Vehicles', href: '/vehicles' },
       { name: 'Customers', href: '/customers' },
       { name: 'Sales', href: '/sales' },
+      { name: 'Repairs', href: '/repairs' },
     ];
 
     links.forEach((link) => {
