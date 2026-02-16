@@ -9,29 +9,43 @@ interface RepairFormProps {
   onSubmit: (data: CreateRepairDto) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  initialData?: Partial<CreateRepairDto>;
 }
 
-export const RepairForm = ({ repair, onSubmit, onCancel, isLoading }: RepairFormProps) => {
+export const RepairForm = ({ repair, onSubmit, onCancel, isLoading, initialData }: RepairFormProps) => {
   const { data: paginatedVehicles } = useVehicles({ limit: 1000 });
   const vehicles = paginatedVehicles?.data || [];
   const { data: customers } = useCustomers();
+
+  type FormValues = Omit<CreateRepairDto, 'startDate' | 'endDate'> & { startDate: string; endDate?: string };
+
+  const getDefaultValues = (): FormValues => {
+    if (repair) {
+      return {
+        ...repair,
+        startDate: new Date(repair.startDate).toISOString().split('T')[0],
+        endDate: repair.endDate ? new Date(repair.endDate).toISOString().split('T')[0] : undefined,
+      } as FormValues;
+    }
+
+    return {
+      vehicleId: initialData?.vehicleId || '',
+      customerId: initialData?.customerId || '',
+      description: '',
+      status: RepairStatus.PENDING,
+      startDate: new Date().toISOString().split('T')[0],
+    } as FormValues;
+  };
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Omit<CreateRepairDto, 'startDate' | 'endDate'> & { startDate: string; endDate?: string }>({
-    defaultValues: repair ? {
-      ...repair,
-      startDate: new Date(repair.startDate).toISOString().split('T')[0],
-      endDate: repair.endDate ? new Date(repair.endDate).toISOString().split('T')[0] : undefined,
-    } as unknown as Omit<CreateRepairDto, 'startDate' | 'endDate'> & { startDate: string; endDate?: string } : {
-      status: RepairStatus.PENDING,
-      startDate: new Date().toISOString().split('T')[0],
-    },
+  } = useForm<FormValues>({
+    defaultValues: getDefaultValues(),
   });
 
-  const handleFormSubmit = (data: Omit<CreateRepairDto, 'startDate' | 'endDate'> & { startDate: string; endDate?: string }) => {
+  const handleFormSubmit = (data: FormValues) => {
     onSubmit({
       ...data,
       startDate: new Date(data.startDate),

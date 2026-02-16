@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { CustomerCard } from '../../src/components/customers/CustomerCard';
 
 describe('CustomerCard', () => {
@@ -26,11 +27,13 @@ describe('CustomerCard', () => {
 
   it('should render customer information', () => {
     render(
-      <CustomerCard
-        customer={mockCustomer}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-      />
+      <MemoryRouter>
+        <CustomerCard
+          customer={mockCustomer}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -40,11 +43,13 @@ describe('CustomerCard', () => {
 
   it('should render location when city and state provided', () => {
     render(
-      <CustomerCard
-        customer={mockCustomer}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-      />
+      <MemoryRouter>
+        <CustomerCard
+          customer={mockCustomer}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText('Anytown, CA')).toBeInTheDocument();
@@ -52,11 +57,13 @@ describe('CustomerCard', () => {
 
   it('should call onEdit when Edit button is clicked', () => {
     render(
-      <CustomerCard
-        customer={mockCustomer}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-      />
+      <MemoryRouter>
+        <CustomerCard
+          customer={mockCustomer}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      </MemoryRouter>
     );
 
     fireEvent.click(screen.getByRole('button', { name: /edit/i }));
@@ -66,11 +73,13 @@ describe('CustomerCard', () => {
 
   it('should call onDelete when Delete button is clicked', () => {
     render(
-      <CustomerCard
-        customer={mockCustomer}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-      />
+      <MemoryRouter>
+        <CustomerCard
+          customer={mockCustomer}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+        />
+      </MemoryRouter>
     );
 
     fireEvent.click(screen.getByRole('button', { name: /delete/i }));
