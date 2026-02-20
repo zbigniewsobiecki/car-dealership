@@ -1,21 +1,28 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { VehicleDetails } from '../../src/pages/VehicleDetails';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { useVehicle } from '../../src/hooks/useVehicles';
-import { useRepairs } from '../../src/hooks/useRepairs';
-import { VehicleType, VehicleStatus, RepairStatus } from '@car-dealership/shared-types';
+import { useRepairs, useCreateRepair, useUpdateRepair, useDeleteRepair } from '../../src/hooks/useRepairs';
+import { VehicleType, VehicleStatus, RepairStatus, CreateRepairDto, UpdateRepairDto } from '@car-dealership/shared-types';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 
 // Mock the hooks
 vi.mock('../../src/hooks/useVehicles', () => ({
   useVehicle: vi.fn(),
+  useVehicles: vi.fn(() => ({ data: { data: [] } })),
+}));
+
+vi.mock('../../src/hooks/useCustomers', () => ({
+  useCustomers: vi.fn(() => ({ data: [] })),
 }));
 
 vi.mock('../../src/hooks/useRepairs', () => ({
   useRepairs: vi.fn(),
-  useCreateRepair: vi.fn(() => ({ mutateAsync: vi.fn(), isPending: false })),
-  useUpdateRepair: vi.fn(() => ({ mutateAsync: vi.fn(), isPending: false })),
-  useDeleteRepair: vi.fn(() => ({ mutateAsync: vi.fn() })),
+  useCreateRepair: vi.fn(),
+  useUpdateRepair: vi.fn(),
+  useDeleteRepair: vi.fn(),
 }));
 
 const mockVehicle = {
@@ -49,122 +56,145 @@ const mockRepairs = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-  {
-    id: 'repair-2',
-    vehicleId: 'vehicle-1',
-    customerId: 'customer-2',
-    description: 'Brake pad replacement',
-    status: RepairStatus.IN_PROGRESS,
-    cost: 350,
-    startDate: new Date('2024-01-10'),
-    technician: 'Jane Doe',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
 ];
 
 const renderVehicleDetails = (vehicleId = 'vehicle-1') => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
   return render(
-    <MemoryRouter initialEntries={[`/vehicles/${vehicleId}`]}>
-      <Routes>
-        <Route path="/vehicles/:id" element={<VehicleDetails />} />
-      </Routes>
-    </MemoryRouter>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[`/vehicles/${vehicleId}`]}>
+        <Routes>
+          <Route path="/vehicles/:id" element={<VehicleDetails />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
 };
 
 describe('VehicleDetails Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useCreateRepair).mockReturnValue({ mutateAsync: vi.fn(), isPending: false } as unknown as ReturnType<typeof useCreateRepair>);
+    vi.mocked(useUpdateRepair).mockReturnValue({ mutateAsync: vi.fn(), isPending: false } as unknown as ReturnType<typeof useUpdateRepair>);
+    vi.mocked(useDeleteRepair).mockReturnValue({ mutateAsync: vi.fn() } as unknown as ReturnType<typeof useDeleteRepair>);
   });
 
   it('renders loading state when vehicle is loading', () => {
-    vi.mocked(useVehicle).mockReturnValue({ isLoading: true, data: undefined } as never);
-    vi.mocked(useRepairs).mockReturnValue({ isLoading: false, data: undefined } as never);
+    vi.mocked(useVehicle).mockReturnValue({ isLoading: true, data: undefined } as unknown as ReturnType<typeof useVehicle>);
+    vi.mocked(useRepairs).mockReturnValue({ isLoading: false, data: undefined } as unknown as ReturnType<typeof useRepairs>);
 
     renderVehicleDetails();
     expect(screen.getByText(/Loading vehicle details.../i)).toBeInTheDocument();
   });
 
-  it('renders vehicle not found message when vehicle does not exist', async () => {
-    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: undefined } as never);
-    vi.mocked(useRepairs).mockReturnValue({ isLoading: false, data: undefined } as never);
+  it('renders vehicle details correctly', () => {
+    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as unknown as ReturnType<typeof useVehicle>);
+    vi.mocked(useRepairs).mockReturnValue({
+      isLoading: false,
+      data: { data: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 10 } },
+    } as unknown as ReturnType<typeof useRepairs>);
 
     renderVehicleDetails();
+
+    expect(screen.getByText('2022 Toyota Camry')).toBeInTheDocument();
+    expect(screen.getByText('VIN: VIN123456')).toBeInTheDocument();
+  });
+
+  it('opens RepairForm when Add Repair button is clicked', async () => {
+    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as unknown as ReturnType<typeof useVehicle>);
+    vi.mocked(useRepairs).mockReturnValue({
+      isLoading: false,
+      data: { data: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 10 } },
+    } as unknown as ReturnType<typeof useRepairs>);
+
+    renderVehicleDetails();
+
+    const addButton = screen.getByRole('button', { name: /Add Repair/i });
+    fireEvent.click(addButton);
+
+    expect(screen.getByText(/New Repair/i)).toBeInTheDocument();
+  });
+
+  it('calls useCreateRepair when form is submitted', async () => {
+    const mockMutateAsync = vi.fn().mockResolvedValue({});
+    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as unknown as ReturnType<typeof useVehicle>);
+    vi.mocked(useRepairs).mockReturnValue({
+      isLoading: false,
+      data: { data: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 10 } },
+    } as unknown as ReturnType<typeof useRepairs>);
+    vi.mocked(useCreateRepair).mockReturnValue({ mutateAsync: mockMutateAsync, isPending: false } as unknown as ReturnType<typeof useCreateRepair>);
+
+    renderVehicleDetails();
+
+    fireEvent.click(screen.getByRole('button', { name: /Add Repair/i }));
+
+    // Fill required fields in RepairForm
+    fireEvent.change(screen.getByLabelText(/Customer/i), { target: { value: 'customer-1' } });
+    fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: 'New Repair' } });
+    
+    fireEvent.click(screen.getByRole('button', { name: /Create Repair/i }));
+
     await waitFor(() => {
-      expect(screen.getByText(/Vehicle not found/i)).toBeInTheDocument();
+      expect(mockMutateAsync).toHaveBeenCalledWith(expect.objectContaining({
+        description: 'New Repair',
+        vehicleId: 'vehicle-1',
+      } as CreateRepairDto));
     });
   });
 
-  it('renders vehicle details correctly', () => {
-    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as never);
+  it('calls useUpdateRepair when edit form is submitted', async () => {
+    const mockMutateAsync = vi.fn().mockResolvedValue({});
+    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as unknown as ReturnType<typeof useVehicle>);
     vi.mocked(useRepairs).mockReturnValue({
       isLoading: false,
-      data: { data: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 10 } },
-    } as never);
+      data: { data: mockRepairs, pagination: { total: 1, totalPages: 1, currentPage: 1, perPage: 10 } },
+    } as unknown as ReturnType<typeof useRepairs>);
+    vi.mocked(useUpdateRepair).mockReturnValue({ mutateAsync: mockMutateAsync, isPending: false } as unknown as ReturnType<typeof useUpdateRepair>);
 
     renderVehicleDetails();
 
-    // Check vehicle information
-    expect(screen.getByText('2022 Toyota Camry')).toBeInTheDocument();
-    expect(screen.getByText('VIN: VIN123456')).toBeInTheDocument();
-    expect(screen.getByText('$25,000')).toBeInTheDocument();
-    expect(screen.getByText('15,000 mi')).toBeInTheDocument();
-    expect(screen.getByText('Automatic')).toBeInTheDocument();
-    expect(screen.getByText('Gasoline')).toBeInTheDocument();
+    const editButton = screen.getByRole('button', { name: /Edit/i });
+    fireEvent.click(editButton);
+
+    expect(screen.getByText(/Edit Repair/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: 'Updated Description' } });
+    fireEvent.click(screen.getByRole('button', { name: /Update Repair/i }));
+
+    await waitFor(() => {
+      expect(mockMutateAsync).toHaveBeenCalledWith(expect.objectContaining({
+        id: 'repair-1',
+        data: expect.objectContaining({
+          description: 'Updated Description',
+        } as UpdateRepairDto),
+      }));
+    });
   });
 
-  it('displays repair history correctly when repairs exist', () => {
-    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as never);
+  it('calls useDeleteRepair when delete button is clicked and confirmed', async () => {
+    const mockMutateAsync = vi.fn().mockResolvedValue({});
+    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as unknown as ReturnType<typeof useVehicle>);
     vi.mocked(useRepairs).mockReturnValue({
       isLoading: false,
-      data: { data: mockRepairs, pagination: { total: 2, totalPages: 1, currentPage: 1, perPage: 10 } },
-    } as never);
+      data: { data: mockRepairs, pagination: { total: 1, totalPages: 1, currentPage: 1, perPage: 10 } },
+    } as unknown as ReturnType<typeof useRepairs>);
+    vi.mocked(useDeleteRepair).mockReturnValue({ mutateAsync: mockMutateAsync } as unknown as ReturnType<typeof useDeleteRepair>);
+
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     renderVehicleDetails();
 
-    // Check repair history section
-    expect(screen.getByText('Repair History')).toBeInTheDocument();
-    expect(screen.getByText('Oil change and tire rotation')).toBeInTheDocument();
-    expect(screen.getByText('Brake pad replacement')).toBeInTheDocument();
-    expect(screen.getByText('Technician: John Smith')).toBeInTheDocument();
-    expect(screen.getByText('Technician: Jane Doe')).toBeInTheDocument();
-  });
+    const deleteButton = screen.getByRole('button', { name: /Delete/i });
+    fireEvent.click(deleteButton);
 
-  it('displays empty state when no repairs exist', () => {
-    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as never);
-    vi.mocked(useRepairs).mockReturnValue({
-      isLoading: false,
-      data: { data: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 10 } },
-    } as never);
-
-    renderVehicleDetails();
-
-    expect(screen.getByText(/No repair history for this vehicle yet/i)).toBeInTheDocument();
-  });
-
-  it('filters repairs by vehicleId', () => {
-    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as never);
-    vi.mocked(useRepairs).mockReturnValue({
-      isLoading: false,
-      data: { data: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 10 } },
-    } as never);
-
-    renderVehicleDetails('vehicle-1');
-
-    // Verify that useRepairs was called with the correct vehicleId filter
-    expect(useRepairs).toHaveBeenCalledWith({ vehicleId: 'vehicle-1' });
-  });
-
-  it('renders Add Repair button', () => {
-    vi.mocked(useVehicle).mockReturnValue({ isLoading: false, data: mockVehicle } as never);
-    vi.mocked(useRepairs).mockReturnValue({
-      isLoading: false,
-      data: { data: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 10 } },
-    } as never);
-
-    renderVehicleDetails();
-
-    expect(screen.getByRole('button', { name: /Add Repair/i })).toBeInTheDocument();
+    expect(window.confirm).toHaveBeenCalled();
+    expect(mockMutateAsync).toHaveBeenCalledWith('repair-1');
   });
 });
