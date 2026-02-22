@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BarChart3 } from 'lucide-react';
+import { formatMonthYear } from '../../utils/dateUtils';
 
 interface MonthlyStat {
   month: string;
@@ -12,10 +13,11 @@ interface MonthlySalesChartProps {
 }
 
 export const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data }) => {
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-  };
+  // Sort data by month ascending for the chart
+  const sortedData = useMemo(() => {
+    if (!data) return [];
+    return [...data].sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+  }, [data]);
 
   if (!data || data.length === 0) {
     return (
@@ -25,9 +27,6 @@ export const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data }) =>
       </div>
     );
   }
-
-  // Sort data by month ascending for the chart
-  const sortedData = [...data].sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
 
   const maxRevenue = Math.max(...sortedData.map((d) => Number(d.revenue)), 1);
   const maxCount = Math.max(...sortedData.map((d) => Number(d.sales_count)), 1);
@@ -55,7 +54,7 @@ export const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data }) =>
                   </div>
                 </div>
                 <span className="text-[10px] text-gray-400 mt-2 rotate-45 origin-left whitespace-nowrap">
-                  {formatDate(stat.month)}
+                  {formatMonthYear(stat.month)}
                 </span>
               </div>
             ))}
@@ -77,7 +76,7 @@ export const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data }) =>
                   </div>
                 </div>
                 <span className="text-[10px] text-gray-400 mt-2 rotate-45 origin-left whitespace-nowrap">
-                  {formatDate(stat.month)}
+                  {formatMonthYear(stat.month)}
                 </span>
               </div>
             ))}

@@ -5,7 +5,7 @@ import {
   BarChart3, 
   Calendar,
   Filter,
-  Download
+  Printer
 } from 'lucide-react';
 import { useSalesStats, useMonthlySalesStats, useSales } from '../hooks/useSales';
 import { useRevenueReport } from '../hooks/useReports';
@@ -14,22 +14,24 @@ import { UserRole } from '@car-dealership/shared-types';
 import { StatsCard } from '../components/dashboard/StatsCard';
 import { MonthlySalesChart } from '../components/dashboard/MonthlySalesChart';
 import { RecentSalesTable } from '../components/dashboard/RecentSalesTable';
+import { formatLocalDate } from '../utils/dateUtils';
 
 export const SalesDashboard: React.FC = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
 
   const [dateRange, setDateRange] = useState({
-    from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().split('T')[0],
-    to: new Date().toISOString().split('T')[0],
+    from: formatLocalDate(new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1)),
+    to: formatLocalDate(new Date()),
   });
 
   const { data: salesStats, isLoading: statsLoading } = useSalesStats();
   const { data: monthlyStats, isLoading: monthlyLoading } = useMonthlySalesStats();
-  const { data: recentSales, isLoading: recentLoading } = useSales({ limit: 5, sortBy: 'sale_date', sortOrder: 'desc' });
+  const { data: recentSales, isLoading: recentLoading } = useSales({ limit: 5, sortBy: 'saleDate', sortOrder: 'desc' });
   const { data: revenueReport, isLoading: reportLoading, refetch: refetchReport } = useRevenueReport(
     isAdmin ? dateRange.from : undefined,
-    isAdmin ? dateRange.to : undefined
+    isAdmin ? dateRange.to : undefined,
+    { enabled: isAdmin }
   );
 
   const isLoading = statsLoading || monthlyLoading || recentLoading;
@@ -57,7 +59,7 @@ export const SalesDashboard: React.FC = () => {
             onClick={() => window.print()}
             className="btn btn-secondary flex items-center space-x-2"
           >
-            <Download className="h-4 w-4" />
+            <Printer className="h-4 w-4" />
             <span>Export Report</span>
           </button>
         </div>
