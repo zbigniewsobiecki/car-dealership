@@ -1,11 +1,12 @@
 import { VehicleStatus, VehicleCondition } from '../enums/vehicle-status.enum';
+import { VehicleType } from '../enums/vehicle-type.enum';
 import { PaginationParams } from '../api/requests.types';
 
 export interface VehicleImage {
-  id: string;
+  id?: string;
   url: string;
-  isPrimary: boolean;
-  order: number;
+  isPrimary?: boolean;
+  order?: number;
 }
 
 export interface Vehicle {
@@ -18,9 +19,12 @@ export interface Vehicle {
   mileage?: number;
   price: number;
   cost?: number;
+  type: VehicleType;
   status: VehicleStatus;
   condition?: VehicleCondition;
   bodyType?: string;
+  engineDisplacement?: number;
+  category?: string;
   transmission?: string;
   fuelType?: string;
   engine?: string;
@@ -45,9 +49,12 @@ export interface CreateVehicleDto {
   mileage?: number;
   price: number;
   cost?: number;
+  type: VehicleType;
   status: VehicleStatus;
   condition?: VehicleCondition;
   bodyType?: string;
+  engineDisplacement?: number;
+  category?: string;
   transmission?: string;
   fuelType?: string;
   engine?: string;
@@ -56,6 +63,7 @@ export interface CreateVehicleDto {
   interiorColor?: string;
   features?: Record<string, unknown>;
   description?: string;
+  images?: VehicleImage[];
   dateAcquired?: Date;
 }
 
@@ -70,6 +78,9 @@ export interface VehicleFilters extends PaginationParams {
   priceMax?: number;
   status?: VehicleStatus;
   condition?: VehicleCondition;
+  type?: VehicleType;
+  engineDisplacement?: number;
+  category?: string;
   search?: string;
 }
 

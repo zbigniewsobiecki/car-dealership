@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
-import { VehicleStatus, VehicleCondition } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
 import { createVehicleValidator } from '../../../../src/middleware/validators/vehicle.validator.js';
 import { validate } from '../../../../src/middleware/validation.middleware.js';
 import { validationResult } from 'express-validator';
@@ -37,6 +37,7 @@ describe('Vehicle Validator', () => {
     year: 2023,
     color: 'Blue',
     price: 25000,
+    type: VehicleType.CAR,
     status: VehicleStatus.AVAILABLE,
   };
 
@@ -131,7 +132,7 @@ describe('Vehicle Validator', () => {
   });
 
   describe('Required fields', () => {
-    const requiredFields = ['make', 'model', 'color'];
+    const requiredFields = ['make', 'model', 'color', 'type'];
 
     requiredFields.forEach(field => {
       it(`should fail if ${field} is missing`, async () => {
@@ -229,6 +230,31 @@ describe('Vehicle Validator', () => {
     describe('fuelType', () => {
       it('should pass when fuelType is a valid string', async () => {
         mockReq.body = { ...validVehicle, fuelType: 'Gasoline' };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+    });
+
+    describe('engineDisplacement', () => {
+      it('should pass when engineDisplacement is a valid non-negative number', async () => {
+        mockReq.body = { ...validVehicle, engineDisplacement: 1200.5 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.isEmpty()).toBe(true);
+      });
+
+      it('should fail when engineDisplacement is negative', async () => {
+        mockReq.body = { ...validVehicle, engineDisplacement: -10 };
+        await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
+        const errors = validationResult(mockReq as Request);
+        expect(errors.array().some(e => e.msg === 'Engine displacement must be a non-negative number')).toBe(true);
+      });
+    });
+
+    describe('category', () => {
+      it('should pass when category is a valid string', async () => {
+        mockReq.body = { ...validVehicle, category: 'Cruiser' };
         await runMiddleware(mockReq as Request, mockRes as Response, createVehicleValidator);
         const errors = validationResult(mockReq as Request);
         expect(errors.isEmpty()).toBe(true);

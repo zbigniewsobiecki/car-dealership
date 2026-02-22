@@ -1,76 +1,49 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { customersService } from '../services/customers.service.js';
+import { BaseController } from './BaseController.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { AppError } from '../middleware/errorHandler.middleware.js';
 
-export const customersController = {
-  async getAll(_req: Request, res: Response, next: NextFunction) {
-    try {
-      const customers = await customersService.getAll();
-      res.json({
-        success: true,
-        data: customers,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+class CustomersController extends BaseController {
+  getAll = asyncHandler(async (_req: Request, res: Response) => {
+    const { data: customers } = await customersService.getAll({});
+    return this.ok(res, customers);
+  });
 
-  async getById(req: Request, res: Response, next: NextFunction) {
-    try {
-      const customer = await customersService.getById(req.params.id);
-      res.json({
-        success: true,
-        data: customer,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  getById = asyncHandler(async (req: Request, res: Response) => {
+    const customer = await customersService.getById(req.params.id);
+    return this.ok(res, customer);
+  });
 
-  async create(req: Request, res: Response, next: NextFunction) {
-    try {
-      const customer = await customersService.create(req.body, req.user!.userId);
-      res.status(201).json({
-        success: true,
-        data: customer,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  create = asyncHandler(async (req: Request, res: Response) => {
+    const customer = await customersService.create(req.body, req.user!.userId);
+    return this.created(res, customer);
+  });
 
-  async update(req: Request, res: Response, next: NextFunction) {
-    try {
-      const customer = await customersService.update(req.params.id, req.body);
-      res.json({
-        success: true,
-        data: customer,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  update = asyncHandler(async (req: Request, res: Response) => {
+    const customer = await customersService.update(req.params.id, req.body);
+    return this.ok(res, customer);
+  });
 
-  async delete(req: Request, res: Response, next: NextFunction) {
-    try {
-      await customersService.delete(req.params.id);
-      res.json({
-        success: true,
-        message: 'Customer deleted successfully',
-      });
-    } catch (error) {
-      next(error);
+  delete = asyncHandler(async (req: Request, res: Response) => {
+    const hardDelete = req.query.hard === 'true';
+    
+    // Only admins can hard delete
+    if (hardDelete && req.user?.role !== 'admin') {
+      throw new AppError(403, 'Only admins can perform hard deletes');
     }
-  },
 
-  async getSales(req: Request, res: Response, next: NextFunction) {
-    try {
-      const sales = await customersService.getSales(req.params.id);
-      res.json({
-        success: true,
-        data: sales,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-};
+    await customersService.delete(req.params.id, hardDelete);
+    return this.message(
+      res, 
+      hardDelete ? 'Customer permanently deleted' : 'Customer soft deleted'
+    );
+  });
+
+  getSales = asyncHandler(async (req: Request, res: Response) => {
+    const sales = await customersService.getSales(req.params.id);
+    return this.ok(res, sales);
+  });
+}
+
+export const customersController = new CustomersController();

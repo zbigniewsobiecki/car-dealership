@@ -1,88 +1,43 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { salesService } from '../services/sales.service.js';
+import { BaseController } from './BaseController.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
-export const salesController = {
-  async getAll(_req: Request, res: Response, next: NextFunction) {
-    try {
-      const sales = await salesService.getAll();
-      res.json({
-        success: true,
-        data: sales,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+class SalesController extends BaseController {
+  getAll = asyncHandler(async (_req: Request, res: Response) => {
+    const { data: sales } = await salesService.getAll({});
+    return this.ok(res, sales);
+  });
 
-  async getById(req: Request, res: Response, next: NextFunction) {
-    try {
-      const sale = await salesService.getById(req.params.id);
-      res.json({
-        success: true,
-        data: sale,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  getById = asyncHandler(async (req: Request, res: Response) => {
+    const sale = await salesService.getById(req.params.id);
+    return this.ok(res, sale);
+  });
 
-  async create(req: Request, res: Response, next: NextFunction) {
-    try {
-      const sale = await salesService.create(req.body);
-      res.status(201).json({
-        success: true,
-        data: sale,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  create = asyncHandler(async (req: Request, res: Response) => {
+    const sale = await salesService.create(req.body);
+    return this.created(res, sale);
+  });
 
-  async update(req: Request, res: Response, next: NextFunction) {
-    try {
-      const sale = await salesService.update(req.params.id, req.body);
-      res.json({
-        success: true,
-        data: sale,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  update = asyncHandler(async (req: Request, res: Response) => {
+    const sale = await salesService.update(req.params.id, req.body);
+    return this.ok(res, sale);
+  });
 
-  async delete(req: Request, res: Response, next: NextFunction) {
-    try {
-      await salesService.delete(req.params.id);
-      res.json({
-        success: true,
-        message: 'Sale deleted successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  delete = asyncHandler(async (req: Request, res: Response) => {
+    await salesService.delete(req.params.id);
+    return this.message(res, 'Sale deleted successfully');
+  });
 
-  async getStats(_req: Request, res: Response, next: NextFunction) {
-    try {
-      const stats = await salesService.getStats();
-      res.json({
-        success: true,
-        data: stats,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  getStats = asyncHandler(async (_req: Request, res: Response) => {
+    const stats = await salesService.getStats();
+    return this.ok(res, stats);
+  });
 
-  async getMonthlyStats(_req: Request, res: Response, next: NextFunction) {
-    try {
-      const stats = await salesService.getMonthlyStats();
-      res.json({
-        success: true,
-        data: stats,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-};
+  getMonthlyStats = asyncHandler(async (_req: Request, res: Response) => {
+    const stats = await salesService.getMonthlyStats();
+    return this.ok(res, stats);
+  });
+}
+
+export const salesController = new SalesController();

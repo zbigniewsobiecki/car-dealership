@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { vehiclesController } from '../controllers/vehicles.controller.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validation.middleware.js';
-import { createVehicleValidator } from '../middleware/validators/vehicle.validator.js';
+import { createVehicleValidator, updateVehicleValidator } from '../middleware/validators/vehicle.validator.js';
 
 const router: Router = Router();
 
@@ -11,9 +11,10 @@ router.use(authenticateToken);
 
 router.get('/', vehiclesController.getAll);
 router.get('/stats', vehiclesController.getStats);
+router.get('/recent', vehiclesController.getRecent);
 router.get('/:id', vehiclesController.getById);
 router.post('/', createVehicleValidator, validate, vehiclesController.create);
-router.put('/:id', vehiclesController.update);
+router.put('/:id', updateVehicleValidator, validate, vehiclesController.update);
 router.delete('/:id', vehiclesController.delete);
 
 export default router;

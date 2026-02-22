@@ -1,105 +1,65 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { vehiclesService } from '../services/vehicles.service.js';
-import { VehicleStatus, VehicleCondition, PaginatedResponse, Vehicle } from '@car-dealership/shared-types';
+import { VehicleStatus, VehicleCondition, VehicleType } from '@car-dealership/shared-types';
+import { BaseController } from './BaseController.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
-export const vehiclesController = {
-  async getAll(req: Request, res: Response, next: NextFunction) {
-    try {
-      const page = req.query.page ? parseInt(req.query.page as string) : 1;
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+class VehiclesController extends BaseController {
+  getAll = asyncHandler(async (req: Request, res: Response) => {
+    const page = req.query.page ? parseInt(req.query.page as string) : 1;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
 
-      const filters = {
-        make: req.query.make as string | undefined,
-        model: req.query.model as string | undefined,
-        yearMin: req.query.yearMin ? parseInt(req.query.yearMin as string) : undefined,
-        yearMax: req.query.yearMax ? parseInt(req.query.yearMax as string) : undefined,
-        priceMin: req.query.priceMin ? parseFloat(req.query.priceMin as string) : undefined,
-        priceMax: req.query.priceMax ? parseFloat(req.query.priceMax as string) : undefined,
-        status: req.query.status as VehicleStatus | undefined,
-        condition: req.query.condition as VehicleCondition | undefined,
-        search: req.query.search as string | undefined,
-        page,
-        limit,
-      };
+    const filters = {
+      make: req.query.make as string | undefined,
+      model: req.query.model as string | undefined,
+      yearMin: req.query.yearMin ? parseInt(req.query.yearMin as string) : undefined,
+      yearMax: req.query.yearMax ? parseInt(req.query.yearMax as string) : undefined,
+      priceMin: req.query.priceMin ? parseFloat(req.query.priceMin as string) : undefined,
+      priceMax: req.query.priceMax ? parseFloat(req.query.priceMax as string) : undefined,
+      status: req.query.status as VehicleStatus | undefined,
+      condition: req.query.condition as VehicleCondition | undefined,
+      type: req.query.type as VehicleType | undefined,
+      search: req.query.search as string | undefined,
+      sortBy: req.query.sortBy as string | undefined,
+      sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
+      page,
+      limit,
+    };
 
-      const { vehicles, total } = await vehiclesService.getAll(filters);
-      
-      const response: PaginatedResponse<Vehicle> = {
-        data: vehicles,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      };
+    const { data: vehicles, total } = await vehiclesService.getAll(filters);
+    return this.paginate(res, vehicles, page, limit, total);
+  });
 
-      res.json({
-        success: true,
-        ...response,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  getById = asyncHandler(async (req: Request, res: Response) => {
+    const vehicle = await vehiclesService.getById(req.params.id);
+    return this.ok(res, vehicle);
+  });
 
-  async getById(req: Request, res: Response, next: NextFunction) {
-    try {
-      const vehicle = await vehiclesService.getById(req.params.id);
-      res.json({
-        success: true,
-        data: vehicle,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  create = asyncHandler(async (req: Request, res: Response) => {
+    const vehicle = await vehiclesService.create(req.body, req.user!.userId);
+    return this.created(res, vehicle);
+  });
 
-  async create(req: Request, res: Response, next: NextFunction) {
-    try {
-      const vehicle = await vehiclesService.create(req.body, req.user!.userId);
-      res.status(201).json({
-        success: true,
-        data: vehicle,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  update = asyncHandler(async (req: Request, res: Response) => {
+    const vehicle = await vehiclesService.update(req.params.id, req.body);
+    return this.ok(res, vehicle);
+  });
 
-  async update(req: Request, res: Response, next: NextFunction) {
-    try {
-      const vehicle = await vehiclesService.update(req.params.id, req.body);
-      res.json({
-        success: true,
-        data: vehicle,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  delete = asyncHandler(async (req: Request, res: Response) => {
+    await vehiclesService.delete(req.params.id);
+    return this.message(res, 'Vehicle deleted successfully');
+  });
 
-  async delete(req: Request, res: Response, next: NextFunction) {
-    try {
-      await vehiclesService.delete(req.params.id);
-      res.json({
-        success: true,
-        message: 'Vehicle deleted successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  getStats = asyncHandler(async (_req: Request, res: Response) => {
+    const stats = await vehiclesService.getStats();
+    return this.ok(res, stats);
+  });
 
-  async getStats(_req: Request, res: Response, next: NextFunction) {
-    try {
-      const stats = await vehiclesService.getStats();
-      res.json({
-        success: true,
-        data: stats,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-};
+  getRecent = asyncHandler(async (req: Request, res: Response) => {
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+    const vehicles = await vehiclesService.getRecent(limit);
+    return this.ok(res, vehicles);
+  });
+}
+
+export const vehiclesController = new VehiclesController();

@@ -1,24 +1,17 @@
 import { VehicleModel } from '../models/Vehicle.model.js';
 import { AppError } from '../middleware/errorHandler.middleware.js';
 import {
+  Vehicle,
   CreateVehicleDto,
   UpdateVehicleDto,
-  VehicleFilters,
   VehicleStats,
 } from '@car-dealership/shared-types';
+import { BaseService } from './BaseService.js';
 
-export const vehiclesService = {
-  async getAll(filters?: VehicleFilters) {
-    return VehicleModel.findAll(filters);
-  },
-
-  async getById(id: string) {
-    const vehicle = await VehicleModel.findById(id);
-    if (!vehicle) {
-      throw new AppError(404, 'Vehicle not found');
-    }
-    return vehicle;
-  },
+class VehiclesService extends BaseService<Vehicle, CreateVehicleDto, UpdateVehicleDto, Record<string, unknown>> {
+  constructor() {
+    super(VehicleModel, 'Vehicle');
+  }
 
   async create(data: CreateVehicleDto, createdBy: string) {
     // Check if VIN already exists
@@ -27,15 +20,12 @@ export const vehiclesService = {
       throw new AppError(400, 'Vehicle with this VIN already exists');
     }
 
-    return VehicleModel.create(data, createdBy);
-  },
+    return super.create(data, createdBy);
+  }
 
   async update(id: string, data: UpdateVehicleDto) {
     // Check if vehicle exists
-    const existing = await VehicleModel.findById(id);
-    if (!existing) {
-      throw new AppError(404, 'Vehicle not found');
-    }
+    const existing = await this.getById(id);
 
     // If VIN is being updated, check it doesn't conflict
     if (data.vin && data.vin !== existing.vin) {
@@ -45,23 +35,21 @@ export const vehiclesService = {
       }
     }
 
-    const updated = await VehicleModel.update(id, data);
-    if (!updated) {
-      throw new AppError(404, 'Vehicle not found');
-    }
-
-    return updated;
-  },
+    return super.update(id, data);
+  }
 
   async delete(id: string) {
-    const deleted = await VehicleModel.delete(id);
-    if (!deleted) {
-      throw new AppError(404, 'Vehicle not found');
-    }
+    await super.delete(id);
     return { success: true };
-  },
+  }
 
   async getStats(): Promise<VehicleStats> {
     return VehicleModel.getStats();
-  },
-};
+  }
+
+  async getRecent(limit: number) {
+    return VehicleModel.findRecent(limit);
+  }
+}
+
+export const vehiclesService = new VehiclesService();

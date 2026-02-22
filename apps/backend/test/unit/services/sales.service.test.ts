@@ -98,7 +98,7 @@ describe('salesService', () => {
 
       expect(mockVehicleModel.findById).toHaveBeenCalledWith(createDto.vehicleId);
       expect(mockCustomerModel.findById).toHaveBeenCalledWith(createDto.customerId);
-      expect(mockSaleModel.create).toHaveBeenCalledWith(createDto);
+      expect(mockSaleModel.create).toHaveBeenCalledWith(createDto, undefined);
       expect(result).toEqual(createdSale);
     });
 

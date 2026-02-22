@@ -1,5 +1,6 @@
-import { Vehicle } from '@car-dealership/shared-types';
-import { Edit, Trash2, Car } from 'lucide-react';
+import { Vehicle, VehicleType } from '@car-dealership/shared-types';
+import { Edit, Trash2, Car, Bike, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 
 interface VehicleCardProps {
@@ -16,12 +17,18 @@ const statusColors = {
 };
 
 export const VehicleCard = ({ vehicle, onEdit, onDelete }: VehicleCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="card hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="bg-primary-100 p-3 rounded-lg">
-            <Car className="h-6 w-6 text-primary-600" />
+            {vehicle.type === VehicleType.MOTORCYCLE ? (
+              <Bike className="h-6 w-6 text-primary-600" />
+            ) : (
+              <Car className="h-6 w-6 text-primary-600" />
+            )}
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
@@ -55,9 +62,22 @@ export const VehicleCard = ({ vehicle, onEdit, onDelete }: VehicleCardProps) => 
             </p>
           </div>
         )}
+        {vehicle.type === VehicleType.MOTORCYCLE && vehicle.engineDisplacement && (
+          <div>
+            <p className="text-sm text-gray-500">Engine</p>
+            <p className="text-lg font-semibold text-gray-900">
+              {vehicle.engineDisplacement} cc
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
+        {vehicle.type === VehicleType.MOTORCYCLE && vehicle.category && (
+          <span className="px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium">
+            {vehicle.category}
+          </span>
+        )}
         {vehicle.condition && (
           <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs capitalize">
             {vehicle.condition.replace('_', ' ')}
@@ -75,21 +95,30 @@ export const VehicleCard = ({ vehicle, onEdit, onDelete }: VehicleCardProps) => 
         )}
       </div>
 
-      <div className="flex space-x-2 pt-4 border-t border-gray-200">
+      <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
         <button
-          onClick={() => onEdit(vehicle)}
-          className="flex-1 btn btn-secondary flex items-center justify-center space-x-2"
+          onClick={() => navigate(`/vehicles/${vehicle.id}`)}
+          className="btn btn-primary flex items-center justify-center space-x-2"
         >
-          <Edit className="h-4 w-4" />
-          <span>Edit</span>
+          <Eye className="h-4 w-4" />
+          <span>View Details</span>
         </button>
-        <button
-          onClick={() => onDelete(vehicle)}
-          className="flex-1 btn btn-danger flex items-center justify-center space-x-2"
-        >
-          <Trash2 className="h-4 w-4" />
-          <span>Delete</span>
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => onEdit(vehicle)}
+            className="flex-1 btn btn-secondary flex items-center justify-center space-x-2"
+          >
+            <Edit className="h-4 w-4" />
+            <span>Edit</span>
+          </button>
+          <button
+            onClick={() => onDelete(vehicle)}
+            className="flex-1 btn btn-danger flex items-center justify-center space-x-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Delete</span>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -40,14 +40,17 @@ const createTables = async () => {
         notes TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP WITH TIME ZONE,
         created_by UUID REFERENCES users(id)
       );
     `);
     console.log('✓ Created customers table');
 
     // Create indexes for customers
-    await query('CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);');
     await query('CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(last_name, first_name);');
+    await query('CREATE INDEX IF NOT EXISTS idx_customers_deleted_at ON customers(deleted_at);');
+    // Create partial unique index for email (only for active customers)
+    await query('CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_active ON customers(email) WHERE deleted_at IS NULL;');
     console.log('✓ Created customers indexes');
 
     // Create vehicles table
@@ -62,6 +65,7 @@ const createTables = async () => {
         mileage INTEGER,
         price DECIMAL(12, 2) NOT NULL,
         cost DECIMAL(12, 2),
+        type VARCHAR(50) NOT NULL DEFAULT 'car' CHECK (type IN ('car', 'motorcycle')),
         status VARCHAR(50) NOT NULL CHECK (status IN ('available', 'sold', 'reserved', 'maintenance')),
         condition VARCHAR(50) CHECK (condition IN ('new', 'used', 'certified_pre_owned')),
         body_type VARCHAR(50),
@@ -88,6 +92,7 @@ const createTables = async () => {
     await query('CREATE INDEX IF NOT EXISTS idx_vehicles_make_model ON vehicles(make, model);');
     await query('CREATE INDEX IF NOT EXISTS idx_vehicles_year ON vehicles(year);');
     await query('CREATE INDEX IF NOT EXISTS idx_vehicles_price ON vehicles(price);');
+    await query('CREATE INDEX IF NOT EXISTS idx_vehicles_type ON vehicles(type);');
     console.log('✓ Created vehicles indexes');
 
     // Create sales table
