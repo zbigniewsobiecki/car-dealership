@@ -7,6 +7,7 @@ import { Customers } from './pages/Customers';
 import { CustomerDetails } from './pages/CustomerDetails';
 import { Sales } from './pages/Sales';
 import { Repairs } from './pages/Repairs';
+import { Reports } from './pages/Reports';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Layout } from './components/layout/Layout';
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/customers/:id" element={<CustomerDetails />} />
             <Route path="/sales" element={<Sales />} />
             <Route path="/repairs" element={<Repairs />} />
+            <Route path="/reports" element={<Reports />} />
           </Route>
         </Route>
       </Routes>

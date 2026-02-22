@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Car, Users, ShoppingCart, Wrench } from 'lucide-react';
+import { LayoutDashboard, Car, Users, ShoppingCart, Wrench, BarChart3 } from 'lucide-react';
 import clsx from 'clsx';
+import { useAuthStore } from '../../store/authStore';
+import { UserRole } from '@car-dealership/shared-types';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -8,13 +10,21 @@ const navigation = [
   { name: 'Customers', href: '/customers', icon: Users },
   { name: 'Sales', href: '/sales', icon: ShoppingCart },
   { name: 'Repairs', href: '/repairs', icon: Wrench },
+  { name: 'Reports', href: '/reports', icon: BarChart3, adminOnly: true },
 ];
 
 export const Sidebar = () => {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === UserRole.ADMIN;
+
+  const filteredNavigation = navigation.filter(
+    (item) => !item.adminOnly || isAdmin
+  );
+
   return (
     <aside className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-20">
       <nav className="p-4 space-y-2">
-        {navigation.map((item) => (
+        {filteredNavigation.map((item) => (
           <NavLink
             key={item.name}
             to={item.href}

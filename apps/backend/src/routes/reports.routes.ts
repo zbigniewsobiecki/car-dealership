@@ -11,5 +11,6 @@ router.use(authenticateToken);
 router.use(requireRole(UserRole.ADMIN));
 
 router.get('/revenue', reportsController.getRevenue);
+router.get('/monthly', reportsController.getMonthlyStats);
 
 export default router;
