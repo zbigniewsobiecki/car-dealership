@@ -1,9 +1,9 @@
 import api from './api';
-import { Sale, CreateSaleDto, UpdateSaleDto } from '@car-dealership/shared-types';
+import { Sale, CreateSaleDto, UpdateSaleDto, PaginationParams } from '@car-dealership/shared-types';
 
 export const salesService = {
-  async getAll() {
-    const response = await api.get('/sales');
+  async getAll(params?: PaginationParams) {
+    const response = await api.get('/sales', { params });
     return response.data.data as Sale[];
   },
 

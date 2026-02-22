@@ -9,6 +9,7 @@ import {
   useUpdateSale,
   useDeleteSale,
   useSalesStats,
+  useMonthlySalesStats,
 } from '../../../src/hooks/useSales';
 
 // Create a wrapper with QueryClientProvider
@@ -109,7 +110,20 @@ describe('useSales hooks', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
       expect(result.current.data).toBeDefined();
-      expect(result.current.data).toHaveProperty('totalSales');
+      expect(result.current.data).toHaveProperty('total_sales');
+    });
+  });
+
+  describe('useMonthlySalesStats', () => {
+    it('should fetch monthly sales stats', async () => {
+      const { result } = renderHook(() => useMonthlySalesStats(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(result.current.data).toBeDefined();
+      expect(Array.isArray(result.current.data)).toBe(true);
     });
   });
 });

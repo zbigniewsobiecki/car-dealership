@@ -6,6 +6,7 @@ import { VehicleDetails } from './pages/VehicleDetails';
 import { Customers } from './pages/Customers';
 import { CustomerDetails } from './pages/CustomerDetails';
 import { Sales } from './pages/Sales';
+import { SalesDashboard } from './pages/SalesDashboard';
 import { Repairs } from './pages/Repairs';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Layout } from './components/layout/Layout';
@@ -25,6 +26,7 @@ function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/customers/:id" element={<CustomerDetails />} />
             <Route path="/sales" element={<Sales />} />
+            <Route path="/sales-dashboard" element={<SalesDashboard />} />
             <Route path="/repairs" element={<Repairs />} />
           </Route>
         </Route>

@@ -20,11 +20,12 @@ describe('Sidebar', () => {
       { name: 'Vehicles', href: '/vehicles' },
       { name: 'Customers', href: '/customers' },
       { name: 'Sales', href: '/sales' },
+      { name: 'Sales Dashboard', href: '/sales-dashboard' },
       { name: 'Repairs', href: '/repairs' },
     ];
 
     links.forEach((link) => {
-      const navLink = screen.getByRole('link', { name: new RegExp(link.name, 'i') });
+      const navLink = screen.getByRole('link', { name: link.name });
       expect(navLink).toBeInTheDocument();
       expect(navLink).toHaveAttribute('href', link.href);
     });
@@ -33,8 +34,8 @@ describe('Sidebar', () => {
   it('highlights the active route', () => {
     renderSidebar(['/vehicles']);
 
-    const vehiclesLink = screen.getByRole('link', { name: /vehicles/i });
-    const dashboardLink = screen.getByRole('link', { name: /dashboard/i });
+    const vehiclesLink = screen.getByRole('link', { name: 'Vehicles' });
+    const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
 
     // Active link should have specific classes
     expect(vehiclesLink).toHaveClass('bg-primary-50');

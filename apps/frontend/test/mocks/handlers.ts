@@ -236,22 +236,37 @@ export const handlers = [
     return HttpResponse.json({
       success: true,
       data: {
-        totalSales: 10,
-        totalRevenue: 200000,
-        pendingSales: 3,
-        completedSales: 6,
-        cancelledSales: 1,
+        total_sales: 10,
+        total_revenue: 200000,
+        pending_sales: 3,
+        completed_sales: 6,
+        average_sale_price: 20000,
       },
     });
   }),
 
-  http.get(`${API_URL}/sales/monthly`, () => {
+  http.get(`${API_URL}/sales/stats/monthly`, () => {
     return HttpResponse.json({
       success: true,
       data: [
-        { month: '2024-01', count: 5, revenue: 100000 },
-        { month: '2024-02', count: 5, revenue: 100000 },
+        { month: '2024-01-01', sales_count: 5, revenue: 100000 },
+        { month: '2024-02-01', sales_count: 5, revenue: 100000 },
       ],
+    });
+  }),
+
+  http.get(`${API_URL}/reports/revenue`, ({ request }) => {
+    const url = new URL(request.url);
+    const from = url.searchParams.get('from');
+    const to = url.searchParams.get('to');
+
+    return HttpResponse.json({
+      success: true,
+      data: {
+        totalRevenue: from && to ? 50000 : 200000,
+        saleCount: from && to ? 2 : 10,
+        averageSalePrice: 25000,
+      },
     });
   }),
 

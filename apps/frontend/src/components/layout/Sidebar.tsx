@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Car, Users, ShoppingCart, Wrench } from 'lucide-react';
+import { LayoutDashboard, Car, Users, ShoppingCart, Wrench, TrendingUp } from 'lucide-react';
 import clsx from 'clsx';
 
 const navigation = [
@@ -7,6 +7,7 @@ const navigation = [
   { name: 'Vehicles', href: '/vehicles', icon: Car },
   { name: 'Customers', href: '/customers', icon: Users },
   { name: 'Sales', href: '/sales', icon: ShoppingCart },
+  { name: 'Sales Dashboard', href: '/sales-dashboard', icon: TrendingUp },
   { name: 'Repairs', href: '/repairs', icon: Wrench },
 ];
 

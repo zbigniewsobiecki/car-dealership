@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { salesService } from '../services/sales.service';
-import { CreateSaleDto, UpdateSaleDto } from '@car-dealership/shared-types';
+import { CreateSaleDto, UpdateSaleDto, PaginationParams } from '@car-dealership/shared-types';
 
-export const useSales = () => {
+export const useSales = (params?: PaginationParams) => {
   return useQuery({
-    queryKey: ['sales'],
-    queryFn: () => salesService.getAll(),
+    queryKey: ['sales', params],
+    queryFn: () => salesService.getAll(params),
   });
 };
 
@@ -58,5 +58,12 @@ export const useSalesStats = () => {
   return useQuery({
     queryKey: ['sales', 'stats'],
     queryFn: () => salesService.getStats(),
+  });
+};
+
+export const useMonthlySalesStats = () => {
+  return useQuery({
+    queryKey: ['sales', 'stats', 'monthly'],
+    queryFn: () => salesService.getMonthlyStats(),
   });
 };
