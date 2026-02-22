@@ -4,6 +4,7 @@ import { Dashboard } from '../../src/pages/Dashboard';
 import { MemoryRouter } from 'react-router-dom';
 import { useVehicleStats, useRecentVehicles } from '../../src/hooks/useVehicles';
 import { useSalesStats } from '../../src/hooks/useSales';
+import { useMonthlyStats } from '../../src/hooks/useReports';
 
 // Mock the hooks
 vi.mock('../../src/hooks/useVehicles', () => ({
@@ -13,6 +14,10 @@ vi.mock('../../src/hooks/useVehicles', () => ({
 
 vi.mock('../../src/hooks/useSales', () => ({
   useSalesStats: vi.fn(),
+}));
+
+vi.mock('../../src/hooks/useReports', () => ({
+  useMonthlyStats: vi.fn(),
 }));
 
 const renderDashboard = () => {
@@ -32,6 +37,7 @@ describe('Dashboard Page', () => {
     vi.mocked(useVehicleStats).mockReturnValue({ isLoading: true, data: undefined } as never);
     vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: undefined } as never);
     vi.mocked(useRecentVehicles).mockReturnValue({ isLoading: false, data: undefined } as never);
+    vi.mocked(useMonthlyStats).mockReturnValue({ isLoading: false, data: undefined } as never);
 
     renderDashboard();
     expect(screen.getByText(/Loading dashboard.../i)).toBeInTheDocument();
@@ -62,6 +68,11 @@ describe('Dashboard Page', () => {
     } as never);
 
     vi.mocked(useRecentVehicles).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as never);
+
+    vi.mocked(useMonthlyStats).mockReturnValue({
       isLoading: false,
       data: [],
     } as never);
@@ -129,6 +140,11 @@ describe('Dashboard Page', () => {
     vi.mocked(useVehicleStats).mockReturnValue({ isLoading: false, data: {} } as never);
     vi.mocked(useSalesStats).mockReturnValue({ isLoading: false, data: {} } as never);
     vi.mocked(useRecentVehicles).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as never);
+
+    vi.mocked(useMonthlyStats).mockReturnValue({
       isLoading: false,
       data: [],
     } as never);

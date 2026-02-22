@@ -33,3 +33,17 @@ export interface RevenueReport {
   saleCount: number;
   averageSalePrice: number;
 }
+
+export interface MonthlySalesStats {
+  month: string;
+  salesCount: number;
+  revenue: number;
+}
+
+export interface ReportSummary {
+  totalRevenue: number;
+  averageSalePrice: number;
+  totalSales: number;
+  pendingSales: number;
+  completedSales: number;
+}

@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 // Mock salesService
 const mockSalesService = {
   getRevenueReport: vi.fn(),
+  getMonthlyStats: vi.fn(),
 };
 
 vi.mock('../../../src/services/sales.service.js', () => ({
@@ -115,6 +116,36 @@ describe('reportsController', () => {
         data: null,
       });
       expect(next).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getMonthlyStats', () => {
+    it('should return monthly stats successfully', async () => {
+      const mockStats = [
+        { month: '2023-01-01', salesCount: 5, revenue: 100000 },
+        { month: '2023-02-01', salesCount: 3, revenue: 60000 },
+      ];
+      mockSalesService.getMonthlyStats.mockResolvedValue(mockStats);
+
+      await reportsController.getMonthlyStats(req as Request, res as Response, next);
+
+      expect(mockSalesService.getMonthlyStats).toHaveBeenCalled();
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockStats,
+      });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should call next with error when service fails', async () => {
+      const error = new Error('Database error');
+      mockSalesService.getMonthlyStats.mockRejectedValue(error);
+
+      await reportsController.getMonthlyStats(req as Request, res as Response, next);
+
+      expect(mockSalesService.getMonthlyStats).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 });

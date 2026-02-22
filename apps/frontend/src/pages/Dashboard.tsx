@@ -1,15 +1,18 @@
 import { useVehicleStats, useRecentVehicles } from '../hooks/useVehicles';
 import { useSalesStats } from '../hooks/useSales';
+import { useMonthlyStats } from '../hooks/useReports';
 import { Car, DollarSign, TrendingUp, Package } from 'lucide-react';
 import { StatsCard } from '../components/dashboard/StatsCard';
 import { RecentVehiclesTable } from '../components/dashboard/RecentVehiclesTable';
+import { RevenueChart } from '../components/reports/RevenueChart';
 
 export const Dashboard = () => {
   const { data: vehicleStats, isLoading: vehicleStatsLoading } = useVehicleStats();
   const { data: salesStats, isLoading: salesStatsLoading } = useSalesStats();
   const { data: recentVehicles, isLoading: recentVehiclesLoading } = useRecentVehicles(5);
+  const { data: monthlyStats, isLoading: monthlyLoading } = useMonthlyStats();
 
-  const isLoading = vehicleStatsLoading || salesStatsLoading || recentVehiclesLoading;
+  const isLoading = vehicleStatsLoading || salesStatsLoading || recentVehiclesLoading || monthlyLoading;
 
   if (isLoading) {
     return (
@@ -131,6 +134,16 @@ export const Dashboard = () => {
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 mt-6">
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Monthly Revenue Trend</h2>
+            <TrendingUp className="h-5 w-5 text-primary-500" />
+          </div>
+          <RevenueChart data={monthlyStats || []} height={200} showLabels={true} />
         </div>
       </div>
 
