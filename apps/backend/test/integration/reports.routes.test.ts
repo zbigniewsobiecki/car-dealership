@@ -105,4 +105,33 @@ describe('Reports Routes Integration', () => {
       expect(response.body.error.message).toBe('Invalid start date format');
     });
   });
+
+  describe('GET /api/reports/monthly-sales', () => {
+    it('should return monthly sales stats for admin', async () => {
+      const mockStats = [
+        { month: '2024-01-01', sales_count: '5', revenue: '100000.00' },
+        { month: '2024-02-01', sales_count: '3', revenue: '75000.00' },
+      ];
+      mockQuery.mockResolvedValueOnce({ rows: mockStats });
+
+      const response = await request(app)
+        .get('/api/reports/monthly-sales')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toEqual([
+        { month: '2024-01', salesCount: 5, revenue: 100000 },
+        { month: '2024-02', salesCount: 3, revenue: 75000 },
+      ]);
+    });
+
+    it('should return 403 for salesperson', async () => {
+      const response = await request(app)
+        .get('/api/reports/monthly-sales')
+        .set('Authorization', `Bearer ${salespersonToken}`);
+
+      expect(response.status).toBe(403);
+    });
+  });
 });

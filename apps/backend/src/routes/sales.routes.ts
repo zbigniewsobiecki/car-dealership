@@ -9,7 +9,7 @@ router.use(authenticateToken);
 
 router.get('/', salesController.getAll);
 router.get('/stats', salesController.getStats);
-router.get('/stats/monthly', salesController.getMonthlyStats);
+router.get('/stats/monthly', salesController.getMonthlySales);
 router.get('/:id', salesController.getById);
 router.post('/', salesController.create);
 router.put('/:id', salesController.update);

@@ -295,18 +295,21 @@ describe('salesService', () => {
     });
   });
 
-  describe('getMonthlyStats', () => {
-    it('should return monthly stats', async () => {
+  describe('getMonthlySales', () => {
+    it('should return monthly sales stats', async () => {
       const monthlyStats = [
-        { month: '2024-01', sales_count: 5, revenue: 100000 },
-        { month: '2024-02', sales_count: 5, revenue: 100000 },
+        { month: '2024-01-01', sales_count: '5', revenue: '100000.00' },
+        { month: '2024-02-01', sales_count: '3', revenue: '75000.00' },
       ];
       mockSaleModel.getMonthlyStats.mockResolvedValue(monthlyStats);
 
-      const result = await salesService.getMonthlyStats();
+      const result = await salesService.getMonthlySales();
 
       expect(mockSaleModel.getMonthlyStats).toHaveBeenCalled();
-      expect(result).toEqual(monthlyStats);
+      expect(result).toEqual([
+        { month: '2024-01', salesCount: 5, revenue: 100000 },
+        { month: '2024-02', salesCount: 3, revenue: 75000 },
+      ]);
     });
   });
 });

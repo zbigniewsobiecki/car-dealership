@@ -2,7 +2,7 @@ import { SaleModel } from '../models/Sale.model.js';
 import { VehicleModel } from '../models/Vehicle.model.js';
 import { CustomerModel } from '../models/Customer.model.js';
 import { AppError } from '../middleware/errorHandler.middleware.js';
-import { Sale, CreateSaleDto, UpdateSaleDto, VehicleStatus, SaleStatus } from '@car-dealership/shared-types';
+import { Sale, CreateSaleDto, UpdateSaleDto, VehicleStatus, SaleStatus, MonthlySalesStats } from '@car-dealership/shared-types';
 import { BaseService } from './BaseService.js';
 
 class SalesService extends BaseService<Sale, CreateSaleDto, UpdateSaleDto> {
@@ -66,8 +66,13 @@ class SalesService extends BaseService<Sale, CreateSaleDto, UpdateSaleDto> {
     return SaleModel.getStats();
   }
 
-  async getMonthlyStats() {
-    return SaleModel.getMonthlyStats();
+  async getMonthlySales(): Promise<MonthlySalesStats[]> {
+    const stats = await SaleModel.getMonthlyStats();
+    return stats.map(row => ({
+      month: new Date(row.month).toISOString().substring(0, 7),
+      salesCount: parseInt(row.sales_count, 10),
+      revenue: parseFloat(row.revenue),
+    }));
   }
 
   async getRevenueReport(from?: string, to?: string) {

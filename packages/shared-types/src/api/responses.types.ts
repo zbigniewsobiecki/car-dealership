@@ -33,3 +33,9 @@ export interface RevenueReport {
   saleCount: number;
   averageSalePrice: number;
 }
+
+export interface MonthlySalesStats {
+  month: string; // YYYY-MM format
+  salesCount: number;
+  revenue: number;
+}

@@ -19,4 +19,17 @@ export const reportsController = {
       next(error);
     }
   },
+
+  async getMonthlySales(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const stats = await salesService.getMonthlySales();
+
+      res.json({
+        success: true,
+        data: stats,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

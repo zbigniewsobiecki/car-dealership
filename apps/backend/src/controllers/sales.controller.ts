@@ -34,8 +34,8 @@ class SalesController extends BaseController {
     return this.ok(res, stats);
   });
 
-  getMonthlyStats = asyncHandler(async (_req: Request, res: Response) => {
-    const stats = await salesService.getMonthlyStats();
+  getMonthlySales = asyncHandler(async (_req: Request, res: Response) => {
+    const stats = await salesService.getMonthlySales();
     return this.ok(res, stats);
   });
 }
