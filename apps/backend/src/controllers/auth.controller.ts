@@ -1,54 +1,30 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { authService } from '../services/auth.service.js';
+import { BaseController } from './BaseController.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
-export const authController = {
-  async register(req: Request, res: Response, next: NextFunction) {
-    try {
-      const result = await authService.register(req.body);
-      res.status(201).json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+class AuthController extends BaseController {
+  register = asyncHandler(async (req: Request, res: Response) => {
+    const result = await authService.register(req.body);
+    return this.created(res, result);
+  });
 
-  async login(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, password } = req.body;
-      const result = await authService.login(email, password);
-      res.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  login = asyncHandler(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const result = await authService.login(email, password);
+    return this.ok(res, result);
+  });
 
-  async refresh(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { refreshToken } = req.body;
-      const result = await authService.refreshToken(refreshToken);
-      res.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  refresh = asyncHandler(async (req: Request, res: Response) => {
+    const { refreshToken } = req.body;
+    const result = await authService.refreshToken(refreshToken);
+    return this.ok(res, result);
+  });
 
-  async getMe(req: Request, res: Response, next: NextFunction) {
-    try {
-      const user = await authService.getMe(req.user!.userId);
-      res.json({
-        success: true,
-        data: user,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-};
+  getMe = asyncHandler(async (req: Request, res: Response) => {
+    const user = await authService.getMe(req.user!.userId);
+    return this.ok(res, user);
+  });
+}
+
+export const authController = new AuthController();
