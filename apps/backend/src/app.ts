@@ -14,6 +14,7 @@ import salesRoutes from './routes/sales.routes.js';
 import repairsRoutes from './routes/repairs.routes.js';
 import reportsRoutes from './routes/reports.routes.js';
 import healthRoutes from './routes/health.routes.js';
+import paymentsRoutes from './routes/payments.routes.js';
 
 const app: express.Application = express();
 
@@ -55,6 +56,7 @@ app.use('/api/customers', customersRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/repairs', repairsRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 // 404 handler
 app.use((_req, res) => {

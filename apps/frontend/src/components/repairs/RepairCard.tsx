@@ -1,11 +1,13 @@
-import { Repair } from '@car-dealership/shared-types';
+import { Repair, RepairStatus } from '@car-dealership/shared-types';
 import { Edit, Trash2, Wrench } from 'lucide-react';
 import clsx from 'clsx';
+import { PaymentButton } from '../payments/PaymentButton';
 
 interface RepairCardProps {
   repair: Repair;
   onEdit: (repair: Repair) => void;
   onDelete: (repair: Repair) => void;
+  onPaymentSuccess?: () => void;
 }
 
 const statusColors = {
@@ -15,7 +17,7 @@ const statusColors = {
   cancelled: 'bg-gray-100 text-gray-800',
 };
 
-export const RepairCard = ({ repair, onEdit, onDelete }: RepairCardProps) => {
+export const RepairCard = ({ repair, onEdit, onDelete, onPaymentSuccess }: RepairCardProps) => {
   const formatDate = (date: Date) => {
     return date.toLocaleDateString();
   };
@@ -80,21 +82,28 @@ export const RepairCard = ({ repair, onEdit, onDelete }: RepairCardProps) => {
         )}
       </div>
 
-      <div className="flex space-x-2 pt-4 border-t border-gray-200">
-        <button
-          onClick={() => onEdit(repair)}
-          className="flex-1 btn btn-secondary flex items-center justify-center space-x-2"
-        >
-          <Edit className="h-4 w-4" />
-          <span>Edit</span>
-        </button>
-        <button
-          onClick={() => onDelete(repair)}
-          className="flex-1 btn btn-danger flex items-center justify-center space-x-2"
-        >
-          <Trash2 className="h-4 w-4" />
-          <span>Delete</span>
-        </button>
+      <div className="space-y-2 pt-4 border-t border-gray-200">
+        {repair.status === RepairStatus.COMPLETED && repair.cost && repair.cost > 0 && (
+          <div className="flex justify-center mb-2">
+            <PaymentButton repair={repair} onPaymentSuccess={onPaymentSuccess} />
+          </div>
+        )}
+        <div className="flex space-x-2">
+          <button
+            onClick={() => onEdit(repair)}
+            className="flex-1 btn btn-secondary flex items-center justify-center space-x-2"
+          >
+            <Edit className="h-4 w-4" />
+            <span>Edit</span>
+          </button>
+          <button
+            onClick={() => onDelete(repair)}
+            className="flex-1 btn btn-danger flex items-center justify-center space-x-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Delete</span>
+          </button>
+        </div>
       </div>
     </div>
   );

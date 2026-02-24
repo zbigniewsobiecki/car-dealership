@@ -58,6 +58,11 @@ export const Repairs = () => {
     }
   };
 
+  const handlePaymentSuccess = () => {
+    // Payment hooks will auto-refresh the repairs list
+    console.log('Payment successful!');
+  };
+
   const handleSubmit = async (data: CreateRepairDto) => {
     try {
       if (editingRepair) {
@@ -105,6 +110,7 @@ export const Repairs = () => {
                 repair={repair}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onPaymentSuccess={handlePaymentSuccess}
               />
             ))}
           </div>

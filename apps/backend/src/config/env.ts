@@ -27,8 +27,14 @@ export const env = {
   },
 
   cors: {
-    origin: (process.env.CORS_ORIGIN === '*' 
-      ? '*' 
+    origin: (process.env.CORS_ORIGIN === '*'
+      ? '*'
       : (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',').map(o => o.trim())) as string | string[],
+  },
+
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY || '',
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
   },
 };

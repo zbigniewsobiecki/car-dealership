@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@car-dealership/shared-types": "workspace:*",
+    "@stripe/react-stripe-js": "^5.6.0",
+    "@stripe/stripe-js": "^8.8.0",
     "@tanstack/react-query": "^5.20.0",
     "axios": "^1.6.0",
     "clsx": "^2.1.0",
