@@ -27,6 +27,7 @@ import {
 
 // Example 1: Simple CRUD service (no filters, array response)
 // This is the simplest use case - just the basic CRUD operations
+/** @deprecated This is an example - do not use in production. Use createCrudService directly. */
 export const customersServiceExample = createCrudService<
   Customer,
   CreateCustomerDto,
@@ -35,6 +36,7 @@ export const customersServiceExample = createCrudService<
 
 // Example 2: CRUD service with custom methods
 // Extend the base service with entity-specific methods using the spread operator
+/** @deprecated This is an example - do not use in production. Use createCrudService directly. */
 export const customersServiceWithCustomMethods = {
   ...createCrudService<Customer, CreateCustomerDto, UpdateCustomerDto>('/customers'),
 
@@ -47,6 +49,7 @@ export const customersServiceWithCustomMethods = {
 
 // Example 3: CRUD service with filters and pagination
 // Use the filters generic and paginated config for services that support filtering
+/** @deprecated This is an example - do not use in production. Use createCrudService directly. */
 export const vehiclesServiceExample = {
   ...createCrudService<Vehicle, CreateVehicleDto, UpdateVehicleDto, VehicleFilters>(
     '/vehicles',
@@ -66,6 +69,7 @@ export const vehiclesServiceExample = {
 };
 
 // Example 4: Multiple custom methods
+/** @deprecated This is an example - do not use in production. Use createCrudService directly. */
 export const salesServiceExample = {
   ...createCrudService<Sale, CreateSaleDto, UpdateSaleDto>('/sales'),
 
@@ -82,6 +86,7 @@ export const salesServiceExample = {
 
 // Example 5: CRUD service with complex filters
 // The factory handles building URLSearchParams from any filter object
+/** @deprecated This is an example - do not use in production. Use createCrudService directly. */
 export const repairsServiceExample = createCrudService<
   Repair,
   CreateRepairDto,
@@ -91,6 +96,7 @@ export const repairsServiceExample = createCrudService<
 
 // Example 6: Overriding a base method
 // You can override any of the base CRUD methods if needed
+/** @deprecated This is an example - do not use in production. Use createCrudService directly. */
 export const customOverrideExample = {
   ...createCrudService<Customer, CreateCustomerDto, UpdateCustomerDto>('/customers'),
 

@@ -24,10 +24,10 @@ export interface CrudService<T, CreateDto, UpdateDto, Filters = Record<string, u
 /**
  * Builds URLSearchParams from a filters object, handling undefined/null values
  */
-function buildSearchParams(filters?: Record<string, unknown>): URLSearchParams {
+function buildSearchParams(filters?: unknown): URLSearchParams {
   const params = new URLSearchParams();
 
-  if (!filters) {
+  if (!filters || typeof filters !== 'object') {
     return params;
   }
 
@@ -43,6 +43,8 @@ function buildSearchParams(filters?: Record<string, unknown>): URLSearchParams {
     } else if (typeof value === 'string') {
       params.append(key, value);
     }
+    // Note: Arrays and objects are intentionally skipped as they're not typically
+    // used as URL query parameters in this context
   });
 
   return params;
@@ -90,7 +92,7 @@ export function createCrudService<
   T,
   CreateDto,
   UpdateDto,
-  Filters extends Record<string, unknown> = Record<string, unknown>
+  Filters = Record<string, unknown>
 >(
   basePath: string,
   config?: CrudServiceConfig
