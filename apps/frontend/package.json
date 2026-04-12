@@ -18,7 +18,7 @@
   "dependencies": {
     "@car-dealership/shared-types": "workspace:*",
     "@tanstack/react-query": "^5.20.0",
-    "axios": "^1.6.0",
+    "axios": "^1.15.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.323.0",
     "react": "^18.2.0",
