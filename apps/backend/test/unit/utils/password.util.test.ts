@@ -102,5 +102,13 @@ describe('passwordUtils', () => {
 
       expect(result).toBe(true);
     });
+
+    it('should round-trip a unicode password', async () => {
+      const password = 'pâsswörd🔐日本語';
+      const hash = await passwordUtils.hash(password);
+      const result = await passwordUtils.compare(password, hash);
+
+      expect(result).toBe(true);
+    });
   });
 });
