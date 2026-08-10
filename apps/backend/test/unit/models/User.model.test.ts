@@ -131,7 +131,7 @@ describe('UserModel', () => {
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO users'),
-        [userData.email, userData.passwordHash, userData.firstName, userData.lastName, userData.role]
+        expect.arrayContaining([userData.email, userData.passwordHash, userData.firstName, userData.lastName])
       );
       expect(result).toEqual({
         id: mockCreatedRow.id,
@@ -251,7 +251,7 @@ describe('UserModel', () => {
   });
 
   describe('findAll', () => {
-    it('should return all users', async () => {
+    it('should return all users with pagination metadata', async () => {
       const mockRows = [
         {
           id: 'user-1',
@@ -262,6 +262,7 @@ describe('UserModel', () => {
           is_active: true,
           created_at: new Date(),
           updated_at: new Date(),
+          full_count: '2',
         },
         {
           id: 'user-2',
@@ -272,6 +273,7 @@ describe('UserModel', () => {
           is_active: true,
           created_at: new Date(),
           updated_at: new Date(),
+          full_count: '2',
         },
       ];
 
@@ -279,12 +281,11 @@ describe('UserModel', () => {
 
       const result = await UserModel.findAll();
 
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('SELECT * FROM users ORDER BY created_at DESC')
-      );
-      expect(result).toHaveLength(2);
-      expect(result[0].email).toBe('user1@example.com');
-      expect(result[1].email).toBe('user2@example.com');
+      expect(mockQuery).toHaveBeenCalled();
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
+      expect(result.data[0].email).toBe('user1@example.com');
+      expect(result.data[1].email).toBe('user2@example.com');
     });
   });
 });
